@@ -16,6 +16,8 @@ resolution = (1000, 800)
 screen = pg.display.set_mode(resolution)
 w, h = pg.display.get_window_size()
 black = (0, 0, 0)
+white = (255, 255, 255)
+blue = (4, 6, 24)
 
 pg.display.set_caption('EduBang')
 icon = pg.image.load('source/Images/icon.png')
@@ -57,7 +59,7 @@ while running:
         if event.type == pg.QUIT:
             running = False
 
-    screen.fill(black)
+    screen.fill(blue)
 
     pg.draw.circle(screen, (255, 0, 0), (w / 2, h / 2), 30, 0)
 
