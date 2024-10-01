@@ -3,10 +3,14 @@ import math
 
 running = True
 
-resolution = (0, 0)
-screen = pg.display.set_mode(resolution, pg.FULLSCREEN)
+resolution = (1000, 800)
+screen = pg.display.set_mode(resolution)
 w,h = pg.display.get_window_size()
 black = (0, 0, 0)
+
+pg.display.set_caption('EduBang')
+icon = pg.image.load('icon.png')
+pg.display.set_icon(icon)
 
 class game:
 
