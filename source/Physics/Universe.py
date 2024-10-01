@@ -16,9 +16,11 @@ class Universe:
     def update(self) -> None:
         for corpse in self.corpses:
             for target in self.corpses:
+                corpse.update()
                 if target == corpse:
                     continue
                 corpse.attract(target)
+                
 
     # Dessiner l'univers
     def draw(self):

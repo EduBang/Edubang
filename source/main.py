@@ -1,5 +1,6 @@
 import pygame as pg
 import math
+from time import sleep
 
 from Physics.Corpse import Corpse
 from Physics.Gravitation import Gravitation
@@ -22,14 +23,13 @@ pg.display.set_icon(icon)
 
 universe = Universe(screen)
 
-# La gravitation se calculera automatiquement plus tard.
-tGravitation = Gravitation(10)
-tPosition = Position(100, 100)
-terre = Corpse(10, tPosition, 50, tGravitation, 0)
+terre = Corpse(10, (100, 100), 50, 0)
+terre.color = (0, 0, 255)
+terre.addForce(Vector(0, 0, 1))
+terre.addForce(Vector(0, 0, 1))
 
-mGravitation = Gravitation(5)
-mPosition = Position(500, 500)
-mars = Corpse(5, mPosition, 50, mGravitation, 0)
+mars = Corpse(5, (500, 500), 50, 0)
+mars.color = (255, 50, 50)
 
 universe.addCorpse(terre)
 universe.addCorpse(mars)
@@ -68,5 +68,6 @@ while running:
 
     game.draw_screen()
 
+    # sleep(1)
 
 game.quit_algo()

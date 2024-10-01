@@ -7,7 +7,7 @@ class Gravitation:
         self.spaces: dict = {}
         x = 0
         for i in range(-10, 0):
-            self.spaces[(x, x + self.space)] = (-i * 10, (-i - 1) * 10)
+            self.spaces[(x, x + self.space)] = (-i * 10)
             x += self.space
         return
 
@@ -18,8 +18,8 @@ class Gravitation:
         return self.space == value.space
 
     # Récupérer le "taux" de la forme selon une distance
-    def getAt(self, distance: Real) -> None:
+    def getAt(self, distance: Real) -> int:
         for i in self.spaces.keys():
             if i[0] < distance < i[1]:
                 return self.spaces[(i[0], i[1])]
-        return (0, 0)
+        return 0
