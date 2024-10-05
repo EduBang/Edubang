@@ -2,11 +2,11 @@ import pygame as pg
 import math
 from time import sleep
 
-from physics.Corpse import Corpse
-from physics.Gravitation import Gravitation
-from physics.Position import Position
-from physics.Universe import Universe
-from physics.Vector import Vector # Ne fonctionne pas encore.
+from Physics.Corpse import Corpse
+from Physics.Gravitation import Gravitation
+from Physics.Position import Position
+from Physics.Universe import Universe
+from Physics.Vector import Vector # Ne fonctionne pas encore.
 
 # Initialisation de Pygame
 pg.init()
