@@ -4,6 +4,9 @@ from math import *
 pg.init()
 
 # Initialisation
+pg.display.set_caption('EduBang')
+icon = pg.image.load('source/Images/icon.png')
+pg.display.set_icon(icon)
 running = True
 resolution = (1200, 1000)
 screen = pg.display.set_mode(resolution)
