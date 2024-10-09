@@ -1,5 +1,6 @@
 import pygame as pg
 from math import *
+from proto import proto
 
 pg.init()
 
@@ -14,28 +15,29 @@ black = (0, 0, 0)
 blue = (0, 0, 255)
 red = (255, 0, 0)
 
-class Game:
-
-    def draw_screen():
+with proto("Game") as Game:
+    @Game
+    def draw_screen(self):
         pg.display.update()
 
-
-    def quit_algo():
+    @Game
+    def quit_algo(self):
         pg.quit()
         quit()
 
 #class trajectoire
-class Path:
+with proto("Path") as Path:
     # dessiner trajectoire terre
-    def draw_corps_path(path, color):
+    @Path
+    def draw_corps_path(self, path, color):
         for pos in path:
             pg.draw.circle(screen,  color, (float(pos[0]), float(pos[1])), 2)
 
 
 
-class Vectors:#jsp
-
-    def get_unit_vector(pos1, pos2):
+with proto("Vectors") as Vectors:
+    @Vectors
+    def get_unit_vector(self, pos1, pos2):
         dif_x = pos2[0] - pos1[0]
         dif_y = pos2[1] - pos1[1]
         distance = sqrt(dif_x ** 2 + dif_y ** 2)
@@ -47,20 +49,21 @@ class Vectors:#jsp
         y_v_unit = dif_y / distance
         return (x_v_unit, y_v_unit)
 
-
-class Corps:
-    def __init__(self, m, radius, pos, color, v_initial_x, v_initial_y):#c'est pas bon
+with proto("Corps") as Corps:
+    @Corps
+    def new(self, m, radius, pos, color, v_initial_x, v_initial_y):#c'est pas bon
         self.mass = m
         self.radius = radius
         self.pos = pos
         self.color = color
         self.velocity = [v_initial_x, v_initial_y]  # Vitesse initiale
         self.path = []
-
-
-    def draw(self):#c'est bon
+    
+    @Corps
+    def draw(self):
         pg.draw.circle(screen, self.color, (float(self.pos[0]), float(self.pos[1])), self.radius)
-
+    
+    @Corps
     def update_position(self, acc, dt):
         self.path.append(self.pos)
         # Mise à jour de la vitesse (conserve l'inertie)
@@ -69,15 +72,14 @@ class Corps:
         
         # Mise à jour de la position en fonction de la nouvelle vitesse (avec inertie)
         self.pos = (self.pos[0] + self.velocity[0] * dt, 
-                    self.pos[1] + self.velocity[1] * dt)
-      
+        self.pos[1] + self.velocity[1] * dt)
 
-class Physics:
-    
-    def get_distance(corps1, corps2):
+with proto("Physics") as Physics:
+    @Physics
+    def get_distance(self, corps1, corps2):
         return sqrt(((corps1.pos[0] - corps2.pos[0]) ** 2) + ((corps1.pos[1] - corps2.pos[1]) ** 2))
-
-    def get_attraction(mass1, mass2, d, radius):
+    @Physics
+    def get_attraction(self, mass1, mass2, d, radius):
         G = 6.67e-11
         
 
