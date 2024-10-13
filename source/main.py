@@ -90,7 +90,9 @@ with proto("Physics") as Physics:
         else :
             return G * ((mass1 * mass2) / (d ** 2))
         
-    #def colision(corps1, corps2)
+    
+    #@Physics
+    #def collision(self, mass1, mass2, d, radius):
 
 
     
