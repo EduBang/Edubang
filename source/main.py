@@ -2,6 +2,12 @@ import pygame as pg
 from math import *
 from proto import proto
 
+
+from vectors.Vectors import *
+from pysics.Physics import *
+from Corpse.Corps import *
+
+
 pg.init()
 
 # Initialisation
@@ -33,66 +39,6 @@ with proto("Path") as Path:
         for pos in path:
             pg.draw.circle(screen,  color, (float(pos[0]), float(pos[1])), 2)
 
-
-
-with proto("Vectors") as Vectors:
-    @Vectors
-    def get_unit_vector(self, pos1, pos2):
-        dif_x = pos2[0] - pos1[0]
-        dif_y = pos2[1] - pos1[1]
-        distance = sqrt(dif_x ** 2 + dif_y ** 2)
-        
-        if distance == 0:
-            return (0, 0)
-        
-        x_v_unit = dif_x / distance
-        y_v_unit = dif_y / distance
-        return (x_v_unit, y_v_unit)
-
-with proto("Corps") as Corps:
-    @Corps
-    def new(self, m, radius, pos, color, v_initial_x, v_initial_y):#c'est pas bon
-        self.mass = m
-        self.radius = radius
-        self.pos = pos
-        self.color = color
-        self.velocity = [v_initial_x, v_initial_y]  # Vitesse initiale
-        self.path = []
-    
-    @Corps
-    def draw(self):
-        pg.draw.circle(screen, self.color, (float(self.pos[0]), float(self.pos[1])), self.radius)
-    
-    @Corps
-    def update_position(self, acc, dt):
-        self.path.append(self.pos)
-        # Mise à jour de la vitesse (conserve l'inertie)
-        self.velocity[0] += acc[0] * dt
-        self.velocity[1] += acc[1] * dt
-        
-        # Mise à jour de la position en fonction de la nouvelle vitesse (avec inertie)
-        self.pos = (self.pos[0] + self.velocity[0] * dt, 
-        self.pos[1] + self.velocity[1] * dt)
-
-with proto("Physics") as Physics:
-    @Physics
-    def get_distance(self, corps1, corps2):
-        return sqrt(((corps1.pos[0] - corps2.pos[0]) ** 2) + ((corps1.pos[1] - corps2.pos[1]) ** 2))
-    @Physics
-    def get_attraction(self, mass1, mass2, d, radius):
-        G = 6.67e-11
-        
-
-        if d == 0:
-            return 0
-
-            
-        else :
-            return G * ((mass1 * mass2) / (d ** 2))
-        
-    
-    #@Physics
-    #def collision(self, mass1, mass2, d, radius):
 
 
     
