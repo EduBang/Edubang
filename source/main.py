@@ -4,7 +4,7 @@ from proto import proto
 
 
 from vectors.Vectors import *
-from pysics.Physics import *
+from physics.Physics import *
 from Corpse.Corps import *
 
 
