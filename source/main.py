@@ -3,10 +3,9 @@ from math import *
 from proto import proto
 
 
-from vectors.Vectors import *
-from physics.Physics import *
-from Corpse.Corps import *
-
+from components.Vectors import *
+from components.Corps import *
+from components.Physics import *
 
 pg.init()
 
