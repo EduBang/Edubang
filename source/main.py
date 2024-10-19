@@ -56,7 +56,7 @@ while running:
     screen.fill(black)
     
     # Calcul des forces et de l'accélération
-    distance = Physics.get_distance(terre, mars)#c'est bon
+    distance = Vectors.get_distance(terre.pos, mars.pos)
     
     
     attraction_terre = Physics.get_attraction(terre.mass, mars.mass, distance, terre.radius)
