@@ -10,8 +10,7 @@ with proto("Physics") as Physics:
         return G * (mass1 * mass2) / (d ** 2)
 
 
-    def get_distance(corps1, corps2):
-        return sqrt(((corps1.pos[0] - corps2.pos[0]) ** 2) + ((corps1.pos[1] - corps2.pos[1]) ** 2))
+    
     
     def get_cinetic_energy(mass, velocity):
         cinetic_energy = 0.5 * mass * velocity ** 2

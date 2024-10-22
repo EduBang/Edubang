@@ -3,7 +3,7 @@ from math import *
 from proto import proto
 
 
-from components.Vectors import *
+from components.Vectors import Vectors
 from components.Corps import *
 from components.Physics import *
 
@@ -56,7 +56,7 @@ while running:
     screen.fill(black)
     
     # Calcul des forces et de l'accélération
-    distance = Vectors.get_distance(terre.pos, mars.pos)
+    distance = Vectors.get_distance(terre, mars)
     
     
     attraction_terre = Physics.get_attraction(terre.mass, mars.mass, distance, terre.radius)
