@@ -22,3 +22,10 @@ with proto("Vectors") as Vectors:
         x_v_unit = dif_x / distance
         y_v_unit = dif_y / distance
         return (x_v_unit, y_v_unit)
+
+    @Vectors
+    def get_unit_vector_mouv(self, pos_init, pos_final):
+        mouv_vector = (pos_final[0] - pos_init[0], pos_final[1] - pos_init[1])
+        norm_mouv_vector = sqrt(mouv_vector[0] ** 2 + mouv_vector[1] ** 2)
+        unit_vector_mouv = (mouv_vector[0] / norm_mouv_vector, mouv_vector[1] / norm_mouv_vector)
+        return unit_vector_mouv
