@@ -3,7 +3,7 @@ from math import *
 from proto import proto
 
 
-from components.Vectors import Vectors
+from components.Vectors import *
 from components.Corps import *
 from components.Physics import *
 
@@ -59,8 +59,8 @@ while running:
     distance = Vectors.get_distance(terre, mars)
     
     
-    attraction_terre = Physics.get_attraction(terre.mass, mars.mass, distance, terre.radius)
-    attraction_mars = Physics.get_attraction(mars.mass, terre.mass, distance, mars.radius)
+    attraction_terre = Physics.get_attraction(terre.mass, mars.mass, distance)
+    attraction_mars = Physics.get_attraction(mars.mass, terre.mass, distance)
     
     unit_vector_terre = Vectors.get_unit_vector(terre.pos, mars.pos)
     unit_vector_mars = Vectors.get_unit_vector(mars.pos, terre.pos)
@@ -78,8 +78,8 @@ while running:
     
     
     # Dessiner les corps
-    mars.draw()
-    terre.draw()
+    mars.draw(screen)
+    terre.draw(screen)
     Path.draw_corps_path(terre.path, terre.color)
     Path.draw_corps_path(mars.path, mars.color)
     

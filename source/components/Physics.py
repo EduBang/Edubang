@@ -3,7 +3,7 @@ from math import *
 
 with proto("Physics") as Physics:
     @Physics
-    def get_attraction(mass1, mass2, d):
+    def get_attraction(self, mass1, mass2, d):
         G = 6.67 * 10 ** -11
         if d == 0:
             return 0

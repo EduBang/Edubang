@@ -12,7 +12,7 @@ with proto("Corps") as Corps:
         self.path = []
     
     @Corps
-    def draw(self):
+    def draw(self, screen):
         pg.draw.circle(screen, self.color, (float(self.pos[0]), float(self.pos[1])), self.radius)
     
     @Corps
