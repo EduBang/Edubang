@@ -10,7 +10,7 @@ with proto("Physics") as Physics:
         return G * (mass1 * mass2) / (d ** 2)
     
     @Physics
-    def get_velocity(pos_init, pos_final, dt):
+    def get_velocity(self, pos_init, pos_final, dt):
         velocity_vector = (pos_final[0] - pos_init[0], pos_final[1] - pos_init[1])
         norm_velocity_vector = sqrt(velocity_vector[0] ** 2 + velocity_vector[1] ** 2)
         velocity = norm_velocity_vector / dt

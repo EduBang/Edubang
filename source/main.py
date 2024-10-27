@@ -22,6 +22,7 @@ black = (0, 0, 0)
 blue = (0, 0, 255)
 red = (255, 0, 0)
 pi = 3.1416
+dt = 1 # Pas de temps (ajustable)
 
 
 with proto("Game") as Game:
@@ -42,23 +43,36 @@ with proto("Path") as Path:
         for pos in path:
             pg.draw.circle(screen,  color, (float(pos[0]), float(pos[1])), 2)
 
-terre = Corps(6e12, 50, (100, 500), red, 0.4, -0.4)
-mars = Corps(6e12, 50, (600, 500), blue, -0.4,0.4)
+terre = Corps(6e12, 50, (100, 500), red, 0, 0.1)
+mars = Corps(6e12, 50, (600, 500), blue, 0, 0)
 
 
-def couleur_moyenne(self, corps1, corps2):
+def couleur_moyenne(corps1, corps2):
     new_color = ((corps1.color[0] + corps2.color[0]) / 2, (corps1.color[1] + corps2.color[1]) / 2, (corps1.color[2] + corps2.color[2]) / 2)
     return new_color
     
 
 
 def process_collide(corps1, corps2):
+    cinetic_energy_corps1 = Physics.get_cinetic_energy(corps1.mass, Physics.get_velocity(corps1.path[-2], corps1.path[-1], dt))
+    cinetic_energy_corps2 = Physics.get_cinetic_energy(corps2.mass, Physics.get_velocity(corps2.path[-2], corps2.path[-1], dt))
+    unit_vector_mouv_corps1 = Vectors.get_unit_vector_mouv(corps1.path[-2], corps1.path[-1])
+    unit_vector_mouv_corps2 = Vectors.get_unit_vector_mouv(corps2.path[-2], corps2.path[-1])
     
-    fusion = Corps(terre.mass + mars.mass, sqrt(((pi * terre.radius ** 2) + (pi * mars.radius ** 2)) / pi), ((terre.pos[0] + mars.pos[0]) / 2,(terre.pos[1] + mars.pos[1]) / 2), couleur_moyenne(terre,mars), #je dois finir ici (c'est en cours)
+    cinetic_energy_vector_corps1 = cinetic_energy_corps1 * unit_vector_mouv_corps1[0], cinetic_energy_corps1 * unit_vector_mouv_corps1[1]
+    cinetic_energy_vector_corps2 = cinetic_energy_corps2 * unit_vector_mouv_corps2[0], cinetic_energy_corps2 * unit_vector_mouv_corps2[1]
+    
+    sum_vector_cinetic_energy_corps1 = cinetic_energy_vector_corps1[0] / corps1.mass, cinetic_energy_vector_corps1[1] / corps1.mass
+    sum_vector_cinetic_energy_corps2 = cinetic_energy_vector_corps2[0] / corps2.mass, cinetic_energy_vector_corps2[1] / corps2.mass
+    
+    
+    fusion = Corps(corps1.mass + corps2.mass, sqrt(((pi * terre.radius ** 2) + (pi * mars.radius ** 2)) / pi),
+                   ((terre.pos[0] + mars.pos[0]) / 2,(terre.pos[1] + mars.pos[1]) / 2), couleur_moyenne(terre,mars),
+                   sum_vector_cinetic_energy_corps1[0] + sum_vector_cinetic_energy_corps2[0], sum_vector_cinetic_energy_corps1[1] + sum_vector_cinetic_energy_corps2[1])
+    return fusion
 
-
-
-# Initialisation des planètes
+collision_occurred = False
+fusion = None
 
 # Boucle principale
 clock = pg.time.Clock()
@@ -69,46 +83,44 @@ while running:
     
     screen.fill(black)
     
-    # Calcul des forces et de l'accélération
-    distance = Vectors.get_distance(terre, mars)
-    
-    
-    attraction_terre = Physics.get_attraction(terre.mass, mars.mass, distance)
-    attraction_mars = Physics.get_attraction(mars.mass, terre.mass, distance)
-    
-    unit_vector_terre = Vectors.get_unit_vector(terre.pos, mars.pos)
-    unit_vector_mars = Vectors.get_unit_vector(mars.pos, terre.pos)
-    
-    # Calcul des accélérations pour la Terre (inversement proportionnel à la masse)
-    acc_terre = [unit_vector_terre[0] * attraction_terre / terre.mass, unit_vector_terre[1] * attraction_terre / terre.mass]
-    acc_mars = [unit_vector_mars[0] * attraction_mars / mars.mass, unit_vector_mars[1] * attraction_mars / mars.mass]
-    acc_new = [unit_vector_mars[0] * attraction_mars / mars.mass, unit_vector_mars[1] * attraction_mars / mars.mass]
+    if not collision_occurred:
+        # Calcul des forces et de l'accélération
+        distance = Vectors.get_distance(terre, mars)
+        
+        attraction_terre = Physics.get_attraction(terre.mass, mars.mass, distance)
+        attraction_mars = Physics.get_attraction(mars.mass, terre.mass, distance)
+        
+        unit_vector_terre = Vectors.get_unit_vector(terre.pos, mars.pos)
+        unit_vector_mars = Vectors.get_unit_vector(mars.pos, terre.pos)
+        
+        # Calcul des accélérations pour la Terre et Mars
+        acc_terre = [unit_vector_terre[0] * attraction_terre / terre.mass, unit_vector_terre[1] * attraction_terre / terre.mass]
+        acc_mars = [unit_vector_mars[0] * attraction_mars / mars.mass, unit_vector_mars[1] * attraction_mars / mars.mass]
 
-    # Mise à jour des positions avec conservation de l'inertie
-    dt = 15 # Pas de temps (ajustable)
-    mars.update_position(acc_mars, dt)
-    terre.update_position(acc_terre, dt)
-    
-    if Captors.collide(terre, mars, distance) == True : 
-        print("colision")
-        process_collide(terre, mars, )
+        # Mise à jour des positions
+        mars.update_position(acc_mars, dt)
+        terre.update_position(acc_terre, dt)
         
-    print(Physics.get_velocity(terre.path[-2], terre.path[-1]), dt)
-        
-        
-    
-    
-    # Dessiner les corps
-    mars.draw(screen)
-    terre.draw(screen)
-    Path.draw_corps_path(terre.path, terre.color)
-    Path.draw_corps_path(mars.path, mars.color)
+        # Vérification de la collision
+        if Captors.collide(terre, mars, distance):
+            print("Collision détectée")
+            fusion = process_collide(terre, mars)
+            collision_occurred = True  # Marquer que la collision a eu lieu
+            
+    # Dessiner les corps ou la fusion en fonction de l'état de collision
+    if collision_occurred:
+        fusion.draw(screen)
+        Path.draw_corps_path(fusion.path, fusion.color)
+        acc_fusion = [0, 0]  # Exemple sans force externe; ajouter des forces si nécessaire
+        fusion.update_position(acc_fusion, dt)
+    else:
+        mars.draw(screen)
+        terre.draw(screen)
+        Path.draw_corps_path(terre.path, terre.color)
+        Path.draw_corps_path(mars.path, mars.color)
     
     # Mettre à jour l'écran
     Game.draw_screen()
-
-    
-    
     clock.tick(60)  # Limite à 60 FPS
 
 Game.quit_algo()
