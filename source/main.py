@@ -53,28 +53,30 @@ with proto("CameraHandler") as CameraHandler:
         self.zoom = 1
         self.maxZoom = 100
         self.minZoom = 0.01
+        self.offset = [0, 0]
+        self.focus = None
         return
 
 Camera = CameraHandler()
 listCorps = []
 
 # simulation de la terre et mars
-terre = Corps(6e12, 50, (100, 500), red, 0, 0.1)
-mars = Corps(6e12, 50, (600, 500), blue, 0, 0)
-listCorps.append(terre)
-listCorps.append(mars)
+# terre = Corps(6e12, 50, (100, 500), red, 0, 0.1)
+# mars = Corps(6e12, 50, (600, 500), blue, 0, 0)
+# listCorps.append(terre)
+# listCorps.append(mars)
 
 # simulation de x corps aléatoires
-# from random import randint
-# x = 10
-# for i in range(x):
-#     a = Corps(randint(5 * 10 ** 9, 20 * 10 ** 9),
-#               randint(10, 50),
-#               (randint(10, 1000), randint(10, 1000)),
-#               (randint(0, 255), randint(0, 255), randint(0, 255)),
-#               randint(-100, 100) / 10000, randint(-100, 100) / 10000
-#               )
-#     listCorps.append(a)
+from random import randint
+x = 10
+for i in range(x):
+    a = Corps(randint(5 * 10 ** 9, 20 * 10 ** 9),
+              randint(10, 50),
+              (randint(10, 1000), randint(10, 1000)),
+              (randint(0, 255), randint(0, 255), randint(0, 255)),
+              randint(-100, 100) / 10000, randint(-100, 100) / 10000
+              )
+    listCorps.append(a)
 
 # simulation d'un petit corps léger qui entre en collision sur un gros et lourd
 # a = Corps(6e10, 10, (100, 500), red, 0, 0)
@@ -94,21 +96,38 @@ keys = {
 }
 
 @events.observe
-def keydown(key):
+def keydown(key: int) -> None:
     if key in keys:
         keys[key] = True
+    return
 
 @events.observe
-def keyup(key):
+def keyup(key: int) -> None:
     if key in keys:
         keys[key] = False
+    return
 
 @events.observe
-def mousewheel(x, y):
+def mousewheel(x: int, y: int) -> None:
     if y == 1 and Camera.zoom < Camera.maxZoom: # scroll vers le haut: zoom
         Camera.zoom *= 1.1
     if y == -1 and Camera.zoom > Camera.minZoom: # scroll vers le bas: dézoom
         Camera.zoom /= 1.1
+    return
+
+@events.observe
+def mousebuttondown(position: tuple[int, int], button: int) -> None:
+    for corps in listCorps:
+        x = float((corps.pos[0] + Camera.x / Camera.zoom) * Camera.zoom)
+        y = float((corps.pos[1] + Camera.y / Camera.zoom) * Camera.zoom)
+        sqx = (position[0] - x) ** 2
+        sqy = (position[1] - y) ** 2
+        if sqrt(sqx + sqy) < corps.radius * Camera.zoom:
+            Camera.focus = corps
+            break
+    else:
+        Camera.focus = None
+    return
 
 
 # Fonction permettant de mélanger les couleurs de 2 corps selon la surface
@@ -143,6 +162,8 @@ def process_collide(corps1, corps2):
     corps = corps1
     hasChanged = False
     if corps2.radius > corps1.radius:
+        if Camera.focus == corps1:
+            Camera.focus = corps2
         corps = corps2
         hasChanged = True
     corps.mass = mass
@@ -181,6 +202,8 @@ while running:
             events.trigger("keyup", event.key)
         if event.type == pg.MOUSEWHEEL:
             events.trigger("mousewheel", event.x, event.y)
+        if event.type == pg.MOUSEBUTTONDOWN:
+            events.trigger("mousebuttondown", event.pos, event.button)
     
     if keys[pg.K_z] or keys[pg.K_UP]: # faire monter la caméra
         Camera.y += Camera.speed
@@ -190,7 +213,13 @@ while running:
         Camera.y -= Camera.speed
     if keys[pg.K_d] or keys[pg.K_RIGHT]: # faire aller la caméra à droite
         Camera.x -= Camera.speed
-    
+
+    if Camera.focus is not None:
+        midScreenX = screen.get_width() // 2
+        midScreenY = screen.get_height() // 2
+        Camera.x = -Camera.focus.pos[0] + midScreenX
+        Camera.y = -Camera.focus.pos[1] + midScreenY
+
     screen.fill(black)
 
     for corps in listCorps:
