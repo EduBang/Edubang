@@ -260,6 +260,6 @@ while running:
     
     # Mettre à jour l'écran
     Game.draw_screen()
-    # clock.tick(60)  # Limite à 60 FPS
+    clock.tick(60)  # Limite à 60 FPS
 
 Game.quit_algo()
