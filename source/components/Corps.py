@@ -12,8 +12,10 @@ with proto("Corps") as Corps:
         self.path = []
     
     @Corps
-    def draw(self, screen):
-        pg.draw.circle(screen, self.color, (float(self.pos[0]), float(self.pos[1])), self.radius)
+    def draw(self, screen, camera):
+        x = float((self.pos[0] + camera.x / camera.zoom) * camera.zoom)
+        y = float((self.pos[1] + camera.y / camera.zoom) * camera.zoom)
+        pg.draw.circle(screen, self.color, (x, y), self.radius * camera.zoom)
     
     @Corps
     def update_position(self, acc, dt):

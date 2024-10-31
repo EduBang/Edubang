@@ -1,6 +1,7 @@
 import pygame as pg
 from math import *
 from proto import proto
+from eventListen import Events
 from statistics import *
 
 
@@ -22,6 +23,7 @@ black = (0, 0, 0)
 blue = (0, 0, 255)
 red = (255, 0, 0)
 dt = 1 # Pas de temps (ajustable)
+events = Events()
 
 
 with proto("Game") as Game:
@@ -42,6 +44,18 @@ with proto("Path") as Path:
         for pos in path:
             pg.draw.circle(screen, color, (float(pos[0]), float(pos[1])), 1)
 
+with proto("CameraHandler") as CameraHandler:
+    @CameraHandler
+    def new(self):
+        self.x = 0
+        self.y = 0
+        self.speed = 5
+        self.zoom = 1
+        self.maxZoom = 100
+        self.minZoom = 0.01
+        return
+
+Camera = CameraHandler()
 listCorps = []
 
 # simulation de la terre et mars
@@ -67,6 +81,35 @@ listCorps.append(mars)
 # b = Corps(6e12, 100, (600, 500), blue, 0, 0)
 # listCorps.append(a)
 # listCorps.append(b)
+
+keys = {
+    pg.K_z: False,
+    pg.K_q: False,
+    pg.K_s: False,
+    pg.K_d: False,
+    pg.K_UP: False,
+    pg.K_LEFT: False,
+    pg.K_DOWN: False,
+    pg.K_RIGHT: False
+}
+
+@events.observe
+def keydown(key):
+    if key in keys:
+        keys[key] = True
+
+@events.observe
+def keyup(key):
+    if key in keys:
+        keys[key] = False
+
+@events.observe
+def mousewheel(x, y):
+    if y == 1 and Camera.zoom < Camera.maxZoom: # scroll vers le haut: zoom
+        Camera.zoom *= 1.1
+    if y == -1 and Camera.zoom > Camera.minZoom: # scroll vers le bas: dézoom
+        Camera.zoom /= 1.1
+
 
 # Fonction permettant de mélanger les couleurs de 2 corps selon la surface
 def mergeColor(a, b) -> tuple[int, int, int]:
@@ -131,7 +174,22 @@ while running:
     for event in pg.event.get():
         if event.type == pg.QUIT:
             running = False
-        
+
+        if event.type == pg.KEYDOWN:
+            events.trigger("keydown", event.key)
+        if event.type == pg.KEYUP:
+            events.trigger("keyup", event.key)
+        if event.type == pg.MOUSEWHEEL:
+            events.trigger("mousewheel", event.x, event.y)
+    
+    if keys[pg.K_z] or keys[pg.K_UP]: # faire monter la caméra
+        Camera.y += Camera.speed
+    if keys[pg.K_q] or keys[pg.K_LEFT]: # faire aller la caméra à gauche
+        Camera.x += Camera.speed
+    if keys[pg.K_s] or keys[pg.K_DOWN]: # faire descendre la caméra
+        Camera.y -= Camera.speed
+    if keys[pg.K_d] or keys[pg.K_RIGHT]: # faire aller la caméra à droite
+        Camera.x -= Camera.speed
     
     screen.fill(black)
 
@@ -147,7 +205,7 @@ while running:
                 listCorps.remove(removedCorps)
         
         corps.update_position([0, 0], dt)
-        corps.draw(screen)
+        corps.draw(screen, Camera)
         # Path.draw_corps_path(corps.path, corps.color)
     
     # Mettre à jour l'écran
