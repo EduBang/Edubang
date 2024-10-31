@@ -6,11 +6,7 @@ with proto("Captors") as Captors:
     
     @Captors
     def collide(self, corps1, corps2, distance):
-        collide = None
-        if distance * 10 <= corps1.radius + corps2.radius:
-            collide = True
-        else:
-            collide = False
-        return collide
+        return 2 * distance <= corps1.radius + corps2.radius
+    
     
     
