@@ -61,22 +61,22 @@ Camera = CameraHandler()
 listCorps = []
 
 # simulation de la terre et mars
-# terre = Corps(6e12, 50, (100, 500), red, 0, 0.1)
-# mars = Corps(6e12, 50, (600, 500), blue, 0, 0)
-# listCorps.append(terre)
-# listCorps.append(mars)
+terre = Corps(6e12, 50, (100, 500), red, 0, 0.1)
+mars = Corps(6e12, 50, (600, 500), blue, 0, 0)
+listCorps.append(terre)
+listCorps.append(mars)
 
 # simulation de x corps aléatoires
-from random import randint
-x = 10
-for i in range(x):
-    a = Corps(randint(5 * 10 ** 9, 20 * 10 ** 9),
-              randint(10, 50),
-              (randint(10, 1000), randint(10, 1000)),
-              (randint(0, 255), randint(0, 255), randint(0, 255)),
-              randint(-100, 100) / 10000, randint(-100, 100) / 10000
-              )
-    listCorps.append(a)
+# from random import randint
+# x = 10
+# for i in range(x):
+#     a = Corps(randint(5 * 10 ** 9, 20 * 10 ** 9),
+#               randint(10, 50),
+#               (randint(10, 1000), randint(10, 1000)),
+#               (randint(0, 255), randint(0, 255), randint(0, 255)),
+#               randint(-100, 100) / 10000, randint(-100, 100) / 10000
+#               )
+#     listCorps.append(a)
 
 # simulation d'un petit corps léger qui entre en collision sur un gros et lourd
 # a = Corps(6e10, 10, (100, 500), red, 0, 0)
@@ -162,8 +162,6 @@ def process_collide(corps1, corps2):
     corps = corps1
     hasChanged = False
     if corps2.radius > corps1.radius:
-        if Camera.focus == corps1:
-            Camera.focus = corps2
         corps = corps2
         hasChanged = True
     corps.mass = mass
@@ -171,6 +169,8 @@ def process_collide(corps1, corps2):
     corps.color = color
     corps.velocity = [vInitialX, vInitialY]
     corps.path = []
+    if Camera.focus in [corps1, corps2]:
+        Camera.focus = corps
     return corps1 if hasChanged else corps2
 
 collision_occurred = False
