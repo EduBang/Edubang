@@ -13,8 +13,8 @@ from components.Captors import *
 pg.init()
 
 # Initialisation
-pg.display.set_caption('EduBang')
-icon = pg.image.load('source/Images/icon.png')
+pg.display.set_caption("EduBang")
+icon = pg.image.load("source/Images/icon.png")
 pg.display.set_icon(icon)
 running = True
 resolution = (1200, 1000)
@@ -42,7 +42,9 @@ with proto("Path") as Path:
     @Path
     def draw_corps_path(self, path, color):
         for pos in path:
-            pg.draw.circle(screen, color, (float(pos[0]), float(pos[1])), 1)
+            x = float((pos[0] + Camera.x / Camera.zoom) * Camera.zoom)
+            y = float((pos[1] + Camera.y / Camera.zoom) * Camera.zoom)
+            pg.draw.circle(screen, color, (x, y), 1000 * Camera.zoom)
 
 with proto("CameraHandler") as CameraHandler:
     @CameraHandler
@@ -52,7 +54,7 @@ with proto("CameraHandler") as CameraHandler:
         self.speed = 5
         self.zoom = 1
         self.maxZoom = 100
-        self.minZoom = 0.01
+        self.minZoom = 0.001
         self.offset = [0, 0]
         self.focus = None
         return
@@ -61,10 +63,10 @@ Camera = CameraHandler()
 listCorps = []
 
 # simulation de la terre et mars
-terre = Corps(6e12, 50, (100, 500), red, 0, 0.1)
-mars = Corps(6e12, 50, (600, 500), blue, 0, 0)
-listCorps.append(terre)
-listCorps.append(mars)
+# terre = Corps(6e12, 50, (100, 500), red, 0, 0.1)
+# mars = Corps(6e12, 50, (600, 500), blue, 0, 0)
+# listCorps.append(terre)
+# listCorps.append(mars)
 
 # simulation de x corps aléatoires
 # from random import randint
@@ -83,6 +85,26 @@ listCorps.append(mars)
 # b = Corps(6e12, 100, (600, 500), blue, 0, 0)
 # listCorps.append(a)
 # listCorps.append(b)
+
+# simulation du système solaire
+# soleil = Corps(1.9885e14, 700, (0, 0), (255, 255, 0), 0, 0)
+# mercure = Corps(3.3011e7, 38, (5800, 0), (127, 127, 127), 0, -0.52)
+# venus = Corps(4.8675e8, 95, (10800, 0), (255, 127, 127), 0, -0.38)
+# terre = Corps(5.9736e8, 100, (15000, 0), (0, 0, 255), 0, -0.32)
+# mars = Corps(6.4185e7, 53, (22000, 0), (255, 50, 50), 0, -0.27)
+# jupiter = Corps(1.8986e11, 300, (77800, 0), (255, 255, 230), 0, -0.143)
+# saturne = Corps(5.6846e10, 260, (142670, 0), (255, 240, 240), 0, -0.105)
+# uranus = Corps(8.681e9, 200, (287070, 0), (100, 100, 200), 0, -0.074)
+# neptune = Corps(1.0243e10, 190, (449840, 0), (100, 100, 255), 0, -0.058)
+# listCorps.append(soleil)
+# listCorps.append(mercure)
+# listCorps.append(venus)
+# listCorps.append(terre)
+# listCorps.append(mars)
+# listCorps.append(jupiter)
+# listCorps.append(saturne)
+# listCorps.append(uranus)
+# listCorps.append(neptune)
 
 keys = {
     pg.K_z: False,
@@ -235,10 +257,9 @@ while running:
         
         corps.update_position([0, 0], dt)
         corps.draw(screen, Camera)
-        # Path.draw_corps_path(corps.path, corps.color)
     
     # Mettre à jour l'écran
     Game.draw_screen()
-    clock.tick(60)  # Limite à 60 FPS
+    # clock.tick(60)  # Limite à 60 FPS
 
 Game.quit_algo()
