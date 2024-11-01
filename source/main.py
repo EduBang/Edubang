@@ -77,13 +77,13 @@ space.append(mars)
 #               (randint(0, 255), randint(0, 255), randint(0, 255)),
 #               randint(-100, 100) / 10000, randint(-100, 100) / 10000
 #               )
-#     listCorps.append(a)
+#     space.append(a)
 
 # simulation d'un petit corps léger qui entre en collision sur un gros et lourd
 # a = Corps(6e10, 10, (100, 500), red, 0, 0)
 # b = Corps(6e12, 100, (600, 500), blue, 0, 0)
-# listCorps.append(a)
-# listCorps.append(b)
+# space.append(a)
+# space.append(b)
 
 # simulation du système solaire
 # soleil = Corps(1.9885e14, 700, (0, 0), (255, 255, 0), 0, 0)
@@ -95,15 +95,15 @@ space.append(mars)
 # saturne = Corps(5.6846e10, 260, (142670, 0), (255, 240, 240), 0, -0.105)
 # uranus = Corps(8.681e9, 200, (287070, 0), (100, 100, 200), 0, -0.074)
 # neptune = Corps(1.0243e10, 190, (449840, 0), (100, 100, 255), 0, -0.058)
-# listCorps.append(soleil)
-# listCorps.append(mercure)
-# listCorps.append(venus)
-# listCorps.append(terre)
-# listCorps.append(mars)
-# listCorps.append(jupiter)
-# listCorps.append(saturne)
-# listCorps.append(uranus)
-# listCorps.append(neptune)
+# space.append(soleil)
+# space.append(mercure)
+# space.append(venus)
+# space.append(terre)
+# space.append(mars)
+# space.append(jupiter)
+# space.append(saturne)
+# space.append(uranus)
+# space.append(neptune)
 
 keys = {
     pg.K_z: False,
@@ -203,8 +203,6 @@ def process_collide(corps1, corps2):
         Camera.focus = corps
     return corps1 if hasChanged else corps2
 
-collision_occurred = False
-fusion = None
 
 # Fonction permettant de mettre à jour la postion entre 2 corps.
 def updateCorps(a, b) -> float:
@@ -245,6 +243,7 @@ while running:
         Camera.x -= Camera.speed
 
     if Camera.focus is not None:
+        # TODO: Faire de sorte que le zoom se contre sur soit sur la souris lorsque rien est focus soit sur le corps s'il y a focus
         midScreenX = screen.get_width() // 2
         midScreenY = screen.get_height() // 2
         Camera.x = -Camera.focus.pos[0] + midScreenX
