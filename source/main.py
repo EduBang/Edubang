@@ -44,7 +44,7 @@ with proto("Path") as Path:
         for pos in path:
             x = float((pos[0] + Camera.x / Camera.zoom) * Camera.zoom)
             y = float((pos[1] + Camera.y / Camera.zoom) * Camera.zoom)
-            pg.draw.circle(screen, color, (x, y), 1000 * Camera.zoom)
+            pg.draw.circle(screen, color, (x, y), 2 * Camera.zoom)
 
 with proto("CameraHandler") as CameraHandler:
     @CameraHandler
@@ -55,18 +55,17 @@ with proto("CameraHandler") as CameraHandler:
         self.zoom = 1
         self.maxZoom = 100
         self.minZoom = 0.001
-        self.offset = [0, 0]
         self.focus = None
         return
 
 Camera = CameraHandler()
-listCorps = []
+space = []
 
 # simulation de la terre et mars
-# terre = Corps(6e12, 50, (100, 500), red, 0, 0.1)
-# mars = Corps(6e12, 50, (600, 500), blue, 0, 0)
-# listCorps.append(terre)
-# listCorps.append(mars)
+terre = Corps(6e12, 50, (100, 500), red, 0, 0.1)
+mars = Corps(6e12, 50, (600, 500), blue, 0, 0)
+space.append(terre)
+space.append(mars)
 
 # simulation de x corps aléatoires
 # from random import randint
@@ -139,16 +138,25 @@ def mousewheel(x: int, y: int) -> None:
 
 @events.observe
 def mousebuttondown(position: tuple[int, int], button: int) -> None:
-    for corps in listCorps:
-        x = float((corps.pos[0] + Camera.x / Camera.zoom) * Camera.zoom)
-        y = float((corps.pos[1] + Camera.y / Camera.zoom) * Camera.zoom)
-        sqx = (position[0] - x) ** 2
-        sqy = (position[1] - y) ** 2
-        if sqrt(sqx + sqy) < corps.radius * Camera.zoom:
-            Camera.focus = corps
-            break
-    else:
-        Camera.focus = None
+    if button in [4, 5]: # les scrolls bas et haut sont considirés comme des cliques de souris
+        return
+    if button == 1: # clique gauche
+        for corps in space:
+            x = float((corps.pos[0] + Camera.x / Camera.zoom) * Camera.zoom)
+            y = float((corps.pos[1] + Camera.y / Camera.zoom) * Camera.zoom)
+            sqx = (position[0] - x) ** 2
+            sqy = (position[1] - y) ** 2
+            if pi * (corps.radius * Camera.zoom) ** 2 < 10:
+                if sqrt(sqx + sqy) < corps.radius // 5:
+                    Camera.focus = corps
+                    Camera.zoom = 1
+                    break
+            if sqrt(sqx + sqy) < corps.radius * Camera.zoom:
+                Camera.focus = corps
+                Camera.zoom = 1
+                break
+        else:
+            Camera.focus = None
     return
 
 
@@ -244,8 +252,8 @@ while running:
 
     screen.fill(black)
 
-    for corps in listCorps:
-        for otherCorps in listCorps:
+    for corps in space:
+        for otherCorps in space:
             if corps == otherCorps: # si le corps est égale à l'autre corps
                 continue # on l'oublie
 
@@ -253,10 +261,11 @@ while running:
             # Vérification de la collision
             if Captors.collide(corps, otherCorps, distance):
                 removedCorps = process_collide(corps, otherCorps)
-                listCorps.remove(removedCorps)
+                space.remove(removedCorps)
         
         corps.update_position([0, 0], dt)
         corps.draw(screen, Camera)
+        # Path.draw_corps_path(corps.path, corps.color)
     
     # Mettre à jour l'écran
     Game.draw_screen()
