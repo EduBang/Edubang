@@ -62,6 +62,38 @@ with proto("Button") as Button:
         Events.group(self, [MethodType(mousemotion, self), MethodType(mousebuttondown, self), MethodType(mousebuttonup, self), MethodType(window, self)])
         return
     
+with proto("MessageBox") as MessageBox:
+    def drawMB(self, screen):
+        if not self.active: return
+        widthScreen, heightScreen = pg.display.get_surface().get_size()
+        xRect = widthScreen / 2 - 50
+        yRect = heightScreen / 2 - 30
+        pg.draw.rect(screen, (255, 255, 255), pg.Rect((xRect, yRect), (100, 60)))
+        surface = font.render(self.text, False, (0, 0, 0))
+        width, height = font.size(self.text)
+        x = xRect - width / 2
+        y = yRect - height / 2
+        screen.blit(surface, (x, y))
+        return
+    
+    @MessageBox
+    def new(self, message: str):
+        self.text = message
+        self.active = False
+        self.draw = MethodType(drawMB, self)
+
+
+
+#class trajectoire
+with proto("Path") as Path:
+    # dessiner trajectoire terre
+    @Path
+    def draw_corps_path(self, screen, path, color):
+        for pos in path:
+            x = float((pos[0] + Game.Camera.x / Game.Camera.zoom) * Game.Camera.zoom)
+            y = float((pos[1] + Game.Camera.y / Game.Camera.zoom) * Game.Camera.zoom)
+            pg.draw.circle(screen, color, (x, y), 100 * Game.Camera.zoom)
+    
 # Fonction permettant de mettre à jour la postion entre 2 corps.
 def updateCorps(a, b) -> float:
     distance = Vectors.get_distance(a, b)

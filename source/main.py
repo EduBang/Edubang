@@ -34,7 +34,7 @@ with proto("Game") as Game:
         self.running = True
         self.space = []
         self.Camera = CameraHandler()
-        self.window = "menu"
+        self.window = ""
         self.windows = {}
 
         ws = [w for w in listdir("./source/window") if path.isfile(path.join("./source/window", w))]
@@ -48,6 +48,8 @@ with proto("Game") as Game:
             drawFunction = getattr(module, "draw")
             self.windows[module_name] = [loadFunction, drawFunction]
 
+        self.select("menu")
+
 
     @Game
     def select(self, w):
@@ -56,20 +58,29 @@ with proto("Game") as Game:
         self.windows[w][0]() # fonction load
         self.window = w
         return
+    
+    @Game
+    def reset(self):
+        self.Camera.reset()
+        self.dt = 1
+        self.space = []
 
-#class trajectoire
-with proto("Path") as Path:
-    # dessiner trajectoire terre
-    @Path
-    def draw_corps_path(self, path, color):
-        for pos in path:
-            x = float((pos[0] + Game.Camera.x / Game.Camera.zoom) * Game.Camera.zoom)
-            y = float((pos[1] + Game.Camera.y / Game.Camera.zoom) * Game.Camera.zoom)
-            pg.draw.circle(screen, color, (x, y), 2 * Game.Camera.zoom)
 
 with proto("CameraHandler") as CameraHandler:
     @CameraHandler
     def new(self):
+        self.active = False
+        self.x = 0
+        self.y = 0
+        self.speed = 5
+        self.zoom = 1
+        self.maxZoom = 1000
+        self.minZoom = 0.001
+        self.focus = None
+        return
+
+    @CameraHandler
+    def reset(self):
         self.active = False
         self.x = 0
         self.y = 0
@@ -199,6 +210,6 @@ while Game.running:
 
     # Mettre à jour l'écran
     Game.draw_screen()
-    clock.tick(60)  # Limite à 60 FPS
+    # clock.tick(60)  # Limite à 60 FPS
 
 Game.quit_algo()
