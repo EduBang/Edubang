@@ -42,6 +42,8 @@ def load(*args, **kwargs):
     saturne = Corps(5.6846e10, 260, (142670, 0), (255, 240, 240), 0, -0.105)
     uranus = Corps(8.681e9, 200, (287070, 0), (100, 100, 200), 0, -0.074)
     neptune = Corps(1.0243e10, 190, (449840, 0), (100, 100, 255), 0, -0.058)
+
+    
     Game.space.append(soleil)
     Game.space.append(mercure)
     Game.space.append(venus)
@@ -51,7 +53,11 @@ def load(*args, **kwargs):
     Game.space.append(saturne)
     Game.space.append(uranus)
     Game.space.append(neptune)
+
     return
+
+pg.font.init()
+font = pg.font.SysFont("Comic Sans MS", 30)
 
 def draw(screen):
     screen.fill((0, 0 ,0))
@@ -69,7 +75,12 @@ def draw(screen):
         
         corps.update_position([0, 0], Game.dt)
         corps.draw(screen, Game.Camera)
-        # Path.draw_corps_path(screen, corps.path, corps.color)
+        Path.draw_corps_path(screen, corps.path, corps.color)
+        
+  
+    
+    surface = font.render("DT : " + str(Game.dt), False, (255, 255, 255))
+    screen.blit(surface, (40, 40))
 
     mb.draw(screen)
     return

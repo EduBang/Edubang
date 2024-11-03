@@ -62,7 +62,7 @@ with proto("Game") as Game:
     @Game
     def reset(self):
         self.Camera.reset()
-        self.dt = 1
+        self.dt = 0
         self.space = []
 
 
@@ -126,6 +126,10 @@ def unhovering(button):
 def keydown(key: int) -> None:
     if key in keys:
         keys[key] = True
+    if key == pg.K_a:
+        Game.dt -= 5
+    if key == pg.K_e:
+        Game.dt += 5
     return
 
 @Events.observe
