@@ -1,10 +1,8 @@
 import pygame as pg
-from math import *
+
 from proto import proto
 from eventListen import Events
-from statistics import *
-
-
+from utils import Button
 from components.Vectors import *
 from components.Corps import *
 from components.Physics import *
@@ -16,6 +14,7 @@ pg.init()
 pg.display.set_caption("EduBang")
 icon = pg.image.load("source/Images/icon.png")
 pg.display.set_icon(icon)
+buttons = []
 running = True
 resolution = (1200, 1000)
 screen = pg.display.set_mode(resolution)
@@ -23,7 +22,6 @@ black = (0, 0, 0)
 blue = (0, 0, 255)
 red = (255, 0, 0)
 dt = 1 # Pas de temps (ajustable)
-events = Events()
 
 
 with proto("Game") as Game:
@@ -53,7 +51,7 @@ with proto("CameraHandler") as CameraHandler:
         self.y = 0
         self.speed = 5
         self.zoom = 1
-        self.maxZoom = 100
+        self.maxZoom = 1000
         self.minZoom = 0.001
         self.focus = None
         return
@@ -116,27 +114,50 @@ keys = {
     pg.K_RIGHT: False
 }
 
-@events.observe
+def buttonOnPressed():
+    print("BUTTON pressed!")
+
+def buttonOnReleased():
+    print("BUTTON released!")
+
+btn = Button((100, 100), (180, 60))
+btn.text = "BUTTON"
+btn.onPressed = buttonOnPressed
+btn.onReleased = buttonOnReleased
+
+@Events.observe
+def hovering(button):
+    if not button in buttons:
+        buttons.append(button)
+    return
+
+@Events.observe
+def unhovering(button):
+    if button in buttons:
+        buttons.remove(button)
+    return
+
+@Events.observe
 def keydown(key: int) -> None:
     if key in keys:
         keys[key] = True
     return
 
-@events.observe
+@Events.observe
 def keyup(key: int) -> None:
     if key in keys:
         keys[key] = False
     return
 
-@events.observe
+@Events.observe
 def mousewheel(x: int, y: int) -> None:
     if y == 1 and Camera.zoom < Camera.maxZoom: # scroll vers le haut: zoom
-        Camera.zoom *= 1.1
+        Camera.zoom *= 1.05
     if y == -1 and Camera.zoom > Camera.minZoom: # scroll vers le bas: dézoom
-        Camera.zoom /= 1.1
+        Camera.zoom /= 1.05
     return
 
-@events.observe
+@Events.observe
 def mousebuttondown(position: tuple[int, int], button: int) -> None:
     if button in [4, 5]: # les scrolls bas et haut sont considirés comme des cliques de souris
         return
@@ -225,13 +246,17 @@ while running:
             running = False
 
         if event.type == pg.KEYDOWN:
-            events.trigger("keydown", event.key)
+            Events.trigger("keydown", event.key)
         if event.type == pg.KEYUP:
-            events.trigger("keyup", event.key)
+            Events.trigger("keyup", event.key)
         if event.type == pg.MOUSEWHEEL:
-            events.trigger("mousewheel", event.x, event.y)
+            Events.trigger("mousewheel", event.x, event.y)
         if event.type == pg.MOUSEBUTTONDOWN:
-            events.trigger("mousebuttondown", event.pos, event.button)
+            Events.trigger("mousebuttondown", event.pos, event.button)
+        if event.type == pg.MOUSEBUTTONUP:
+            Events.trigger("mousebuttonup", event.pos, event.button)
+        if event.type == pg.MOUSEMOTION:
+            Events.trigger("mousemotion", event.pos)
     
     if keys[pg.K_z] or keys[pg.K_UP]: # faire monter la caméra
         Camera.y += Camera.speed
@@ -243,11 +268,10 @@ while running:
         Camera.x -= Camera.speed
 
     if Camera.focus is not None:
-        # TODO: Faire de sorte que le zoom se contre sur soit sur la souris lorsque rien est focus soit sur le corps s'il y a focus
         midScreenX = screen.get_width() // 2
         midScreenY = screen.get_height() // 2
-        Camera.x = -Camera.focus.pos[0] + midScreenX
-        Camera.y = -Camera.focus.pos[1] + midScreenY
+        Camera.x = midScreenX - Camera.focus.pos[0]
+        Camera.y = midScreenY - Camera.focus.pos[1]
 
     screen.fill(black)
 
@@ -266,6 +290,13 @@ while running:
         corps.draw(screen, Camera)
         # Path.draw_corps_path(corps.path, corps.color)
     
+    btn.draw(screen)
+
+    if len(buttons) == 0: # Si la souris ne hover plus rien
+        pg.mouse.set_cursor(pg.SYSTEM_CURSOR_ARROW)
+
+
+
     # Mettre à jour l'écran
     Game.draw_screen()
     clock.tick(60)  # Limite à 60 FPS
