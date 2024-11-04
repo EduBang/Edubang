@@ -10,6 +10,7 @@ from components.Corps import *
 from components.Physics import *
 from components.Captors import *
 
+
 pg.font.init()
 font = pg.font.SysFont("Comic Sans MS", 12)
 
@@ -92,7 +93,6 @@ with proto("Path") as Path:
         for pos in path:
             x = float((pos[0] + Game.Camera.x / Game.Camera.zoom) * Game.Camera.zoom)
             y = float((pos[1] + Game.Camera.y / Game.Camera.zoom) * Game.Camera.zoom)
-            pg.draw.circle(screen, color, (x, y), 100 * Game.Camera.zoom)
     
 # Fonction permettant de mettre à jour la postion entre 2 corps.
 def updateCorps(a, b) -> float:
@@ -149,3 +149,17 @@ def process_collide(corps1, corps2):
     if Game.Camera.focus in [corps1, corps2]:
         Game.Camera.focus = corps
     return corps1 if hasChanged else corps2
+
+
+def draw_velocity_vector(self, corps):
+    corps_velocity = Physics.get_velocity(corps.path[-2], corps.path[-1], Game.dt)
+    unit_vector_mouv = Vectors.get_unit_vector_mouv(corps.path[-2], corps.path[-1])
+    velocity_vector = unit_vector_mouv[0] * corps_velocity, unit_vector_mouv[1] * corps_velocity
+    return velocity_vector
+    
+def draw_cinetic_energy_vector(self, corps):
+    unit_vector_mouv = Vectors.get_unit_vector_mouv(corps.path[-2], corps.path[-1])
+    cinetic_energy = Physics.get_cinetic_energy(corps.mass, Physics.get_velocity(corps.path[-2], corps.path[-1], Game.dt))
+    cinetic_energy_vector = unit_vector_mouv * cinetic_energy
+    return cinetic_energy_vector
+    
