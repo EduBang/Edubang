@@ -11,7 +11,7 @@ pg.init()
 
 # Initialisation
 pg.display.set_caption("EduBang")
-icon = pg.image.load("source/Images/icon.png")
+icon = pg.image.load("source/assets/images/icon.png")
 pg.display.set_icon(icon)
 buttons = []
 resolution = (1200, 1000)

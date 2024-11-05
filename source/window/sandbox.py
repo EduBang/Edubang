@@ -1,7 +1,7 @@
 import pygame as pg
 
 from main import Game
-from utils import updateCorps, process_collide, Captors, Corps, MessageBox, Path
+from source.shared.utils.utils import updateCorps, process_collide, Captors, Corps, MessageBox, Path
 
 from eventListen import Events
 

@@ -1,7 +1,7 @@
 from random import randint
 
 from main import Game
-from utils import updateCorps, process_collide, Captors, Button, Corps, Path
+from source.shared.utils.utils import updateCorps, process_collide, Captors, Button, Corps, Path
 
 def playSandbox():
     Game.reset()
