@@ -62,7 +62,57 @@ with proto("Button") as Button:
         self.onHover = onHover
         Events.group(self, [MethodType(mousemotion, self), MethodType(mousebuttondown, self), MethodType(mousebuttonup, self), MethodType(window, self)])
         return
+
+with proto("CheckBox") as CheckBox:
+    def drawCheckBox(self, screen):
+        color = (0, 0, 255) if self.checked else (255, 255, 255)
+        pg.draw.rect(screen, color, pg.Rect(self.position, self.size), 0, 5)
+        pg.draw.line(screen, (0, 0, 0), (self.position[0] + 7, self.position[1] + 20), (self.position[0] + 17, self.position[1] + 30), 5)
+        pg.draw.line(screen, (0, 0, 0), (self.position[0] + 17, self.position[1] + 30), (self.position[0] + 32, self.position[1] + 10), 5)
+        
+        return
     
+    def mousemotion(self, position: tuple[int, int]) -> None:
+        mouseX, mouseY = pg.mouse.get_pos()
+        if mouseX > self.position[0] and mouseX < self.position[0] + self.size[0] and mouseY > self.position[1] and mouseY < self.position[1] + self.size[1]:
+            self.onHover()
+            Events.trigger("hovering", self)
+        else:
+            Events.trigger("unhovering", self)
+        return
+
+    def mousebuttondown(self, position: tuple[int, int], button: int) -> None:
+        mouseX, mouseY = pg.mouse.get_pos()
+        if mouseX > self.position[0] and mouseX < self.position[0] + self.size[0] and mouseY > self.position[1] and mouseY < self.position[1] + self.size[1]:
+            self.onPressed()
+        return
+    
+    def mousebuttonup(self, position: tuple[int, int], button: int) -> None:
+        mouseX, mouseY = pg.mouse.get_pos()
+        if mouseX > self.position[0] and mouseX < self.position[0] + self.size[0] and mouseY > self.position[1] and mouseY < self.position[1] + self.size[1]:
+            self.onReleased()
+        return
+
+    def window(self, w):
+        Events.stopObserving(self)
+
+    def onHover():
+        pg.mouse.set_cursor(pg.SYSTEM_CURSOR_HAND)
+
+    @CheckBox
+    def onPressed(self):
+        self.checked = not self.checked
+    
+    @CheckBox
+    def new(self, position: tuple[int, int], checked: bool = False):
+        self.checked = checked
+        self.position = position
+        self.size  = [40, 40]
+        self.draw = MethodType(drawCheckBox, self)
+        self.onReleased = lambda: None
+        self.onHover = onHover
+        Events.group(self, [MethodType(mousemotion, self), MethodType(mousebuttondown, self), MethodType(mousebuttonup, self), MethodType(window, self)])
+
 with proto("MessageBox") as MessageBox:
     def drawMB(self, screen):
         if not self.active: return

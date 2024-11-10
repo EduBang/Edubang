@@ -1,7 +1,8 @@
 from random import randint
 
 from main import Game
-from source.shared.utils.utils import updateCorps, process_collide, Captors, Button, Corps, Path
+from source.shared.utils.utils import updateCorps, process_collide, Captors, Button, Corps, CheckBox
+
 
 def playSandbox():
     Game.reset()
@@ -68,6 +69,8 @@ def load(*args, **kwargs):
     quitButton.onPressed = quitFunction
     buttons.append(quitButton)
 
+    check = CheckBox((300, 100))
+    buttons.append(check)
     
     return
 
