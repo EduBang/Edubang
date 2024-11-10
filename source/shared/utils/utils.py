@@ -5,28 +5,23 @@ import pygame as pg
 from main import Game
 from proto import proto
 from eventListen import Events
-from components.Vectors import *
-from components.Corps import *
-from components.Physics import *
-from components.Captors import *
-
-
-pg.font.init()
-font = pg.font.SysFont("Comic Sans MS", 12)
+from shared.components.Vectors import *
+from shared.components.Corps import *
+from shared.components.Physics import *
+from shared.components.Captors import *
 
 with proto("Button") as Button:
     def drawButton(self, screen):
-        pg.draw.rect(screen, (255, 255, 255), pg.Rect(self.position, self.size))
-        surface = font.render(self.text, False, (0, 0, 0))
-        width, height = font.size(self.text)
+        pg.draw.rect(screen, (255, 255, 255), pg.Rect(self.position, self.size), 0, 8)
+        surface = Game.font.render(self.text, False, (0, 0, 0))
+        width, height = Game.font.size(self.text)
         x = self.position[0] + (self.size[0] - width) / 2
         y = self.position[1] + (self.size[1] - height) / 2
         screen.blit(surface, (x, y))
         return
     
     def mousemotion(self, position: tuple[int, int]) -> None:
-        mouseX, mouseY = pg.mouse.get_pos()
-        if mouseX > self.position[0] and mouseX < self.position[0] + self.size[0] and mouseY > self.position[1] and mouseY < self.position[1] + self.size[1]:
+        if position[0] > self.position[0] and position[1] < self.position[0] + self.size[0] and position[1] > self.position[1] and position[1] < self.position[1] + self.size[1]:
             self.onHover()
             Events.trigger("hovering", self)
         else:
@@ -34,14 +29,14 @@ with proto("Button") as Button:
         return
 
     def mousebuttondown(self, position: tuple[int, int], button: int) -> None:
-        mouseX, mouseY = pg.mouse.get_pos()
-        if mouseX > self.position[0] and mouseX < self.position[0] + self.size[0] and mouseY > self.position[1] and mouseY < self.position[1] + self.size[1]:
+        if button != 1: return
+        if position[0] > self.position[0] and position[0] < self.position[0] + self.size[0] and position[1] > self.position[1] and position[1] < self.position[1] + self.size[1]:
             self.onPressed()
         return
     
     def mousebuttonup(self, position: tuple[int, int], button: int) -> None:
-        mouseX, mouseY = pg.mouse.get_pos()
-        if mouseX > self.position[0] and mouseX < self.position[0] + self.size[0] and mouseY > self.position[1] and mouseY < self.position[1] + self.size[1]:
+        if button != 1: return
+        if position[0] > self.position[0] and position[0] < self.position[0] + self.size[0] and position[1] > self.position[1] and position[1] < self.position[1] + self.size[1]:
             self.onReleased()
         return
 
@@ -66,15 +61,14 @@ with proto("Button") as Button:
 with proto("CheckBox") as CheckBox:
     def drawCheckBox(self, screen):
         color = (0, 0, 255) if self.checked else (255, 255, 255)
-        pg.draw.rect(screen, color, pg.Rect(self.position, self.size), 0, 5)
-        pg.draw.line(screen, (0, 0, 0), (self.position[0] + 7, self.position[1] + 20), (self.position[0] + 17, self.position[1] + 30), 5)
-        pg.draw.line(screen, (0, 0, 0), (self.position[0] + 17, self.position[1] + 30), (self.position[0] + 32, self.position[1] + 10), 5)
-        
+        pg.draw.rect(screen, color, pg.Rect(self.position, self.size), 0, 4)
+        if color == (0, 0, 255):
+            pg.draw.line(screen, (0, 0, 0), (self.position[0] + 7, self.position[1] + 20), (self.position[0] + 17, self.position[1] + 30), 5)
+            pg.draw.line(screen, (0, 0, 0), (self.position[0] + 17, self.position[1] + 30), (self.position[0] + 32, self.position[1] + 10), 5)
         return
     
     def mousemotion(self, position: tuple[int, int]) -> None:
-        mouseX, mouseY = pg.mouse.get_pos()
-        if mouseX > self.position[0] and mouseX < self.position[0] + self.size[0] and mouseY > self.position[1] and mouseY < self.position[1] + self.size[1]:
+        if position[0] > self.position[0] and position[0] < self.position[0] + self.size[0] and position[1] > self.position[1] and position[1] < self.position[1] + self.size[1]:
             self.onHover()
             Events.trigger("hovering", self)
         else:
@@ -82,14 +76,14 @@ with proto("CheckBox") as CheckBox:
         return
 
     def mousebuttondown(self, position: tuple[int, int], button: int) -> None:
-        mouseX, mouseY = pg.mouse.get_pos()
-        if mouseX > self.position[0] and mouseX < self.position[0] + self.size[0] and mouseY > self.position[1] and mouseY < self.position[1] + self.size[1]:
+        if button != 1: return
+        if position[0] > self.position[0] and position[0] < self.position[0] + self.size[0] and position[1] > self.position[1] and position[1] < self.position[1] + self.size[1]:
             self.onPressed()
         return
     
     def mousebuttonup(self, position: tuple[int, int], button: int) -> None:
-        mouseX, mouseY = pg.mouse.get_pos()
-        if mouseX > self.position[0] and mouseX < self.position[0] + self.size[0] and mouseY > self.position[1] and mouseY < self.position[1] + self.size[1]:
+        if button != 1: return
+        if position[0] > self.position[0] and position[0] < self.position[0] + self.size[0] and position[1] > self.position[1] and position[1] < self.position[1] + self.size[1]:
             self.onReleased()
         return
 
@@ -114,28 +108,108 @@ with proto("CheckBox") as CheckBox:
         Events.group(self, [MethodType(mousemotion, self), MethodType(mousebuttondown, self), MethodType(mousebuttonup, self), MethodType(window, self)])
 
 with proto("MessageBox") as MessageBox:
-    def drawMB(self, screen):
+    @MessageBox
+    def draw(self, screen):
         if not self.active: return
         widthScreen, heightScreen = pg.display.get_surface().get_size()
-        xRect = widthScreen / 2 - 50
-        yRect = heightScreen / 2 - 30
-        pg.draw.rect(screen, (255, 255, 255), pg.Rect((xRect, yRect), (100, 60)))
-        surface = font.render(self.text, False, (0, 0, 0))
-        width, height = font.size(self.text)
-        x = xRect - width / 2
-        y = yRect - height / 2
-        screen.blit(surface, (x, y))
+        surface = Game.font.render(self.text, False, (0, 0, 0))
+        width, height = Game.font.size(self.text)
+        x = widthScreen // 2
+        y = heightScreen // 2
+        xRect = x - (width + 20) // 2
+        yRect = y - (height + 20) // 2
+        pg.draw.rect(screen, (255, 255, 255), pg.Rect((xRect , yRect), (width + 20, height + 20)))
+        screen.blit(surface, (xRect + 10, yRect + height // 2))
         return
     
     @MessageBox
     def new(self, message: str):
         self.text = message
         self.active = False
-        self.draw = MethodType(drawMB, self)
+
+with proto("KeyBind") as KeyBind:
+    def drawKeyBind(self, screen):
+        color = (0, 0, 255) if self.focus else (255, 255, 255)
+        pg.draw.rect(screen, color, pg.Rect(self.position, self.size), 0, 4)
+        surface = Game.font.render(chr(self.key), False, (0, 0, 0))
+        width, height = Game.font.size(chr(self.key))
+        x = self.position[0] + width // 2
+        y = self.position[1] + height // 2
+        screen.blit(surface, (x, y))
+        return
+    
+    def mousemotion(self, position: tuple[int, int]) -> None:
+        if position[0] > self.position[0] and position[0] < self.position[0] + self.size[0] and position[1] > self.position[1] and position[1] < self.position[1] + self.size[1]:
+            self.onHover()
+            Events.trigger("hovering", self)
+        else:
+            Events.trigger("unhovering", self)
+        return
+
+    def mousebuttondown(self, position: tuple[int, int], button: int) -> None:
+        if button != 1: return
+        if position[0] > self.position[0] and position[0] < self.position[0] + self.size[0] and position[1] > self.position[1] and position[1] < self.position[1] + self.size[1]:
+            self.onPressed()
+        return
+    
+    def mousebuttonup(self, position: tuple[int, int], button: int) -> None:
+        if button != 1: return
+        if position[0] > self.position[0] and position[0] < self.position[0] + self.size[0] and position[1] > self.position[1] and position[1] < self.position[1] + self.size[1]:
+            self.onReleased()
+        else:
+            self.focus = False
+        return
+
+    def window(self, w):
+        Events.stopObserving(self)
+
+    def keydown(self, key: int) -> None:
+        if self.focus:
+            if 0 < key < 1114112:
+                self.key = key
+            self.focus = False
+        return
+
+    def onHover():
+        pg.mouse.set_cursor(pg.SYSTEM_CURSOR_HAND)
+
+    @KeyBind
+    def onPressed(self) -> None:
+        self.focus = True
+        return
+
+    @KeyBind
+    def new(self, key: int, position: tuple[int, int]) -> None:
+        self.focus = False
+        self.key = key
+        self.position = position
+        self.size  = [40, 40]
+        self.draw = MethodType(drawKeyBind, self)
+        self.onReleased = lambda: None
+        self.onHover = onHover
+        Events.group(self, [MethodType(mousemotion, self), MethodType(mousebuttondown, self), MethodType(mousebuttonup, self), MethodType(window, self), MethodType(keydown, self)])
+
+with proto("Text") as Text:
+    @Text
+    def draw(self, screen) -> None:
+        surface = Game.font.render(self.text, self.antialiasing, self.color)
+        screen.blit(surface, self.position)
+
+    @Text
+    def new(self, text: str, position: tuple[int, int], antialiasing: bool = False, color: tuple[int, int, int] = (0, 0, 0)) -> None:
+        self.text = text
+        self.position = position
+        self.antialiasing = antialiasing
+        self.color = color
+        self.size = Game.font.size(self.text)
 
 
+# prototype pour garder des variables
+with proto("DataKeeper") as DataKeeper:
+    @DataKeeper
+    def new(self):
+        return
 
-#class trajectoire
 with proto("Path") as Path:
     # dessiner trajectoire terre
     @Path

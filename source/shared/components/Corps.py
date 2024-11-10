@@ -2,6 +2,8 @@ from proto import proto
 import pygame as pg
 from math import pi
 
+from main import Game
+
 with proto("Corps") as Corps:
     @Corps
     def new(self, mass, radius, pos, color, v_initial_x, v_initial_y):
@@ -16,9 +18,13 @@ with proto("Corps") as Corps:
     def draw(self, screen, camera):
         x = float((self.pos[0] + camera.x / camera.zoom) * camera.zoom)
         y = float((self.pos[1] + camera.y / camera.zoom) * camera.zoom)
-        if pi * (self.radius * camera.zoom) ** 2 < 10: # Si le corps est trop petit sur l'écran, alors il va l'afficher à un 5ème de sa taille et ne dépendra plus du zoom.
-            pg.draw.circle(screen, self.color, (x, y), self.radius // 5)
-            pg.draw.circle(screen, (255, 255, 255), (x, y), self.radius // 5, 1)
+        if pi * (self.radius * camera.zoom) ** 2 < 10: # Si le corps est trop petit sur l'écran, alors il va l'afficher avec une croix
+            pg.draw.line(screen, (255, 255, 255), (x - 8, y), (x + 8, y), 2)
+            pg.draw.line(screen, (255, 255, 255), (x, y - 8), (x, y + 8), 2)
+            if hasattr(self, "name"): # s'il a l'attribut "name", alors il va l'afficher
+                pg.draw.line(screen, (255, 255, 255), (x + 4, y - 4), (x + 16, y - 16), 1)
+                surface = Game.font.render(self.name, False, (255, 255, 255))
+                screen.blit(surface, (x + 18, y - 30))
         else:
             pg.draw.circle(screen, self.color, (x, y), self.radius * camera.zoom)
     

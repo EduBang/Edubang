@@ -1,12 +1,16 @@
 from random import randint
 
 from main import Game
-from source.shared.utils.utils import updateCorps, process_collide, Captors, Button, Corps, CheckBox
+from shared.utils.utils import updateCorps, process_collide, Captors, Button, Corps
 
 
 def playSandbox():
     Game.reset()
     Game.select("sandbox")
+
+def goKeybind():
+    Game.reset()
+    Game.select("keybind")
 
 def quitFunction():
     Game.running = False
@@ -64,35 +68,37 @@ def load(*args, **kwargs):
     sandbox.onPressed = playSandbox
     buttons.append(sandbox)
 
-    quitButton = Button((100, 200), (180, 60))
+    keybindButton = Button((100, 200), (180, 60))
+    keybindButton.text = "Keybind"
+    keybindButton.onPressed = goKeybind
+    buttons.append(keybindButton)
+
+    quitButton = Button((100, 300), (180, 60))
     quitButton.text = "Quit"
     quitButton.onPressed = quitFunction
     buttons.append(quitButton)
-
-    check = CheckBox((300, 100))
-    buttons.append(check)
-    
     return
 
 def draw(screen):
     screen.fill((0, 0 ,0))
 
     for corps in Game.space:
-        for otherCorps in Game.space:
-            if corps == otherCorps: # si le corps est égale à l'autre corps
-                continue # on l'oublie
+        corps.draw(screen, Game.Camera)
+    
+    for btn in buttons:
+        btn.draw(screen)
+    
+    return
 
+def update():
+    for corps in Game.space:
+        for otherCorps in Game.space:
+            if corps == otherCorps:
+                continue
             distance = updateCorps(corps, otherCorps)
-            # Vérification de la collision
             if Captors.collide(corps, otherCorps, distance):
                 removedCorps = process_collide(corps, otherCorps)
                 Game.space.remove(removedCorps)
         
         corps.update_position([0, 0], Game.dt)
-        corps.draw(screen, Game.Camera)
-        # Path.draw_corps_path(screen, corps.path, corps.color)
-    
-    for btn in buttons:
-        btn.draw(screen)
-    
     return
