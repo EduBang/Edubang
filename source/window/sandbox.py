@@ -1,17 +1,37 @@
 import pygame as pg
 
 from main import Game
-from shared.utils.utils import updateCorps, process_collide, Captors, Corps, MessageBox, Path, DataKeeper
+from shared.utils.utils import updateCorps, process_collide, Captors, Corps, MessageBox, Path, DataKeeper, Input, Text, CheckBox
 
 from eventListen import Events
 
 dk = DataKeeper()
-
 dk.active = False
+interface = []
+font = pg.font.SysFont("Comic Sans MS", 30)
 mb = MessageBox("Return to menu ?")
 
 @Events.observe
-def keydown(key: int) -> None:
+def window(w):
+    for i in interface:
+        interface.remove(i)
+
+@Events.observe
+def keydown(event) -> None:
+    key = Game.getKeyFromCode(event.key)
+    if key:
+        Game.keys[key] = True
+    if Game.keys["increaseTime"]:
+        for i in interface:
+            if not hasattr(i, "numberOnly"): continue
+            txt = i.text
+            i.text = str(int(txt if txt != "" else "0") + 1)
+    if Game.keys["decreaseTime"]:
+        for i in interface:
+            if not hasattr(i, "numberOnly"): continue
+            txt = i.text
+            i.text = str(int(txt if txt != "" else "0") - 1)
+    key = event.key
     if not dk.active: return
     if key == pg.K_ESCAPE:
         if mb.active:
@@ -25,7 +45,8 @@ def keydown(key: int) -> None:
         mb.active = False
 
 @Events.observe
-def mousebuttondown(position: tuple[int, int], button: int) -> None:
+def mousebuttondown(event) -> None:
+    button = event.button
     if not dk.active: return
     if button in [4, 5]:
         return
@@ -64,19 +85,50 @@ def load(*args, **kwargs):
     Game.space.append(uranus)
     Game.space.append(neptune)
 
+    textDT = Text("DT : ", (40, 40), color=(255, 255, 255), font=font)
+    interface.append(textDT)
+
+    inputDT = Input(str(Game.dt), (100, 40), (200, 40))
+    def inputDTdraw(screen):
+        color = (0, 0, 255) if inputDT.focus else (255, 255, 255)
+        surface = inputDT.font.render(inputDT.text, False, color)
+        dim = inputDT.font.size(inputDT.text)
+        x = inputDT.position[0] + 5
+        y = inputDT.position[1] + inputDT.size[1] // 2 - dim[1] // 2
+        screen.blit(surface, (x, y))
+    inputDT.draw = inputDTdraw
+    inputDT.font = font
+    inputDT.numberOnly = True
+    interface.append(inputDT)
+
+    textShowPath = Text("Afficher les trajectoires", (40, 108), color=(255, 255, 255))
+    interface.append(textShowPath)
+
+    showPath = CheckBox((220, 100), False)
+    showPath.trajectoire = None
+    interface.append(showPath)
+
     return
 
-font = pg.font.SysFont("Comic Sans MS", 30)
-
 def draw(screen):
-    screen.fill((0, 0 ,0))
+    screen.fill((0, 0, 0))
+
+    showPath: bool = False
+
+    for element in interface:
+        if not hasattr(element, "trajectoire",): continue
+        showPath = element.checked
+        
 
     for corps in Game.space:
         corps.draw(screen, Game.Camera)
-        Path.draw_corps_path(screen, corps.path, corps.color)
+        if showPath:
+            Path.draw_corps_path(screen, corps.path, corps.color)
 
-    surface = font.render("DT : %s" % str(Game.dt), False, (255, 255, 255))
-    screen.blit(surface, (40, 40))
+    for element in interface:
+        element.draw(screen)
+        if hasattr(element, "numberOnly"):
+            Game.dt = int(element.text) if element.text not in ["-", ""] else 0
 
     mb.draw(screen)
     return

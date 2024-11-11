@@ -3,7 +3,6 @@ from os import listdir, path
 from importlib import util
 from math import pi, sqrt
 
-
 import pygame as pg
 
 from proto import proto
@@ -20,7 +19,7 @@ resolution = (1200, 1000)
 screen = pg.display.set_mode(resolution)
 pg.key.set_repeat(500, 50)
 pg.font.init()
-font = pg.font.SysFont("Comic Sans MS", 12)
+font = pg.font.SysFont("Comic Sans MS", 14)
 
 with proto("Game") as Game:
     @Game
@@ -70,7 +69,6 @@ with proto("Game") as Game:
         values = self.keybinds.values()
         for v, k in zip(values, keys):
             self.invertedKeybinds[v] = k
-        print(self.keybinds)
         return
     
     @Game
@@ -151,25 +149,24 @@ def unhovering(button):
     return
 
 @Events.observe
-def keydown(code: int) -> None:
+def keydown(event) -> None:
+    code = event.key
     key = Game.getKeyFromCode(code)
     if key:
         Game.keys[key] = True
-        if Game.keys["increaseTime"]:
-            Game.dt += 1
-        if Game.keys["decreaseTime"]:
-            Game.dt -= 1
     return
 
 @Events.observe
-def keyup(code: int) -> None:
+def keyup(event) -> None:
+    code = event.key
     key = Game.getKeyFromCode(code)
     if key:
         Game.keys[key] = False
     return
 
 @Events.observe
-def mousewheel(x: int, y: int) -> None:
+def mousewheel(event) -> None:
+    x, y = event.x, event.y
     if not Game.Camera.active: return
     if y == 1 and Game.Camera.zoom < Game.Camera.maxZoom: # scroll vers le haut: zoom
         Game.Camera.zoom *= 1.05
@@ -178,16 +175,18 @@ def mousewheel(x: int, y: int) -> None:
     return
 
 @Events.observe
-def mousebuttondown(position: tuple[int, int], button: int) -> None:
+def mousebuttondown(event) -> None:
+    button = event.button
+    x, y = event.pos
     if button in [4, 5]: # les scrolls bas et haut sont considirés comme des cliques de souris
         return
     if button == 1: # clique gauche
         if not Game.Camera.active: return
         for corps in Game.space:
-            x = float((corps.pos[0] + Game.Camera.x / Game.Camera.zoom) * Game.Camera.zoom)
-            y = float((corps.pos[1] + Game.Camera.y / Game.Camera.zoom) * Game.Camera.zoom)
-            sqx = (position[0] - x) ** 2
-            sqy = (position[1] - y) ** 2
+            xC = float((corps.pos[0] + Game.Camera.x / Game.Camera.zoom) * Game.Camera.zoom)
+            yC = float((corps.pos[1] + Game.Camera.y / Game.Camera.zoom) * Game.Camera.zoom)
+            sqx = (x - xC) ** 2
+            sqy = (y - yC) ** 2
             if pi * (corps.radius * Game.Camera.zoom) ** 2 < 10:
                 if sqrt(sqx + sqy) < corps.radius // 5:
                     Game.Camera.focus = corps
@@ -215,17 +214,17 @@ def gameLoop() -> None:
                 Game.running = False
 
             if event.type == pg.KEYDOWN:
-                Events.trigger("keydown", event.key)
+                Events.trigger("keydown", event) # key, unicode
             if event.type == pg.KEYUP:
-                Events.trigger("keyup", event.key)
+                Events.trigger("keyup", event) # key
             if event.type == pg.MOUSEWHEEL:
-                Events.trigger("mousewheel", event.x, event.y)
+                Events.trigger("mousewheel", event) # x, y
             if event.type == pg.MOUSEBUTTONDOWN:
-                Events.trigger("mousebuttondown", event.pos, event.button)
+                Events.trigger("mousebuttondown", event) # pos, button
             if event.type == pg.MOUSEBUTTONUP:
-                Events.trigger("mousebuttonup", event.pos, event.button)
+                Events.trigger("mousebuttonup", event) # pos, button
             if event.type == pg.MOUSEMOTION:
-                Events.trigger("mousemotion", event.pos)
+                Events.trigger("mousemotion", event) # pos
         
         if Game.Camera.active:
             if Game.keys["cameraUp"]: # faire monter la caméra

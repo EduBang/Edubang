@@ -3,6 +3,7 @@ from random import randint
 from main import Game
 from shared.utils.utils import updateCorps, process_collide, Captors, Button, Corps
 
+from eventListen import Events
 
 def playSandbox():
     Game.reset()
@@ -15,7 +16,12 @@ def goKeybind():
 def quitFunction():
     Game.running = False
 
-buttons = []
+interface = []
+
+@Events.observe
+def window(w):
+    for i in interface:
+        interface.remove(i)
 
 def load(*args, **kwargs):
     if randint(0, 1) == 0:
@@ -66,17 +72,17 @@ def load(*args, **kwargs):
     sandbox = Button((100, 100), (180, 60))
     sandbox.text = "Play Sandbox"
     sandbox.onPressed = playSandbox
-    buttons.append(sandbox)
+    interface.append(sandbox)
 
     keybindButton = Button((100, 200), (180, 60))
     keybindButton.text = "Keybind"
     keybindButton.onPressed = goKeybind
-    buttons.append(keybindButton)
+    interface.append(keybindButton)
 
     quitButton = Button((100, 300), (180, 60))
     quitButton.text = "Quit"
     quitButton.onPressed = quitFunction
-    buttons.append(quitButton)
+    interface.append(quitButton)
     return
 
 def draw(screen):
@@ -85,8 +91,8 @@ def draw(screen):
     for corps in Game.space:
         corps.draw(screen, Game.Camera)
     
-    for btn in buttons:
-        btn.draw(screen)
+    for element in interface:
+        element.draw(screen)
     
     return
 

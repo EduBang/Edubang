@@ -3,14 +3,21 @@ import json
 from main import Game
 from shared.utils.utils import Button, DataKeeper, KeyBind, Text
 
+from eventListen import Events
+
 dk = DataKeeper()
 
-buttons = []
+interface = []
+
+@Events.observe
+def window(w):
+    for i in interface:
+        interface.remove(i)
 
 def backFunction():
     newKeybinds = {}
     with open("source/data/keybind.json", "w", encoding="utf-8") as f:
-        for keybind in buttons:
+        for keybind in interface:
             if not hasattr(keybind, "kb"):
                 continue
             newKeybinds[getattr(keybind, "kb")] = keybind.key
@@ -24,7 +31,7 @@ def load() -> None:
     backButton = Button((100, 100), (180, 60))
     backButton.text = "Back to menu"
     backButton.onPressed = backFunction
-    buttons.append(backButton)
+    interface.append(backButton)
 
     with open("source/data/keybind.json", "r", encoding="utf-8") as f:
         dk.keybinds = json.load(f)
@@ -34,14 +41,14 @@ def load() -> None:
         keybind = KeyBind(dk.keybinds[kb], (200, 100 * (i + 1) + 100))
         keybind.kb = kb
         text = Text(kb, (100, 100 * (i + 1) + 110), color=(255, 255, 255))
-        buttons.append(keybind)
-        buttons.append(text)
+        interface.append(keybind)
+        interface.append(text)
     return
 
 def draw(screen) -> None:
     screen.fill((0, 0 ,0))
-    for btn in buttons:
-        btn.draw(screen)
+    for element in interface:
+        element.draw(screen)
     return
 
 def update() -> None:

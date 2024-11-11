@@ -20,23 +20,28 @@ with proto("Button") as Button:
         screen.blit(surface, (x, y))
         return
     
-    def mousemotion(self, position: tuple[int, int]) -> None:
-        if position[0] > self.position[0] and position[1] < self.position[0] + self.size[0] and position[1] > self.position[1] and position[1] < self.position[1] + self.size[1]:
+    def mousemotion(self, event) -> None:
+        x, y = event.pos
+        if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
             self.onHover()
             Events.trigger("hovering", self)
         else:
             Events.trigger("unhovering", self)
         return
 
-    def mousebuttondown(self, position: tuple[int, int], button: int) -> None:
+    def mousebuttondown(self, event) -> None:
+        button = event.button
+        x, y = event.pos
         if button != 1: return
-        if position[0] > self.position[0] and position[0] < self.position[0] + self.size[0] and position[1] > self.position[1] and position[1] < self.position[1] + self.size[1]:
+        if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
             self.onPressed()
         return
     
-    def mousebuttonup(self, position: tuple[int, int], button: int) -> None:
+    def mousebuttonup(self, event) -> None:
+        button = event.button
+        x, y = event.pos
         if button != 1: return
-        if position[0] > self.position[0] and position[0] < self.position[0] + self.size[0] and position[1] > self.position[1] and position[1] < self.position[1] + self.size[1]:
+        if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
             self.onReleased()
         return
 
@@ -67,23 +72,28 @@ with proto("CheckBox") as CheckBox:
             pg.draw.line(screen, (0, 0, 0), (self.position[0] + 17, self.position[1] + 30), (self.position[0] + 32, self.position[1] + 10), 5)
         return
     
-    def mousemotion(self, position: tuple[int, int]) -> None:
-        if position[0] > self.position[0] and position[0] < self.position[0] + self.size[0] and position[1] > self.position[1] and position[1] < self.position[1] + self.size[1]:
+    def mousemotion(self, event) -> None:
+        x, y = event.pos
+        if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
             self.onHover()
             Events.trigger("hovering", self)
         else:
             Events.trigger("unhovering", self)
         return
 
-    def mousebuttondown(self, position: tuple[int, int], button: int) -> None:
+    def mousebuttondown(self, event) -> None:
+        button = event.button
+        x, y = event.pos
         if button != 1: return
-        if position[0] > self.position[0] and position[0] < self.position[0] + self.size[0] and position[1] > self.position[1] and position[1] < self.position[1] + self.size[1]:
+        if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
             self.onPressed()
         return
     
-    def mousebuttonup(self, position: tuple[int, int], button: int) -> None:
+    def mousebuttonup(self, event) -> None:
+        button = event.button
+        x, y = event.pos
         if button != 1: return
-        if position[0] > self.position[0] and position[0] < self.position[0] + self.size[0] and position[1] > self.position[1] and position[1] < self.position[1] + self.size[1]:
+        if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
             self.onReleased()
         return
 
@@ -138,26 +148,29 @@ with proto("KeyBind") as KeyBind:
         screen.blit(surface, (x, y))
         return
     
-    def mousemotion(self, position: tuple[int, int]) -> None:
-        if position[0] > self.position[0] and position[0] < self.position[0] + self.size[0] and position[1] > self.position[1] and position[1] < self.position[1] + self.size[1]:
+    def mousemotion(self, event) -> None:
+        x, y = event.pos
+        if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
             self.onHover()
             Events.trigger("hovering", self)
         else:
             Events.trigger("unhovering", self)
         return
 
-    def mousebuttondown(self, position: tuple[int, int], button: int) -> None:
+    def mousebuttondown(self, event) -> None:
+        button = event.button
+        x, y = event.pos
         if button != 1: return
-        if position[0] > self.position[0] and position[0] < self.position[0] + self.size[0] and position[1] > self.position[1] and position[1] < self.position[1] + self.size[1]:
+        if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
             self.onPressed()
         return
     
-    def mousebuttonup(self, position: tuple[int, int], button: int) -> None:
+    def mousebuttonup(self, event) -> None:
+        button = event.button
+        x, y = event.pos
         if button != 1: return
-        if position[0] > self.position[0] and position[0] < self.position[0] + self.size[0] and position[1] > self.position[1] and position[1] < self.position[1] + self.size[1]:
+        if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
             self.onReleased()
-        else:
-            self.focus = False
         return
 
     def window(self, w):
@@ -192,17 +205,93 @@ with proto("KeyBind") as KeyBind:
 with proto("Text") as Text:
     @Text
     def draw(self, screen) -> None:
-        surface = Game.font.render(self.text, self.antialiasing, self.color)
+        surface = self.font.render(self.text, self.antialiasing, self.color)
         screen.blit(surface, self.position)
 
     @Text
-    def new(self, text: str, position: tuple[int, int], antialiasing: bool = False, color: tuple[int, int, int] = (0, 0, 0)) -> None:
+    def new(self, text: str, position: tuple[int, int], antialiasing: bool = False, color: tuple[int, int, int] = (0, 0, 0), font=Game.font) -> None:
         self.text = text
         self.position = position
         self.antialiasing = antialiasing
         self.color = color
+        self.font = font
         self.size = Game.font.size(self.text)
 
+with proto("Input") as Input:
+    def drawInput(self, screen):
+        color = (0, 0, 255) if self.focus else (255, 255, 255)
+        pg.draw.rect(screen, color, pg.Rect(self.position, self.size), 0, 4)
+        surface = self.font.render(self.text, False, (0, 0, 0))
+        dim = self.font.size(self.text)
+        x = self.position[0] + 5
+        y = self.position[1] + self.size[1] // 2 - dim[1] // 2
+        screen.blit(surface, (x, y))
+        return
+    
+    def mousemotion(self, event) -> None:
+        x, y = event.pos
+        if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
+            self.onHover()
+            Events.trigger("hovering", self)
+        else:
+            Events.trigger("unhovering", self)
+        return
+
+    def mousebuttondown(self, event) -> None:
+        button = event.button
+        x, y = event.pos
+        if button != 1: return
+        if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
+            self.onPressed()
+        return
+    
+    def mousebuttonup(self, event) -> None:
+        button = event.button
+        x, y = event.pos
+        if button != 1: return
+        if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
+            self.onReleased()
+        else:
+            self.focus = False
+        return
+
+    def window(self, w):
+        Events.stopObserving(self)
+
+    def keydown(self, event) -> None:
+        if self.focus:
+            if event.key in [pg.K_RETURN, pg.K_ESCAPE, pg.K_TAB]:
+                self.focus = False
+            elif event.key == pg.K_BACKSPACE:
+                self.text = self.text[:-1]
+            else:
+                if self.numberOnly:
+                    if not event.unicode.isdigit():
+                        return
+                self.text += event.unicode
+        return
+
+    def onHover():
+        pg.mouse.set_cursor(pg.SYSTEM_CURSOR_HAND)
+
+    @Input
+    def onPressed(self) -> None:
+        self.focus = True
+        return
+
+    @Input
+    def new(self, text: str, position: tuple[int, int], size: tuple[int, int]) -> None:
+        self.focus = False
+        self.text = text
+        self.position = position
+        self.size  = size
+        self.draw = MethodType(drawInput, self)
+        self.onReleased = lambda: None
+        self.afterInput = lambda: None
+        self.onHover = onHover
+        self.font = Game.font
+        self.numberOnly = False
+        Events.group(self, [MethodType(mousemotion, self), MethodType(mousebuttondown, self), MethodType(mousebuttonup, self), MethodType(window, self), MethodType(keydown, self)])
 
 # prototype pour garder des variables
 with proto("DataKeeper") as DataKeeper:
@@ -217,6 +306,7 @@ with proto("Path") as Path:
         for pos in path:
             x = float((pos[0] + Game.Camera.x / Game.Camera.zoom) * Game.Camera.zoom)
             y = float((pos[1] + Game.Camera.y / Game.Camera.zoom) * Game.Camera.zoom)
+            pg.draw.circle(screen, color, (x, y), 1)
     
 # Fonction permettant de mettre à jour la postion entre 2 corps.
 def updateCorps(a, b) -> float:
