@@ -20,7 +20,7 @@ screen = pg.display.set_mode((resolution), pg.RESIZABLE)
 pg.display.set_caption('Resizable_window')
 pg.key.set_repeat(500, 50)
 pg.font.init()
-font = pg.font.SysFont("Comic Sans MS", 14)
+font = pg.font.SysFont("FixelText-Semibold.otf", 30)
 
 with proto("Game") as Game:
     @Game
