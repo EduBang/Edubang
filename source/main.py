@@ -7,7 +7,6 @@ from math import pi, sqrt
 from proto import proto
 from eventListen import Events
 
-
 pg.init()
 
 # Initialisation
@@ -19,7 +18,13 @@ resolution = (1280, 720)
 screen = pg.display.set_mode((resolution), pg.RESIZABLE)
 pg.key.set_repeat(500, 50)
 pg.font.init()
-font = pg.font.SysFont("FixelText-Semibold.otf", 30)
+black = pg.font.SysFont("FixelText-black.otf", 30)
+extrabold = pg.font.SysFont("FixelText-ExtraBold.otf", 30)
+bold = pg.font.SysFont("FixelText-bold.otf", 30)
+semibold = pg.font.SysFont("FixelText-Semibold.otf", 30)
+medium = pg.font.SysFont("FixelText-Medium.otf", 30)
+regular = pg.font.SysFont("FixelText-Regular.otf", 30)
+light = pg.font.SysFont("FixelText-Light.otf", 30)
 
 with proto("Game") as Game:
     @Game
@@ -36,7 +41,7 @@ with proto("Game") as Game:
         self.Camera = CameraHandler()
         self.window = ""
         self.windows = {}
-        self.font = font
+        self.font = regular
         self.keybinds = {}
         self.keys = {}
         self.invertedKeybinds = {}
