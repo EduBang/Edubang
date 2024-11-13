@@ -1,4 +1,5 @@
 from types import MethodType
+from random import randint
 
 import pygame as pg
 
@@ -9,6 +10,8 @@ from shared.components.Vectors import *
 from shared.components.Corps import *
 from shared.components.Physics import *
 from shared.components.Captors import *
+
+# region Prototypes
 
 with proto("Button") as Button:
     def drawButton(self, screen):
@@ -60,6 +63,7 @@ with proto("Button") as Button:
         self.onPressed = lambda: None
         self.onReleased = lambda: None
         self.onHover = onHover
+        self.meta = {}
         Events.group(self, [MethodType(mousemotion, self), MethodType(mousebuttondown, self), MethodType(mousebuttonup, self), MethodType(window, self)])
         return
 
@@ -115,6 +119,7 @@ with proto("CheckBox") as CheckBox:
         self.draw = MethodType(drawCheckBox, self)
         self.onReleased = lambda: None
         self.onHover = onHover
+        self.meta = {}
         Events.group(self, [MethodType(mousemotion, self), MethodType(mousebuttondown, self), MethodType(mousebuttonup, self), MethodType(window, self)])
 
 with proto("MessageBox") as MessageBox:
@@ -136,6 +141,7 @@ with proto("MessageBox") as MessageBox:
     def new(self, message: str):
         self.text = message
         self.active = False
+        self.meta = {}
 
 with proto("KeyBind") as KeyBind:
     def drawKeyBind(self, screen):
@@ -200,6 +206,7 @@ with proto("KeyBind") as KeyBind:
         self.draw = MethodType(drawKeyBind, self)
         self.onReleased = lambda: None
         self.onHover = onHover
+        self.meta = {}
         Events.group(self, [MethodType(mousemotion, self), MethodType(mousebuttondown, self), MethodType(mousebuttonup, self), MethodType(window, self), MethodType(keydown, self)])
 
 with proto("Text") as Text:
@@ -216,6 +223,7 @@ with proto("Text") as Text:
         self.color = color
         self.font = font
         self.size = Game.font.size(self.text)
+        self.meta = {}
 
 with proto("Input") as Input:
     def drawInput(self, screen):
@@ -258,6 +266,7 @@ with proto("Input") as Input:
     def window(self, w):
         Events.stopObserving(self)
 
+    # eventListen à résoudre, prend la dernière fonction et l'applique pour toutes les protos
     def keydown(self, event) -> None:
         if self.focus:
             if event.key in [pg.K_RETURN, pg.K_ESCAPE, pg.K_TAB]:
@@ -291,6 +300,7 @@ with proto("Input") as Input:
         self.onHover = onHover
         self.font = Game.font
         self.numberOnly = False
+        self.meta = {}
         Events.group(self, [MethodType(mousemotion, self), MethodType(mousebuttondown, self), MethodType(mousebuttonup, self), MethodType(window, self), MethodType(keydown, self)])
 
 # prototype pour garder des variables
@@ -307,7 +317,11 @@ with proto("Path") as Path:
             x = float((pos[0] + Game.Camera.x / Game.Camera.zoom) * Game.Camera.zoom)
             y = float((pos[1] + Game.Camera.y / Game.Camera.zoom) * Game.Camera.zoom)
             pg.draw.circle(screen, color, (x, y), 1)
-    
+
+# endregion
+
+# region Fonctions physiques
+
 # Fonction permettant de mettre à jour la postion entre 2 corps.
 def updateCorps(a, b) -> float:
     distance = Vectors.get_distance(a, b)
@@ -364,7 +378,38 @@ def process_collide(corps1, corps2):
         Game.Camera.focus = corps
     return corps1 if hasChanged else corps2
 
+# endregion
 
+# region Fond espace
+
+def loadSpace(perlin) -> tuple[dict[tuple, tuple], int]:
+    noise_matrix = [[perlin.noise(x / 80, y / 80) for y in range(perlin.size)] for x in range(perlin.size)]
+
+    galaxy = {}
+
+    # Code qui génère les amas de galaxies
+    for x in range(perlin.size):
+        for y in range(perlin.size):
+            noise_x = int(x)
+            noise_y = int(y)
+            noise_val = noise_matrix[noise_x][noise_y]
+
+            # Si le "bruit" est fort, il va générer une galaxie.
+            if noise_val > 0.15:
+                color = (int(205 * noise_val), int(150 * noise_val), int(205 * noise_val * 0.8))
+                galaxy[(x, y)] = color
+
+    return (galaxy, perlin.size)
+
+def loadStars(n: int = 100, position: tuple[int, int] = (-1000, 1000)) -> list[tuple[int, int]]:
+    stars = {}
+    for i in range(n):
+        stars[(randint(position[0], position[1]), randint(position[0], position[1]))] = (255, 255, 255)
+    return stars
+
+# endregion
+
+# region Vecteur
 def draw_velocity_vector(self, corps):
     corps_velocity = Physics.get_velocity(corps.path[-2], corps.path[-1], Game.dt)
     unit_vector_mouv = Vectors.get_unit_vector_mouv(corps.path[-2], corps.path[-1])
@@ -377,3 +422,4 @@ def draw_cinetic_energy_vector(self, corps):
     cinetic_energy_vector = unit_vector_mouv * cinetic_energy
     return cinetic_energy_vector
     
+# endregion

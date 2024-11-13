@@ -244,8 +244,8 @@ def gameLoop() -> None:
             if Game.Camera.focus is not None:
                 midScreenX = screen.get_width() // 2
                 midScreenY = screen.get_height() // 2
-                Game.Camera.x = midScreenX - Game.Camera.focus.pos[0]
-                Game.Camera.y = midScreenY - Game.Camera.focus.pos[1]
+                Game.Camera.x = midScreenX - Game.Camera.focus.pos[0] * Game.Camera.zoom
+                Game.Camera.y = midScreenY - Game.Camera.focus.pos[1] * Game.Camera.zoom
 
         if len(buttons) == 0: # Si la souris ne hover plus rien
             pg.mouse.set_cursor(pg.SYSTEM_CURSOR_ARROW)

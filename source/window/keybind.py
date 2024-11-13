@@ -38,7 +38,7 @@ def load() -> None:
         f.close()
 
     for i, kb in enumerate(dk.keybinds):
-        keybind = KeyBind(dk.keybinds[kb], (200, 100 * (i + 1) + 100))
+        keybind = KeyBind(dk.keybinds[kb], (250, 100 * (i + 1) + 100))
         keybind.kb = kb
         text = Text(kb, (100, 100 * (i + 1) + 110), color=(255, 255, 255))
         interface.append(keybind)

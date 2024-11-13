@@ -1,12 +1,19 @@
 import pygame as pg
-
-from main import Game
-from shared.utils.utils import updateCorps, process_collide, Captors, Corps, MessageBox, Path, DataKeeper, Input, Text, CheckBox
+from PIL import Image
 
 from eventListen import Events
+from nsi25perlin import PerlinNoise
+
+from main import Game
+from shared.utils.utils import updateCorps, process_collide, Captors, Corps, MessageBox, Path, DataKeeper, Input, Text, CheckBox, loadSpace, loadStars
+
+
 
 dk = DataKeeper()
 dk.active = False
+dk.image = None
+dk.stars = []
+dk.perlin = PerlinNoise(768)
 interface = []
 font = pg.font.SysFont("Comic Sans MS", 30)
 mb = MessageBox("Return to menu ?")
@@ -31,6 +38,9 @@ def keydown(event) -> None:
             if not hasattr(i, "numberOnly"): continue
             txt = i.text
             i.text = str(int(txt if txt != "" else "0") - 1)
+    if Game.keys["resetCamera"]:
+        Game.Camera.reset()
+        Game.Camera.active = True
     key = event.key
     if not dk.active: return
     if key == pg.K_ESCAPE:
@@ -55,6 +65,15 @@ def mousebuttondown(event) -> None:
 def load(*args, **kwargs):
     Game.Camera.active = True
     dk.active = True
+
+    space, size = loadSpace(dk.perlin)
+    img = Image.new("RGB", (size, size))
+    for pos in space:
+        img.putpixel(pos, (space[pos]))
+    img = img.resize((5 * size, 5 * size), Image.Resampling.LANCZOS)
+    dk.image = pg.image.fromstring(img.tobytes(), img.size, img.mode)
+    
+    dk.stars = loadStars(2000, (-3000, 3000))
 
     soleil = Corps(1.9885e14, 700, (0, 0), (255, 255, 0), 0, 0)
     soleil.name = "Soleil"
@@ -104,7 +123,7 @@ def load(*args, **kwargs):
     textShowPath = Text("Afficher les trajectoires", (40, 108), color=(255, 255, 255))
     interface.append(textShowPath)
 
-    showPath = CheckBox((220, 100), False)
+    showPath = CheckBox((280, 100), False)
     showPath.trajectoire = None
     interface.append(showPath)
 
@@ -115,10 +134,19 @@ def draw(screen):
 
     showPath: bool = False
 
+    image = dk.image
+    size = image.get_size()
+
+    screen.blit(image, (Game.Camera.x / 10 - size[0] // 4, Game.Camera.y / 10 - size[1] // 4))
+
+    for star in dk.stars:
+        x = int(star[0] + Game.Camera.x / 7)
+        y = int(star[1] + Game.Camera.y / 7)
+        screen.set_at((x, y), dk.stars[star])
+
     for element in interface:
-        if not hasattr(element, "trajectoire",): continue
+        if not hasattr(element, "trajectoire"): continue
         showPath = element.checked
-        
 
     for corps in Game.space:
         corps.draw(screen, Game.Camera)
