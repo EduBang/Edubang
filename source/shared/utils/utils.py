@@ -23,7 +23,7 @@ with proto("Button") as Button:
         screen.blit(surface, (x, y))
         return
     
-    def mousemotion(self, event) -> None:
+    def mousemotionBTN(self, event) -> None:
         x, y = event.pos
         if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
             self.onHover()
@@ -32,7 +32,7 @@ with proto("Button") as Button:
             Events.trigger("unhovering", self)
         return
 
-    def mousebuttondown(self, event) -> None:
+    def mousebuttondownBTN(self, event) -> None:
         button = event.button
         x, y = event.pos
         if button != 1: return
@@ -40,7 +40,7 @@ with proto("Button") as Button:
             self.onPressed()
         return
     
-    def mousebuttonup(self, event) -> None:
+    def mousebuttonupBTN(self, event) -> None:
         button = event.button
         x, y = event.pos
         if button != 1: return
@@ -48,7 +48,7 @@ with proto("Button") as Button:
             self.onReleased()
         return
 
-    def window(self, w):
+    def windowBTN(self, w):
         Events.stopObserving(self)
 
     def onHover():
@@ -64,7 +64,12 @@ with proto("Button") as Button:
         self.onReleased = lambda: None
         self.onHover = onHover
         self.meta = {}
-        Events.group(self, [MethodType(mousemotion, self), MethodType(mousebuttondown, self), MethodType(mousebuttonup, self), MethodType(window, self)])
+        Events.group(self, {
+            "mousemotion": MethodType(mousemotionBTN, self),
+            "mousebuttondown": MethodType(mousebuttondownBTN, self),
+            "mousebuttonup": MethodType(mousebuttonupBTN, self),
+            "window": MethodType(windowBTN, self)
+            })
         return
 
 with proto("CheckBox") as CheckBox:
@@ -76,7 +81,7 @@ with proto("CheckBox") as CheckBox:
             pg.draw.line(screen, (0, 0, 0), (self.position[0] + 17, self.position[1] + 30), (self.position[0] + 32, self.position[1] + 10), 5)
         return
     
-    def mousemotion(self, event) -> None:
+    def mousemotionCB(self, event) -> None:
         x, y = event.pos
         if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
             self.onHover()
@@ -85,7 +90,7 @@ with proto("CheckBox") as CheckBox:
             Events.trigger("unhovering", self)
         return
 
-    def mousebuttondown(self, event) -> None:
+    def mousebuttondownCB(self, event) -> None:
         button = event.button
         x, y = event.pos
         if button != 1: return
@@ -93,7 +98,7 @@ with proto("CheckBox") as CheckBox:
             self.onPressed()
         return
     
-    def mousebuttonup(self, event) -> None:
+    def mousebuttonupCB(self, event) -> None:
         button = event.button
         x, y = event.pos
         if button != 1: return
@@ -101,7 +106,7 @@ with proto("CheckBox") as CheckBox:
             self.onReleased()
         return
 
-    def window(self, w):
+    def windowCB(self, w):
         Events.stopObserving(self)
 
     def onHover():
@@ -120,7 +125,12 @@ with proto("CheckBox") as CheckBox:
         self.onReleased = lambda: None
         self.onHover = onHover
         self.meta = {}
-        Events.group(self, [MethodType(mousemotion, self), MethodType(mousebuttondown, self), MethodType(mousebuttonup, self), MethodType(window, self)])
+        Events.group(self, {
+            "mousemotion": MethodType(mousemotionCB, self),
+            "mousebuttondown": MethodType(mousebuttondownCB, self),
+            "mousebuttonup": MethodType(mousebuttonupCB, self),
+            "window": MethodType(windowCB, self)
+            })
 
 with proto("MessageBox") as MessageBox:
     @MessageBox
@@ -154,7 +164,7 @@ with proto("KeyBind") as KeyBind:
         screen.blit(surface, (x, y))
         return
     
-    def mousemotion(self, event) -> None:
+    def mousemotionKB(self, event) -> None:
         x, y = event.pos
         if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
             self.onHover()
@@ -163,7 +173,7 @@ with proto("KeyBind") as KeyBind:
             Events.trigger("unhovering", self)
         return
 
-    def mousebuttondown(self, event) -> None:
+    def mousebuttondownKB(self, event) -> None:
         button = event.button
         x, y = event.pos
         if button != 1: return
@@ -171,7 +181,7 @@ with proto("KeyBind") as KeyBind:
             self.onPressed()
         return
     
-    def mousebuttonup(self, event) -> None:
+    def mousebuttonupKB(self, event) -> None:
         button = event.button
         x, y = event.pos
         if button != 1: return
@@ -179,13 +189,13 @@ with proto("KeyBind") as KeyBind:
             self.onReleased()
         return
 
-    def window(self, w):
+    def windowKB(self, w):
         Events.stopObserving(self)
 
-    def keydown(self, key: int) -> None:
+    def keydownKB(self, event) -> None:
         if self.focus:
-            if 0 < key < 1114112:
-                self.key = key
+            if 0 < event.key < 1114112:
+                self.key = event.key
             self.focus = False
         return
 
@@ -207,7 +217,13 @@ with proto("KeyBind") as KeyBind:
         self.onReleased = lambda: None
         self.onHover = onHover
         self.meta = {}
-        Events.group(self, [MethodType(mousemotion, self), MethodType(mousebuttondown, self), MethodType(mousebuttonup, self), MethodType(window, self), MethodType(keydown, self)])
+        Events.group(self, {
+            "mousemotion": MethodType(mousemotionKB, self),
+            "mousebuttondown": MethodType(mousebuttondownKB, self),
+            "mousebuttonup": MethodType(mousebuttonupKB, self),
+            "window": MethodType(windowKB, self),
+            "keydown": MethodType(keydownKB, self)
+            })
 
 with proto("Text") as Text:
     @Text
@@ -236,7 +252,7 @@ with proto("Input") as Input:
         screen.blit(surface, (x, y))
         return
     
-    def mousemotion(self, event) -> None:
+    def mousemotionI(self, event) -> None:
         x, y = event.pos
         if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
             self.onHover()
@@ -245,7 +261,7 @@ with proto("Input") as Input:
             Events.trigger("unhovering", self)
         return
 
-    def mousebuttondown(self, event) -> None:
+    def mousebuttondownI(self, event) -> None:
         button = event.button
         x, y = event.pos
         if button != 1: return
@@ -253,7 +269,7 @@ with proto("Input") as Input:
             self.onPressed()
         return
     
-    def mousebuttonup(self, event) -> None:
+    def mousebuttonupI(self, event) -> None:
         button = event.button
         x, y = event.pos
         if button != 1: return
@@ -263,11 +279,10 @@ with proto("Input") as Input:
             self.focus = False
         return
 
-    def window(self, w):
+    def windowI(self, w):
         Events.stopObserving(self)
 
-    # eventListen à résoudre, prend la dernière fonction et l'applique pour toutes les protos
-    def keydown(self, event) -> None:
+    def keydownI(self, event) -> None:
         if self.focus:
             if event.key in [pg.K_RETURN, pg.K_ESCAPE, pg.K_TAB]:
                 self.focus = False
@@ -301,7 +316,13 @@ with proto("Input") as Input:
         self.font = Game.font
         self.numberOnly = False
         self.meta = {}
-        Events.group(self, [MethodType(mousemotion, self), MethodType(mousebuttondown, self), MethodType(mousebuttonup, self), MethodType(window, self), MethodType(keydown, self)])
+        Events.group(self, {
+            "mousemotion": MethodType(mousemotionI, self),
+            "mousebuttondown": MethodType(mousebuttondownI, self),
+            "mouseubuttonup": MethodType(mousebuttonupI, self),
+            "window": MethodType(windowI, self),
+            "keydown": MethodType(keydownI, self)
+            })
 
 # prototype pour garder des variables
 with proto("DataKeeper") as DataKeeper:

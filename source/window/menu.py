@@ -1,9 +1,11 @@
 from random import randint
 
+from eventListen import Events
+
 from main import Game
 from shared.utils.utils import updateCorps, process_collide, Captors, Button, Corps
 
-from eventListen import Events
+
 
 def playSandbox():
     Game.reset()

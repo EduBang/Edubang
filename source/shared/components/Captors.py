@@ -1,5 +1,5 @@
 from proto import proto
-from math import *
+
 # si la distance est >= somme rayon --> collision
 
 with proto("Captors") as Captors:

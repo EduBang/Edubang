@@ -1,9 +1,10 @@
 import json
 
+from eventListen import Events
+
 from main import Game
 from shared.utils.utils import Button, DataKeeper, KeyBind, Text
 
-from eventListen import Events
 
 dk = DataKeeper()
 

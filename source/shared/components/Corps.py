@@ -1,6 +1,7 @@
+from math import pi
+
 from proto import proto
 import pygame as pg
-from math import pi
 
 from main import Game
 

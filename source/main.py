@@ -1,9 +1,9 @@
 import json
-import pygame as pg
-
 from os import listdir, path
-from importlib import util
 from math import pi, sqrt
+from importlib import util
+
+import pygame as pg
 from proto import proto
 from eventListen import Events
 

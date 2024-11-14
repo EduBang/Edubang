@@ -1,6 +1,5 @@
 import pygame as pg
 from PIL import Image
-
 from eventListen import Events
 from nsi25perlin import PerlinNoise
 

@@ -1,5 +1,6 @@
+from math import sqrt
+
 from proto import proto
-from math import *
 
 with proto("Physics") as Physics:
     @Physics

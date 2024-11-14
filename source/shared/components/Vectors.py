@@ -1,8 +1,6 @@
+from math import sqrt
 
 from proto import proto
-from math import *
-
-
 
 with proto("Vectors") as Vectors:
     
