@@ -7,6 +7,8 @@ import pygame as pg
 from proto import proto
 from eventListen import Events
 
+from shared.components import Physics
+
 pg.init()
 
 # Initialisation
@@ -106,6 +108,25 @@ with proto("Game") as Game:
         self.Camera.reset()
         self.dt = 1
         self.space = []
+
+    @Game
+    def normalizeCinetic(self, corps = None) -> dict:
+        values = {}
+        for i in self.space:
+            cinetic_energy = Physics.get_cinetic_energy(i.mass, Physics.get_velocity(i.path[-2], i.path[-1], Game.dt))
+            values[i] = cinetic_energy
+
+        valuesList = values.values()
+        originalMin = min(valuesList)
+        originalMax = max(valuesList)
+
+        d = {}
+        for value in values:
+            d[value] = (value - originalMin) / (originalMax - originalMin) * 100
+
+        if corps and corps in d.keys():
+            return d[corps]
+        return d
 
 
 with proto("CameraHandler") as CameraHandler:

@@ -1,5 +1,6 @@
 from types import MethodType
 from random import randint
+from math import cos, sin, radians
 
 import pygame as pg
 
@@ -431,16 +432,52 @@ def loadStars(n: int = 100, position: tuple[int, int] = (-1000, 1000)) -> list[t
 # endregion
 
 # region Vecteur
-def draw_velocity_vector(self, corps):
-    corps_velocity = Physics.get_velocity(corps.path[-2], corps.path[-1], Game.dt)
-    unit_vector_mouv = Vectors.get_unit_vector_mouv(corps.path[-2], corps.path[-1])
-    velocity_vector = unit_vector_mouv[0] * corps_velocity, unit_vector_mouv[1] * corps_velocity
-    return velocity_vector
+def draw_velocity_vector(screen, corps):
+    if len(corps.path) > 1:
+        corps_velocity = Physics.get_velocity(corps.path[-2], corps.path[-1], Game.dt)
+        unit_vector_mouv = Vectors.get_unit_vector_mouv(corps.path[-2], corps.path[-1])
+        velocity_vector = unit_vector_mouv[0] * corps_velocity, unit_vector_mouv[1] * corps_velocity
+
+        k = 50
+
+        startX = corps.pos[0] * Game.Camera.zoom + Game.Camera.x
+        startY = corps.pos[1] * Game.Camera.zoom + Game.Camera.y
+
+        endX = startX + velocity_vector[0] * k
+        endY = startY + velocity_vector[1] * k
+
+        pg.draw.line(screen, (0, 255, 0), (startX, startY), (endX, endY), 5)
     
-def draw_cinetic_energy_vector(self, corps):
-    unit_vector_mouv = Vectors.get_unit_vector_mouv(corps.path[-2], corps.path[-1])
-    cinetic_energy = Physics.get_cinetic_energy(corps.mass, Physics.get_velocity(corps.path[-2], corps.path[-1], Game.dt))
-    cinetic_energy_vector = unit_vector_mouv * cinetic_energy
-    return cinetic_energy_vector
+def draw_cinetic_energy_vector(screen, corps):
+    # 
+    #     unit_vector_mouv = Vectors.get_unit_vector_mouv(corps.path[-2], corps.path[-1])
+    #     cinetic_energy = Physics.get_cinetic_energy(corps.mass, Physics.get_velocity(corps.path[-2], corps.path[-1], Game.dt))
+    #     cinetic_energy_vector = unit_vector_mouv[0] * cinetic_energy, unit_vector_mouv[1] * cinetic_energy
+
+    #     k = 1 / corps.mass
+
+    #     startX = corps.pos[0] * Game.Camera.zoom + Game.Camera.x
+    #     startY = corps.pos[1] * Game.Camera.zoom + Game.Camera.y
+
+    #     endX = startX + cinetic_energy_vector[0] * k
+    #     endY = startY + cinetic_energy_vector[1] * k
+
+    #     pg.draw.line(screen, (255, 0, 0), (startX, startY), (endX, endY), 5)
+
+    if len(corps.path) > 1:
+        unit_vector_mouv = Vectors.get_unit_vector_mouv(corps.path[-2], corps.path[-1])
+        cinetic_energy = Game.normalizeCinetic(corps)
+        cinetic_energy_vector = unit_vector_mouv[0] * cinetic_energy, unit_vector_mouv[1] * cinetic_energy
+
+        k = 1
+
+        startX = corps.pos[0] * Game.Camera.zoom + Game.Camera.x
+        startY = corps.pos[1] * Game.Camera.zoom + Game.Camera.y
+
+        endX = startX + cinetic_energy_vector[0] * k
+        endY = startY + cinetic_energy_vector[1] * k
+
+        pg.draw.line(screen, (255, 0, 0), (startX, startY), (endX, endY), 5)
+
     
 # endregion

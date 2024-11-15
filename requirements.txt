@@ -1,3 +1,5 @@
 pygame
+pillow
 proto-obj
+nsi25Perlin
 eventListen

@@ -4,7 +4,7 @@ from eventListen import Events
 from nsi25perlin import PerlinNoise
 
 from main import Game
-from shared.utils.utils import updateCorps, process_collide, Captors, Corps, MessageBox, Path, DataKeeper, Input, Text, CheckBox, loadSpace, loadStars
+from shared.utils.utils import updateCorps, process_collide, Captors, Corps, MessageBox, Path, DataKeeper, Input, Text, CheckBox, loadSpace, loadStars, draw_velocity_vector, draw_cinetic_energy_vector
 
 
 
@@ -151,6 +151,9 @@ def draw(screen):
         corps.draw(screen, Game.Camera)
         if showPath:
             Path.draw_corps_path(screen, corps.path, corps.color)
+
+        draw_velocity_vector(screen, corps)
+        draw_cinetic_energy_vector(screen, corps)
 
     for element in interface:
         element.draw(screen)

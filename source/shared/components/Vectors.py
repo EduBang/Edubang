@@ -25,5 +25,8 @@ with proto("Vectors") as Vectors:
     def get_unit_vector_mouv(self, pos_init, pos_final):
         mouv_vector = (pos_final[0] - pos_init[0], pos_final[1] - pos_init[1])
         norm_mouv_vector = sqrt(mouv_vector[0] ** 2 + mouv_vector[1] ** 2)
-        unit_vector_mouv = (mouv_vector[0] / norm_mouv_vector, mouv_vector[1] / norm_mouv_vector)
+        if norm_mouv_vector != 0:
+            unit_vector_mouv = (mouv_vector[0] / norm_mouv_vector, mouv_vector[1] / norm_mouv_vector)
+        else:
+            unit_vector_mouv = (0, 0)
         return unit_vector_mouv
