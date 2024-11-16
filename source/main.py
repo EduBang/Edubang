@@ -7,7 +7,7 @@ import pygame as pg
 from proto import proto
 from eventListen import Events
 
-from shared.components import Physics
+from shared.components.Physics import Physics
 
 pg.init()
 
@@ -122,7 +122,7 @@ with proto("Game") as Game:
 
         d = {}
         for value in values:
-            d[value] = (value - originalMin) / (originalMax - originalMin) * 100
+            d[value] = (values[value] - originalMin) / (originalMax - originalMin) * 100
 
         if corps and corps in d.keys():
             return d[corps]
