@@ -325,6 +325,83 @@ with proto("Input") as Input:
             "keydown": MethodType(keydownI, self)
             })
 
+with proto("SlideBar") as SlideBar:
+    def drawSlideBar(self, screen):
+        if self.active:
+            pos = pg.mouse.get_pos()
+            value = pos[0] - self.position[0]
+            if value > self.size[0]:
+                value = self.values[1]
+            elif value < 0:
+                value = self.values[0]
+            self.value = value
+
+        pg.draw.rect(screen, (255, 255, 255), pg.Rect(self.position, self.size), 0, 8)
+        pg.draw.rect(screen, (0, 0, 250), pg.Rect(self.position, (self.value, 5)), 0, 8)
+        pg.draw.circle(screen, (0, 0, 250), (self.position[0] + self.value, self.position[1] + 2.5), 5)
+        return
+    
+    def mousemotionSB(self, event) -> None:
+        x, y = event.pos
+        if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
+            self.onHover()
+            Events.trigger("hovering", self)
+        else:
+            Events.trigger("unhovering", self)
+        return
+
+    def mousebuttondownSB(self, event) -> None:
+        button = event.button
+        x, y = event.pos
+        if button != 1: return
+        if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
+            self.onPressed()
+        else:
+            self.active = False
+        return
+    
+    def mousebuttonupSB(self, event) -> None:
+        button = event.button
+        x, y = event.pos
+        if button != 1: return
+        if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
+            self.onReleased()
+        else:
+            self.active = False
+        return
+
+    def windowSB(self, w):
+        Events.stopObserving(self)
+
+    def onHover():
+        pg.mouse.set_cursor(pg.SYSTEM_CURSOR_HAND)
+
+    @SlideBar
+    def onPressed(self):
+        self.active = True
+
+    @SlideBar
+    def onReleased(self):
+        self.active = False
+
+    @SlideBar
+    def new(self, position: tuple[int, int]):
+        self.active = False
+        self.values = [0, 100]
+        self.value = self.values[0]
+        self.position = position
+        self.size = (100, 5)
+        self.draw = MethodType(drawSlideBar, self)
+        self.onHover = onHover
+        self.meta = {}
+        Events.group(self, {
+            "mousemotion": MethodType(mousemotionSB, self),
+            "mousebuttondown": MethodType(mousebuttondownSB, self),
+            "mousebuttonup": MethodType(mousebuttonupSB, self),
+            "window": MethodType(windowSB, self)
+            })
+        return
+
 # prototype pour garder des variables
 with proto("DataKeeper") as DataKeeper:
     @DataKeeper
@@ -449,21 +526,6 @@ def draw_velocity_vector(screen, corps):
         pg.draw.line(screen, (0, 255, 0), (startX, startY), (endX, endY), 5)
     
 def draw_cinetic_energy_vector(screen, corps):
-    # 
-    #     unit_vector_mouv = Vectors.get_unit_vector_mouv(corps.path[-2], corps.path[-1])
-    #     cinetic_energy = Physics.get_cinetic_energy(corps.mass, Physics.get_velocity(corps.path[-2], corps.path[-1], Game.dt))
-    #     cinetic_energy_vector = unit_vector_mouv[0] * cinetic_energy, unit_vector_mouv[1] * cinetic_energy
-
-    #     k = 1 / corps.mass
-
-    #     startX = corps.pos[0] * Game.Camera.zoom + Game.Camera.x
-    #     startY = corps.pos[1] * Game.Camera.zoom + Game.Camera.y
-
-    #     endX = startX + cinetic_energy_vector[0] * k
-    #     endY = startY + cinetic_energy_vector[1] * k
-
-    #     pg.draw.line(screen, (255, 0, 0), (startX, startY), (endX, endY), 5)
-
     if len(corps.path) > 1:
         unit_vector_mouv = Vectors.get_unit_vector_mouv(corps.path[-2], corps.path[-1])
         cinetic_energy = Game.normalizeCinetic(corps)
