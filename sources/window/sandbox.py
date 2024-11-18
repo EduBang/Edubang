@@ -61,8 +61,6 @@ def keydown(event) -> None:
     elif key == pg.K_KP_MINUS:
         Game.Camera.zoom /= 1.05
         
-        
-
 @Events.observe
 def mousebuttondown(event) -> None:
     button = event.button
