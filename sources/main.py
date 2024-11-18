@@ -13,20 +13,20 @@ pg.init()
 
 # Initialisation
 pg.display.set_caption("EduBang")
-icon = pg.image.load("source/assets/images/icon.png")
+icon = pg.image.load("./data/images/icon.png")
 pg.display.set_icon(icon)
 buttons = []
 resolution = (1280, 720)
 screen = pg.display.set_mode((resolution), pg.RESIZABLE)
 pg.key.set_repeat(500, 50)
 pg.font.init()
-black = pg.font.SysFont("FixelText-black.otf", 30)
-extrabold = pg.font.SysFont("FixelText-ExtraBold.otf", 30)
-bold = pg.font.SysFont("FixelText-bold.otf", 30)
-semibold = pg.font.SysFont("FixelText-Semibold.otf", 30)
-medium = pg.font.SysFont("FixelText-Medium.otf", 30)
-regular = pg.font.SysFont("FixelText-Regular.otf", 30)
-light = pg.font.SysFont("FixelText-Light.otf", 30)
+black = pg.font.SysFont("data/fonts/FixelText-black.otf", 30)
+extrabold = pg.font.SysFont("data/fonts/FixelText-ExtraBold.otf", 30)
+bold = pg.font.SysFont("data/fonts/FixelText-bold.otf", 30)
+semibold = pg.font.SysFont("data/fonts/FixelText-Semibold.otf", 30)
+medium = pg.font.SysFont("data/fonts/FixelText-Medium.otf", 30)
+regular = pg.font.SysFont("data/fonts/FixelText-Regular.otf", 30)
+light = pg.font.SysFont("data/fonts/FixelText-Light.otf", 30)
 
 with proto("Game") as Game:
     @Game
@@ -48,10 +48,10 @@ with proto("Game") as Game:
         self.keys = {}
         self.invertedKeybinds = {}
 
-        ws = [w for w in listdir("./source/window") if path.isfile(path.join("./source/window", w))]
+        ws = [w for w in listdir("./sources/window") if path.isfile(path.join("./sources/window", w))]
         for w in ws:
             module_name = w[:-3]
-            file_path = path.join("./source/window", w)
+            file_path = path.join("./sources/window", w)
             spec = util.spec_from_file_location(module_name, file_path)
             module = util.module_from_spec(spec)
             spec.loader.exec_module(module)
@@ -60,7 +60,7 @@ with proto("Game") as Game:
             updateFunction = getattr(module, "update")
             self.windows[module_name] = [loadFunction, drawFunction, updateFunction]
 
-        with open("source/data/keybind.json", "r", encoding="utf-8") as f:
+        with open("data/keybind.json", "r", encoding="utf-8") as f:
             Game.keybinds = json.load(f)
             f.close()
 

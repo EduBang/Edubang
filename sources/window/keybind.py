@@ -16,7 +16,7 @@ def window(w):
 
 def backFunction():
     newKeybinds = {}
-    with open("source/data/keybind.json", "w", encoding="utf-8") as f:
+    with open("data/keybind.json", "w", encoding="utf-8") as f:
         for keybind in interface:
             if not hasattr(keybind, "kb"):
                 continue
@@ -33,7 +33,7 @@ def load() -> None:
     backButton.onPressed = backFunction
     interface.append(backButton)
 
-    with open("source/data/keybind.json", "r", encoding="utf-8") as f:
+    with open("data/keybind.json", "r", encoding="utf-8") as f:
         dk.keybinds = json.load(f)
         f.close()
 
