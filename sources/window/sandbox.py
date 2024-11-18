@@ -55,6 +55,13 @@ def keydown(event) -> None:
             mb.active = True
     else:
         mb.active = False
+        
+    if key == pg.K_KP_PLUS:
+        Game.Camera.zoom *= 1.05
+    elif key == pg.K_KP_MINUS:
+        Game.Camera.zoom /= 1.05
+        
+        
 
 @Events.observe
 def mousebuttondown(event) -> None:
