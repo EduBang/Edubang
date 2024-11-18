@@ -1,6 +1,7 @@
 from math import sqrt
-
 from proto import proto
+
+gravitation_constant = 6.67e-11
 
 with proto("Physics") as Physics:
     @Physics

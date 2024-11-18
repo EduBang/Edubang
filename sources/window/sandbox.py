@@ -82,6 +82,8 @@ def loader():
     
     dk.stars = loadStars(2000, (-3000, 3000))
 
+    ref = Corps(0, 10, (0, 0), (0, 255, 0), 0, 0)
+    ref.name = "Ref"
     soleil = Corps(1.9885e14, 700, (0, 0), (255, 255, 0), 0, 0)
     soleil.name = "Soleil"
     mercure = Corps(3.3011e7, 38, (5800, 0), (127, 127, 127), 0, -0.52)
@@ -133,6 +135,13 @@ def loader():
     showPath = CheckBox((280, 100), False)
     showPath.trajectoire = None
     interface.append(showPath)
+    
+    textShowAttractionNorm = Text("Afficher la norme d'attraction", (40, 50), color=(255, 255, 255))
+    interface.append(textShowAttractionNorm)
+
+    showAttractionNorm = CheckBox((280, 50), False)
+    showAttractionNorm.attraction_norm = None
+    interface.append(showAttractionNorm)
 
     dk.loadingFinished = True
 
@@ -164,13 +173,16 @@ def draw(screen):
         screen.set_at((x, y), dk.stars[star])
 
     for element in interface:
-        if not hasattr(element, "trajectoire"): continue
-        showPath = element.checked
+        if hasattr(element, "trajectoire"):
+            showPath = element.checked
+        if hasattr(element, "attractionnorm"):
+            showAttractionNorm = element.checked
 
+        
     for corps in Game.space:
         corps.draw(screen, Game.Camera)
         if showPath:
-            Path.draw_corps_path(screen, corps.path, corps.color)
+            Path.draw_corps_path(screen, corps.path, corps.color) #ici check machin
 
         draw_velocity_vector(screen, corps)
         draw_cinetic_energy_vector(screen, corps)

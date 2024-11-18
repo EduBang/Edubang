@@ -541,5 +541,10 @@ def draw_cinetic_energy_vector(screen, corps):
 
         pg.draw.line(screen, (255, 0, 0), (startX, startY), (endX, endY), 5)
 
+def draw_attraction_norm(screen, ): #  chanp gravitation = G*(mass_obj_select / d2)
+    list_attraction_norm = []
     
-# endregion
+    for corps in Game.space:      
+        list_attraction_norm.append(Physics.gravitation_constant * (corps.mass / Physics.get_distance(pg.mouse.get_pos(), corps)))
+        
+# endregionx = float((self.pos[0] + camera.x / camera.zoom) * camera.zoom)
