@@ -561,7 +561,7 @@ def loadSpace(perlin) -> tuple[dict[tuple, tuple], int]:
 
             # Si le "bruit" est fort, il va générer une galaxie.
             if noise_val > 0.15:
-                color = (int(205 * noise_val), int(150 * noise_val), int(205 * noise_val * 0.8))
+                color = (int(70 * noise_val), int(20 * noise_val), int(70 * noise_val * 0.8))
                 galaxy[(x, y)] = color
 
     return (galaxy, perlin.size)
