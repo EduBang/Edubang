@@ -1,15 +1,16 @@
+import threading
+
 import pygame as pg
 from PIL import Image
 from eventListen import Events
 from nsi25perlin import PerlinNoise
 
-from main import Game
+from main import Game, medium
 from shared.utils.utils import updateCorps, process_collide, Captors, Corps, MessageBox, Path, DataKeeper, Input, Text, CheckBox, loadSpace, loadStars, draw_velocity_vector, draw_cinetic_energy_vector
-
-
 
 dk = DataKeeper()
 dk.active = False
+dk.loadingFinished = False
 dk.image = None
 dk.stars = []
 dk.perlin = PerlinNoise(768)
@@ -19,8 +20,7 @@ mb = MessageBox("Return to menu ?")
 
 @Events.observe
 def window(w):
-    for i in interface:
-        interface.remove(i)
+    interface.clear()
 
 @Events.observe
 def keydown(event) -> None:
@@ -46,6 +46,9 @@ def keydown(event) -> None:
         if mb.active:
             mb.active = False
             dk.active = False
+            dk.loadingFinished = False
+            dk.image = None
+            dk.stars = []
             Game.reset()
             Game.select("menu") # double échap pour quitter
         else:
@@ -61,7 +64,7 @@ def mousebuttondown(event) -> None:
         return
     mb.active = False
 
-def load(*args, **kwargs):
+def loader():
     Game.Camera.active = True
     dk.active = True
 
@@ -126,10 +129,22 @@ def load(*args, **kwargs):
     showPath.trajectoire = None
     interface.append(showPath)
 
+    dk.loadingFinished = True
+
+    return
+
+def load(*args, **kwargs):
+    dk.loadingFinished = False
+    thread = threading.Thread(target=loader)
+    thread.start()
     return
 
 def draw(screen):
     screen.fill((0, 0, 0))
+    if not dk.loadingFinished: # écran de chargement, à améliorer
+        text = medium.render("Loading...", False, (255, 255, 255))
+        screen.blit(text, (10, 10))
+        return
 
     showPath: bool = False
 

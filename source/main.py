@@ -121,10 +121,14 @@ with proto("Game") as Game:
         originalMax = max(valuesList)
 
         d = {}
-        for value in values:
-            d[value] = (values[value] - originalMin) / (originalMax - originalMin) * 100
+        if originalMax - originalMin == 0:
+            for value in values:
+                d[value] = 0
+        else:
+            for value in values:
+                d[value] = (values[value] - originalMin) / (originalMax - originalMin) * 100
 
-        if corps and corps in d.keys():
+        if corps and corps in d:
             return d[corps]
         return d
 

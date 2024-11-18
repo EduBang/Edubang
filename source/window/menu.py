@@ -22,8 +22,7 @@ interface = []
 
 @Events.observe
 def window(w):
-    for i in interface:
-        interface.remove(i)
+    interface.clear()
 
 def load(*args, **kwargs):
     if randint(0, 1) == 0:
