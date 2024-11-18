@@ -82,8 +82,6 @@ def loader():
     
     dk.stars = loadStars(2000, (-3000, 3000))
 
-    ref = Corps(0, 10, (0, 0), (0, 255, 0), 0, 0)
-    ref.name = "Ref"
     soleil = Corps(1.9885e14, 700, (0, 0), (255, 255, 0), 0, 0)
     soleil.name = "Soleil"
     mercure = Corps(3.3011e7, 38, (5800, 0), (127, 127, 127), 0, -0.52)
