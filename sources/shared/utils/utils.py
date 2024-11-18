@@ -15,7 +15,7 @@ from shared.components.Captors import *
 # region Prototypes
 
 with proto("Button") as Button:
-    def drawButton(self, screen):
+    def drawButton(self, screen) -> None:
         pg.draw.rect(screen, (255, 255, 255), pg.Rect(self.position, self.size), 0, 8)
         surface = Game.font.render(self.text, False, (0, 0, 0))
         width, height = Game.font.size(self.text)
@@ -49,32 +49,42 @@ with proto("Button") as Button:
             self.onReleased()
         return
 
-    def windowBTN(self, w):
-        Events.stopObserving(self)
+    def mousewheelBTN(self, event) -> None:
+        if not self.scrollable: return
+        self.offsetY = 10 * event.y
+        self.position[1] += self.offsetY
+        return
 
-    def onHover():
+    def windowBTN(self, w) -> None:
+        Events.stopObserving(self)
+        return
+
+    def onHover() -> None:
         pg.mouse.set_cursor(pg.SYSTEM_CURSOR_HAND)
+        return
 
     @Button
-    def new(self, position: tuple[int, int], size: tuple[int, int]):
+    def new(self, position: tuple[int, int], size: tuple[int, int]) -> None:
         self.text = "Button"
-        self.position = position
+        self.position = list(position)
         self.size = size
         self.draw = MethodType(drawButton, self)
         self.onPressed = lambda: None
         self.onReleased = lambda: None
         self.onHover = onHover
-        self.meta = {}
+        self.scrollable = False
+        self.offsetY = 0
         Events.group(self, {
             "mousemotion": MethodType(mousemotionBTN, self),
             "mousebuttondown": MethodType(mousebuttondownBTN, self),
             "mousebuttonup": MethodType(mousebuttonupBTN, self),
+            "mousewheel": MethodType(mousewheelBTN, self),
             "window": MethodType(windowBTN, self)
             })
         return
 
 with proto("CheckBox") as CheckBox:
-    def drawCheckBox(self, screen):
+    def drawCheckBox(self, screen) -> None:
         color = (0, 0, 255) if self.checked else (255, 255, 255)
         pg.draw.rect(screen, color, pg.Rect(self.position, self.size), 0, 4)
         if color == (0, 0, 255):
@@ -106,36 +116,48 @@ with proto("CheckBox") as CheckBox:
         if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
             self.onReleased()
         return
+    
+    def mousewheelCB(self, event) -> None:
+        if not self.scrollable: return
+        self.offsetY = 10 * event.y
+        self.position[1] += self.offsetY
+        return
 
-    def windowCB(self, w):
+    def windowCB(self, w) -> None:
         Events.stopObserving(self)
+        return
 
-    def onHover():
+    def onHover() -> None:
         pg.mouse.set_cursor(pg.SYSTEM_CURSOR_HAND)
+        return
 
     @CheckBox
-    def onPressed(self):
+    def onPressed(self) -> None:
         self.checked = not self.checked
+        return
     
     @CheckBox
-    def new(self, position: tuple[int, int], checked: bool = False):
+    def new(self, position: tuple[int, int], checked: bool = False) -> None:
         self.checked = checked
-        self.position = position
+        self.position = list(position)
         self.size  = [40, 40]
         self.draw = MethodType(drawCheckBox, self)
         self.onReleased = lambda: None
         self.onHover = onHover
-        self.meta = {}
+        self.scrollable = False
+        self.offsetY = 0
         Events.group(self, {
             "mousemotion": MethodType(mousemotionCB, self),
             "mousebuttondown": MethodType(mousebuttondownCB, self),
             "mousebuttonup": MethodType(mousebuttonupCB, self),
+            "mousewheel": MethodType(mousewheelCB, self),
             "window": MethodType(windowCB, self)
             })
+        return
 
 with proto("MessageBox") as MessageBox:
     @MessageBox
-    def draw(self, screen):
+    def draw(self, screen) -> None:
         if not self.active: return
         widthScreen, heightScreen = pg.display.get_surface().get_size()
         surface = Game.font.render(self.text, False, (0, 0, 0))
@@ -149,10 +171,10 @@ with proto("MessageBox") as MessageBox:
         return
     
     @MessageBox
-    def new(self, message: str):
+    def new(self, message: str) -> None:
         self.text = message
         self.active = False
-        self.meta = {}
+        return
 
 with proto("KeyBind") as KeyBind:
     def drawKeyBind(self, screen):
@@ -189,9 +211,16 @@ with proto("KeyBind") as KeyBind:
         if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
             self.onReleased()
         return
+    
+    def mousewheelKB(self, event) -> None:
+        if not self.scrollable: return
+        self.offsetY = 10 * event.y
+        self.position[1] += self.offsetY
+        return
 
-    def windowKB(self, w):
+    def windowKB(self, w) -> None:
         Events.stopObserving(self)
+        return
 
     def keydownKB(self, event) -> None:
         if self.focus:
@@ -200,8 +229,9 @@ with proto("KeyBind") as KeyBind:
             self.focus = False
         return
 
-    def onHover():
+    def onHover() -> None:
         pg.mouse.set_cursor(pg.SYSTEM_CURSOR_HAND)
+        return
 
     @KeyBind
     def onPressed(self) -> None:
@@ -212,38 +242,51 @@ with proto("KeyBind") as KeyBind:
     def new(self, key: int, position: tuple[int, int]) -> None:
         self.focus = False
         self.key = key
-        self.position = position
+        self.position = list(position)
         self.size  = [40, 40]
         self.draw = MethodType(drawKeyBind, self)
         self.onReleased = lambda: None
         self.onHover = onHover
-        self.meta = {}
+        self.scrollable = False
+        self.offsetY = 0
         Events.group(self, {
             "mousemotion": MethodType(mousemotionKB, self),
             "mousebuttondown": MethodType(mousebuttondownKB, self),
             "mousebuttonup": MethodType(mousebuttonupKB, self),
+            "mousewheel": MethodType(mousewheelKB, self),
             "window": MethodType(windowKB, self),
             "keydown": MethodType(keydownKB, self)
             })
+        return
 
 with proto("Text") as Text:
     @Text
     def draw(self, screen) -> None:
         surface = self.font.render(self.text, self.antialiasing, self.color)
         screen.blit(surface, self.position)
+        return
+
+    def mousewheelT(self, event) -> None:
+        if not self.scrollable: return
+        self.offsetY = 10 * event.y
+        self.position[1] += self.offsetY
+        return
 
     @Text
     def new(self, text: str, position: tuple[int, int], antialiasing: bool = False, color: tuple[int, int, int] = (0, 0, 0), font=Game.font) -> None:
         self.text = text
-        self.position = position
+        self.position = list(position)
         self.antialiasing = antialiasing
         self.color = color
         self.font = font
         self.size = Game.font.size(self.text)
-        self.meta = {}
+        self.scrollable = False
+        self.offsetY = 0
+        Events.group(self, {"mousewheel": MethodType(mousewheelT, self)})
+        return
 
 with proto("Input") as Input:
-    def drawInput(self, screen):
+    def drawInput(self, screen) -> None:
         color = (0, 0, 255) if self.focus else (255, 255, 255)
         pg.draw.rect(screen, color, pg.Rect(self.position, self.size), 0, 4)
         surface = self.font.render(self.text, False, (0, 0, 0))
@@ -279,9 +322,16 @@ with proto("Input") as Input:
         else:
             self.focus = False
         return
+    
+    def mousewheelI(self, event) -> None:
+        if not self.scrollable: return
+        self.offsetY = 10 * event.y
+        self.position[1] += self.offsetY
+        return
 
-    def windowI(self, w):
+    def windowI(self, w) -> None:
         Events.stopObserving(self)
+        return
 
     def keydownI(self, event) -> None:
         if self.focus:
@@ -296,8 +346,9 @@ with proto("Input") as Input:
                 self.text += event.unicode
         return
 
-    def onHover():
+    def onHover() -> None:
         pg.mouse.set_cursor(pg.SYSTEM_CURSOR_HAND)
+        return
 
     @Input
     def onPressed(self) -> None:
@@ -316,17 +367,20 @@ with proto("Input") as Input:
         self.onHover = onHover
         self.font = Game.font
         self.numberOnly = False
-        self.meta = {}
+        self.scrollable = False
+        self.offsetY = 0
         Events.group(self, {
             "mousemotion": MethodType(mousemotionI, self),
             "mousebuttondown": MethodType(mousebuttondownI, self),
             "mouseubuttonup": MethodType(mousebuttonupI, self),
+            "mousewheel": MethodType(mousewheelI, self),
             "window": MethodType(windowI, self),
             "keydown": MethodType(keydownI, self)
             })
+        return
 
 with proto("SlideBar") as SlideBar:
-    def drawSlideBar(self, screen):
+    def drawSlideBar(self, screen) -> None:
         if self.active:
             pos = pg.mouse.get_pos()
             value = pos[0] - self.position[0]
@@ -369,23 +423,33 @@ with proto("SlideBar") as SlideBar:
         else:
             self.active = False
         return
+    
+    def mousewheelSB(self, event) -> None:
+        if not self.scrollable: return
+        self.offsetY = 10 * event.y
+        self.position[1] += self.offsetY
+        return
 
-    def windowSB(self, w):
+    def windowSB(self, w) -> None:
         Events.stopObserving(self)
+        return
 
-    def onHover():
+    def onHover() -> None:
         pg.mouse.set_cursor(pg.SYSTEM_CURSOR_HAND)
+        return
 
     @SlideBar
-    def onPressed(self):
+    def onPressed(self) -> None:
         self.active = True
+        return
 
     @SlideBar
-    def onReleased(self):
+    def onReleased(self) -> None:
         self.active = False
+        return
 
     @SlideBar
-    def new(self, position: tuple[int, int]):
+    def new(self, position: tuple[int, int]) -> None:
         self.active = False
         self.values = [0, 100]
         self.value = self.values[0]
@@ -393,11 +457,13 @@ with proto("SlideBar") as SlideBar:
         self.size = (100, 5)
         self.draw = MethodType(drawSlideBar, self)
         self.onHover = onHover
-        self.meta = {}
+        self.scrollable = False
+        self.offsetY = 0
         Events.group(self, {
             "mousemotion": MethodType(mousemotionSB, self),
             "mousebuttondown": MethodType(mousebuttondownSB, self),
             "mousebuttonup": MethodType(mousebuttonupSB, self),
+            "mousewheel": MethodType(mousewheelSB, self),
             "window": MethodType(windowSB, self)
             })
         return

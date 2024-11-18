@@ -208,7 +208,7 @@ def mousewheel(event) -> None:
 def mousebuttondown(event) -> None:
     button = event.button
     x, y = event.pos
-    if button in [4, 5]: # les scrolls bas et haut sont considirés comme des cliques de souris
+    if button in [4, 5]: # les scrolls bas et haut sont considérés comme des cliques de souris
         return
     if button == 1: # clique gauche
         if not Game.Camera.active: return

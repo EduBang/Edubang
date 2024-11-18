@@ -5,7 +5,6 @@ from eventListen import Events
 from main import Game
 from shared.utils.utils import Button, DataKeeper, KeyBind, Text
 
-
 dk = DataKeeper()
 
 interface = []
@@ -29,6 +28,7 @@ def backFunction():
 
 def load() -> None:
     backButton = Button((100, 100), (180, 60))
+    backButton.scrollable = True
     backButton.text = "Back to menu"
     backButton.onPressed = backFunction
     interface.append(backButton)
@@ -40,7 +40,9 @@ def load() -> None:
     for i, kb in enumerate(dk.keybinds):
         keybind = KeyBind(dk.keybinds[kb], (250, 100 * (i + 1) + 100))
         keybind.kb = kb
+        keybind.scrollable = True
         text = Text(kb, (100, 100 * (i + 1) + 110), color=(255, 255, 255))
+        text.scrollable = True
         interface.append(keybind)
         interface.append(text)
     return
