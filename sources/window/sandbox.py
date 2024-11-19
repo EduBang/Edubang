@@ -1,4 +1,6 @@
-import threading
+import ctypes
+from threading import Thread
+from os import path
 
 import pygame as pg
 from PIL import Image
@@ -11,6 +13,9 @@ from shared.utils.utils import updateCorps, process_collide, Captors, Corps, Mes
 dk = DataKeeper()
 dk.active = False
 dk.loadingFinished = False
+dk.loadingImages = []
+dk.loadingImageIndex = 0
+dk.process = None
 dk.image = None
 dk.stars = []
 dk.perlin = PerlinNoise(768)
@@ -18,9 +23,25 @@ interface = []
 font = pg.font.SysFont("Comic Sans MS", 30)
 mb = MessageBox("Return to menu ?")
 
+def kill(thread: Thread) -> None:
+    threadId = thread.ident
+    if not threadId: return
+
+    pointer = ctypes.pythonapi.PyThreadState_SetAsyncExc(ctypes.c_long(threadId), ctypes.py_object(SystemExit))
+    if pointer == 0: return
+    elif pointer > 1:
+        ctypes.pythonapi.PyThreadState_SetAsyncExc(threadId, 0)
+    return
+
 @Events.observe
 def window(w):
     interface.clear()
+    isAlive = getattr(dk.process, "is_alive", False)
+    if isAlive:
+        kill(dk.process)
+        dk.process = None
+    
+
 
 @Events.observe
 def keydown(event) -> None:
@@ -142,20 +163,30 @@ def loader():
     interface.append(showAttractionNorm)
 
     dk.loadingFinished = True
+    dk.loadingImages = []
+    dk.loadingImageIndex = 0
+    dk.process = None
 
     return
 
 def load(*args, **kwargs):
     dk.loadingFinished = False
-    thread = threading.Thread(target=loader)
-    thread.start()
+    process = Thread(target=loader)
+    process.start()
+    dk.process = process
+    for i in range(60):
+        img = pg.image.load(path.join("./data/videos/loadingScreen", "%s.jpg" % i))
+        img = pg.transform.scale(img, (108, 108))
+        dk.loadingImages.append(img)
     return
 
 def draw(screen):
     screen.fill((0, 0, 0))
     if not dk.loadingFinished: # écran de chargement, à améliorer
         text = medium.render("Loading...", False, (255, 255, 255))
-        screen.blit(text, (10, 10))
+        screen.blit(text, (150, 55))
+        image = dk.loadingImages[dk.loadingImageIndex]
+        screen.blit(image, (10, 10))
         return
 
     showPath: bool = False
@@ -193,7 +224,12 @@ def draw(screen):
     mb.draw(screen)
     return
 
-def update(): 
+def update():
+    if not dk.loadingFinished:
+        dk.loadingImageIndex += 1
+        if dk.loadingImageIndex > 59:
+            dk.loadingImageIndex = 0
+
     for corps in Game.space:
         for otherCorps in Game.space:
             if corps == otherCorps:
