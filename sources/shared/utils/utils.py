@@ -483,6 +483,83 @@ with proto("Path") as Path:
             y = float((pos[1] + Game.Camera.y / Game.Camera.zoom) * Game.Camera.zoom)
             pg.draw.circle(screen, color, (x, y), 1)
 
+with proto("SizeViewer") as SizeViewer:
+    def drawSizeViewer(self, screen):
+        width, text = getSize()
+        x, y = self.position
+        pg.draw.rect(screen, (255, 255, 255), pg.Rect((x, y), (width, 2)))
+        pg.draw.rect(screen, (255, 255, 255), pg.Rect((x, y - 4), (2, 10)))
+        pg.draw.rect(screen, (255, 255, 255), pg.Rect((x + 100, y - 4), (2, 10)))
+        surface = Game.font.render(text, False, (255, 255, 255))
+        screen.blit(surface, (x, y - 40))
+        w, h = Game.font.size(text)
+        self.size = (w if w > 100 else 100, h + 60)
+        return
+
+    def getSize() -> tuple[int, str]:
+        unit = "km"
+        distance = round(100 / Game.Camera.zoom, 3)
+        if Game.Camera.zoom < 0.1:
+            unit = "x10³ km"
+            distance = round(100 / Game.Camera.zoom / 1000, 3)
+            if distance > 1000:
+                unit = "x10⁶ km"
+                distance = round(100 / Game.Camera.zoom / 1000000, 3)
+        elif Game.Camera.zoom > 100:
+            unit = "m"
+            distance = round((100 / Game.Camera.zoom) * 1000, 3)
+
+        return (100, f"{distance} {unit}")
+
+    def mousemotionSV(self, event) -> None:
+        x, y = event.pos
+        if self.focus:
+            self.position = (x - self.size[0] // 2, y)
+        if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
+            Events.trigger("hovering", self)
+        else:
+            Events.trigger("unhovering", self)
+        return
+
+    def mousebuttondownSV(self, event) -> None:
+        button = event.button
+        x, y = event.pos
+        if button != 1: return
+        if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
+            self.focus = True
+            self.position = (x - self.size[0] // 2, y)
+        return
+    
+    def mousebuttonupSV(self, event) -> None:
+        button = event.button
+        if button != 1: return
+        self.focus = False
+        return
+    
+    def windowSV(self, w) -> None:
+        Events.stopObserving(self)
+        return
+
+    def onHover() -> None:
+        pg.mouse.set_cursor(pg.SYSTEM_CURSOR_HAND)
+        return
+
+    @SizeViewer
+    def new(self, position: tuple[int, int]) -> None:
+        self.position = list(position)
+        self.draw = MethodType(drawSizeViewer, self)
+        self.size = (0, 0)
+        self.focus = False
+        Events.group(self, {
+            "mousemotion": MethodType(mousemotionSV, self),
+            "mousebuttondown": MethodType(mousebuttondownSV, self),
+            "mousebuttonup": MethodType(mousebuttonupSV, self),
+            "window": MethodType(windowSV, self)
+            })
+        return
+        
+
+
 # endregion
 
 # region Fonctions physiques
@@ -496,8 +573,8 @@ def updateCorps(a, b) -> float:
     accA = [unitVectorA[0] * attraction / a.mass, unitVectorA[1] * attraction / a.mass]
     accB = [unitVectorB[0] * attraction / b.mass, unitVectorB[1] * attraction / b.mass]
 
-    a.update_position(accA, Game.dt)
-    b.update_position(accB, Game.dt)
+    a.update_position(accA, Game.deltaTime * Game.timeScale)
+    b.update_position(accB, Game.deltaTime * Game.timeScale)
     return distance
 
 # Fonction permettant de mélanger les couleurs de 2 corps selon la surface
@@ -512,8 +589,8 @@ def mergeColor(a, b) -> tuple[int, int, int]:
 
 
 def process_collide(corps1, corps2):
-    cinetic_energy_corps1 = Physics.get_cinetic_energy(corps1.mass, Physics.get_velocity(corps1.path[-2], corps1.path[-1], Game.dt))
-    cinetic_energy_corps2 = Physics.get_cinetic_energy(corps2.mass, Physics.get_velocity(corps2.path[-2], corps2.path[-1], Game.dt))
+    cinetic_energy_corps1 = Physics.get_cinetic_energy(corps1.mass, Physics.get_velocity(corps1.path[-2], corps1.path[-1], Game.deltaTime * Game.timeScale))
+    cinetic_energy_corps2 = Physics.get_cinetic_energy(corps2.mass, Physics.get_velocity(corps2.path[-2], corps2.path[-1], Game.deltaTime * Game.timeScale))
     unit_vector_mouv_corps1 = Vectors.get_unit_vector_mouv(corps1.path[-2], corps1.path[-1])
     unit_vector_mouv_corps2 = Vectors.get_unit_vector_mouv(corps2.path[-2], corps2.path[-1])
     

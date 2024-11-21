@@ -1,4 +1,4 @@
-import ctypes
+from ctypes import pythonapi, c_long, py_object
 from threading import Thread
 from os import path
 
@@ -7,8 +7,8 @@ from PIL import Image
 from eventListen import Events
 from nsi25perlin import PerlinNoise
 
-from main import Game, medium
-from shared.utils.utils import updateCorps, process_collide, Captors, Corps, MessageBox, Path, DataKeeper, Input, Text, CheckBox, loadSpace, loadStars, draw_velocity_vector, draw_cinetic_energy_vector
+from main import Game #, medium
+from shared.utils.utils import updateCorps, process_collide, Captors, Corps, MessageBox, Path, DataKeeper, Input, Text, CheckBox, SizeViewer, loadSpace, loadStars, draw_velocity_vector, draw_cinetic_energy_vector
 
 dk = DataKeeper()
 dk.active = False
@@ -27,10 +27,9 @@ def kill(thread: Thread) -> None:
     threadId = thread.ident
     if not threadId: return
 
-    pointer = ctypes.pythonapi.PyThreadState_SetAsyncExc(ctypes.c_long(threadId), ctypes.py_object(SystemExit))
-    if pointer == 0: return
-    elif pointer > 1:
-        ctypes.pythonapi.PyThreadState_SetAsyncExc(threadId, 0)
+    pointer = pythonapi.PyThreadState_SetAsyncExc(c_long(threadId), py_object(SystemExit))
+    if pointer > 1:
+        pythonapi.PyThreadState_SetAsyncExc(threadId, 0)
     return
 
 @Events.observe
@@ -103,25 +102,25 @@ def loader():
     
     dk.stars = loadStars(2000, (-3000, 3000))
 
-    soleil = Corps(1.9885e14, 700, (0, 0), (255, 255, 0), 0, 0)
+    soleil = Corps(1.9885e30, 696342, (0, 0), (255, 255, 0), 0, 0)
     soleil.name = "Soleil"
-    mercure = Corps(3.3011e7, 38, (5800, 0), (127, 127, 127), 0, -0.52)
+    mercure = Corps(3.3011e23, 2439.7, (57_909_050, 0), (127, 127, 127), 0, -47.362)
     mercure.name = "Mercure"
-    venus = Corps(4.8675e8, 95, (10800, 0), (255, 127, 127), 0, -0.38)
+    venus = Corps(4.8675e24, 6051.8, (108_209_500, 0), (255, 127, 127), 0, -35.02571)
     venus.name = "Vénus"
-    terre = Corps(5.9736e8, 100, (15000, 0), (0, 0, 255), 0, -0.32)
+    terre = Corps(5.9736e24, 6371.008, (149_597_887.5 , 0), (0, 0, 255), 0, -29.783)
     terre.name = "Terre"
-    mars = Corps(6.4185e7, 53, (22000, 0), (255, 50, 50), 0, -0.27)
+    mars = Corps(6.4185e23, 3389.5, (227_944_000, 0), (255, 50, 50), 0, -24.080)
     mars.name = "Mars"
-    jupiter = Corps(1.8986e11, 300, (77800, 0), (255, 255, 230), 0, -0.143)
+    jupiter = Corps(1.8986e27, 69911, (778_340_000, 0), (255, 255, 230), 0, -13.0585)
     jupiter.name = "Jupiter"
-    saturne = Corps(5.6846e10, 260, (142670, 0), (255, 240, 240), 0, -0.105)
+    saturne = Corps(5.6846e26, 58232, (1_426_700_000, 0), (255, 240, 240), 0, -9.6407)
     saturne.name = "Saturne"
-    uranus = Corps(8.681e9, 200, (287070, 0), (100, 100, 200), 0, -0.074)
+    uranus = Corps(8.681e25, 25362, (2_870_700_000, 0), (100, 100, 200), 0, -6.796732)
     uranus.name = "Uranus"
-    neptune = Corps(1.0243e10, 190, (449840, 0), (100, 100, 255), 0, -0.058)
+    neptune = Corps(1.0243e26, 24622, (4_498_400_000, 0), (100, 100, 255), 0, -5.43248)
     neptune.name = "Neptune"
-    
+
     Game.space.append(soleil)
     Game.space.append(mercure)
     Game.space.append(venus)
@@ -131,6 +130,10 @@ def loader():
     Game.space.append(saturne)
     Game.space.append(uranus)
     Game.space.append(neptune)
+
+    # km = Corps(1, 1, (0, 0), (255, 255, 255), 0, 0)
+    # km.name = "1 Kilometer"
+    # Game.space.append(km)
 
     textDT = Text("DT : ", (40, 40), color=(255, 255, 255), font=font)
     interface.append(textDT)
@@ -162,6 +165,9 @@ def loader():
     showAttractionNorm.attraction_norm = None
     interface.append(showAttractionNorm)
 
+    sizeViewer = SizeViewer((10, 300))
+    interface.append(sizeViewer)
+
     dk.loadingFinished = True
     dk.loadingImages = []
     dk.loadingImageIndex = 0
@@ -183,7 +189,8 @@ def load(*args, **kwargs):
 def draw(screen):
     screen.fill((0, 0, 0))
     if not dk.loadingFinished: # écran de chargement, à améliorer
-        text = medium.render("Loading...", False, (255, 255, 255))
+        # text = medium.render("Loading...", False, (255, 255, 255))
+        text = Game.font.render("Loading...", False, (255, 255, 255))
         screen.blit(text, (150, 55))
         image = dk.loadingImages[dk.loadingImageIndex]
         screen.blit(image, (10, 10))
@@ -213,13 +220,13 @@ def draw(screen):
         if showPath:
             Path.draw_corps_path(screen, corps.path, corps.color) #ici check machin
 
-        draw_velocity_vector(screen, corps)
-        draw_cinetic_energy_vector(screen, corps)
+        # draw_velocity_vector(screen, corps)
+        # draw_cinetic_energy_vector(screen, corps)
 
     for element in interface:
         element.draw(screen)
         if hasattr(element, "numberOnly"):
-            Game.dt = int(element.text) if element.text not in ["-", ""] else 0
+            Game.timeScale = int(element.text) if element.text not in ["-", ""] else 0
 
     mb.draw(screen)
     return
@@ -239,5 +246,5 @@ def update():
                 removedCorps = process_collide(corps, otherCorps)
                 Game.space.remove(removedCorps)
         
-        corps.update_position([0, 0], Game.dt)
+        corps.update_position([0, 0], Game.deltaTime * Game.timeScale)
     return

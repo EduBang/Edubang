@@ -20,13 +20,15 @@ resolution = (1280, 720)
 screen = pg.display.set_mode((resolution), pg.RESIZABLE)
 pg.key.set_repeat(500, 50)
 pg.font.init()
-black = pg.font.SysFont("data/fonts/FixelText-black.otf", 30)
-extrabold = pg.font.SysFont("data/fonts/FixelText-ExtraBold.otf", 30)
-bold = pg.font.SysFont("data/fonts/FixelText-bold.otf", 30)
-semibold = pg.font.SysFont("data/fonts/FixelText-Semibold.otf", 30)
-medium = pg.font.SysFont("data/fonts/FixelText-Medium.otf", 30)
-regular = pg.font.SysFont("data/fonts/FixelText-Regular.otf", 30)
-light = pg.font.SysFont("data/fonts/FixelText-Light.otf", 30)
+clock = pg.time.Clock()
+# black = pg.font.SysFont("data/fonts/FixelText-black.otf", 30)
+# extrabold = pg.font.SysFont("data/fonts/FixelText-ExtraBold.otf", 30)
+# bold = pg.font.SysFont("data/fonts/FixelText-bold.otf", 30)
+# semibold = pg.font.SysFont("data/fonts/FixelText-Semibold.otf", 30)
+# medium = pg.font.SysFont("data/fonts/FixelText-Medium.otf", 30)
+# regular = pg.font.SysFont("data/fonts/FixelText-Regular.otf", 30)
+# light = pg.font.SysFont("data/fonts/FixelText-Light.otf", 30)
+font = pg.font.SysFont("Arial", 30)
 
 with proto("Game") as Game:
     @Game
@@ -37,13 +39,14 @@ with proto("Game") as Game:
     @Game
     def load(self):
 
-        self.dt = 1
+        self.timeScale = 1 # seconde
+        self.deltaTime = 0 # seconde
         self.running = True
         self.space = []
         self.Camera = CameraHandler()
         self.window = ""
         self.windows = {}
-        self.font = regular
+        self.font = font #regular
         self.keybinds = {}
         self.keys = {}
         self.invertedKeybinds = {}
@@ -140,9 +143,9 @@ with proto("CameraHandler") as CameraHandler:
         self.x = 0
         self.y = 0
         self.speed = 5
-        self.zoom = 1
-        self.maxZoom = 1000
-        self.minZoom = 0.001
+        self.zoom = 0.00_1
+        self.maxZoom = 10_000_000
+        self.minZoom = 0.00_000_01
         self.focus = None
         return
 
@@ -152,9 +155,9 @@ with proto("CameraHandler") as CameraHandler:
         self.x = 0
         self.y = 0
         self.speed = 5
-        self.zoom = 1
-        self.maxZoom = 1000
-        self.minZoom = 0.001
+        self.zoom = 0.00_1
+        self.maxZoom = 10_000_000
+        self.minZoom = 0.00_000_01
         self.focus = None
         return
 
@@ -218,7 +221,7 @@ def mousebuttondown(event) -> None:
             sqx = (x - xC) ** 2
             sqy = (y - yC) ** 2
             if pi * (corps.radius * Game.Camera.zoom) ** 2 < 10:
-                if sqrt(sqx + sqy) < corps.radius // 5:
+                if sqrt(sqx + sqy) < 10:
                     Game.Camera.focus = corps
                     Game.Camera.zoom = 1
                     break
@@ -275,6 +278,8 @@ def gameLoop() -> None:
         if len(buttons) == 0: # Si la souris ne hover plus rien
             pg.mouse.set_cursor(pg.SYSTEM_CURSOR_ARROW)
 
+        Game.deltaTime = clock.tick(60) / 1000
+        
         draw()
         update()
 

@@ -8,8 +8,8 @@ from main import Game
 with proto("Corps") as Corps:
     @Corps
     def new(self, mass, radius, pos, color, v_initial_x, v_initial_y):
-        self.mass = mass
-        self.radius = radius
+        self.mass = mass # kilogramme
+        self.radius = radius # kilomètre
         self.pos = pos
         self.color = color
         self.velocity = [v_initial_x, v_initial_y]  # Vitesse initiale

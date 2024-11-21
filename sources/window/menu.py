@@ -107,5 +107,5 @@ def update():
                 removedCorps = process_collide(corps, otherCorps)
                 Game.space.remove(removedCorps)
         
-        corps.update_position([0, 0], Game.dt)
+        corps.update_position([0, 0], Game.deltaTime * Game.timeScale)
     return

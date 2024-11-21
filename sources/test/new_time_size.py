@@ -19,7 +19,7 @@ time_scale = 1.0
 # Position et vitesse initiale d'un objet
 x_position = 100
 y_position = HEIGHT // 2
-speed = 200  # Vitesse en pixels par seconde
+speed = 200  # Vitesse en pixels par seconde (px/s)
 
 # Boucle principale du jeu
 clock = pygame.time.Clock()
