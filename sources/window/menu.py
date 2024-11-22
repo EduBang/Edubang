@@ -30,7 +30,6 @@ def window(w) -> None:
 
 def load(*args, **kwargs) -> None:
     if randint(0, 1) == 0:
-        Game.timeScale = 1
         Game.Camera.zoom = 1
         x = 10
         for i in range(x):
@@ -80,14 +79,12 @@ def load(*args, **kwargs) -> None:
         Game.Camera.x = 100
         Game.Camera.y = 500
     elif randint(0, 1) == 0:
-        Game.timeScale = 1
         Game.Camera.zoom = 1
         a = Corps(6e17, 10, (100, 500), (255, 0, 0), 0, 0)
         b = Corps(6e17, 100, (600, 500), (0, 0, 255), 0, 0)
         Game.space.append(a)
         Game.space.append(b)
     else:
-        Game.timeScale = 1
         Game.Camera.zoom = 1
         terre = Corps(6e17, 50, (100, 500), (255, 0, 0), 0, 0.1)
         mars = Corps(6e17, 50, (600, 500), (0, 0, 255), 0, 0)

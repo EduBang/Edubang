@@ -14,7 +14,7 @@ pg.init()
 
 # Initialisation
 pg.display.set_caption("EduBang")
-icon = pg.image.load("./data/images/icon.png")
+icon = pg.image.load("data/images/icon.png")
 pg.display.set_icon(icon)
 MUSIC_END_EVENT = pg.USEREVENT + 1
 buttons = []
@@ -132,7 +132,7 @@ with proto("Game") as Game:
     @Game
     def reset(self) -> None:
         self.Camera.reset()
-        self.dt = 1
+        self.timeScale = 1
         self.space = []
         return
 

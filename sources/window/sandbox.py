@@ -197,10 +197,12 @@ def draw(screen) -> None:
     screen.fill((0, 0, 0))
     if not dk.loadingFinished: # écran de chargement, à améliorer
         # text = medium.render("Loading...", False, (255, 255, 255))
+        width, height = screen.get_size()
         text = Game.font.render("Loading...", False, (255, 255, 255))
-        screen.blit(text, (150, 55))
+        tW, tH = Game.font.size("Loading...")
+        screen.blit(text, (width // 2 - tW + 70, height // 2 - tH // 2))
         image = dk.loadingImages[dk.loadingImageIndex]
-        screen.blit(image, (10, 10))
+        screen.blit(image, (width // 2 - 108 // 2 - tW, height // 2 - 108 // 2))
         return
 
     showPath: bool = False
