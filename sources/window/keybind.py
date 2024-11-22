@@ -10,10 +10,11 @@ dk = DataKeeper()
 interface = []
 
 @Events.observe
-def window(w):
+def window(w) -> None:
     interface.clear()
+    return
 
-def backFunction():
+def backFunction() -> None:
     newKeybinds = {}
     with open("data/keybind.json", "w", encoding="utf-8") as f:
         for keybind in interface:
@@ -25,6 +26,7 @@ def backFunction():
     Game.keybinds = newKeybinds
     Game.resetKeys()
     Game.select("settings")
+    return
 
 def load() -> None:
     backButton = Button((100, 100), (180, 60))

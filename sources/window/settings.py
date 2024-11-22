@@ -10,15 +10,17 @@ dk = DataKeeper()
 
 interface = []
 
-def goKeybind():
+def goKeybind() -> None:
     Game.reset()
     Game.select("keybind")
+    return
 
 @Events.observe
-def window(w):
+def window(w) -> None:
     interface.clear()
+    return
 
-def backFunction():
+def backFunction() -> None:
     settings = {}
     with open("data/settings.json", "w", encoding="utf-8") as f:
         for element in interface:
@@ -31,6 +33,7 @@ def backFunction():
     pg.mixer.music.set_volume(settings["volume"] / 100)
     Game.resetKeys()
     Game.select("menu")
+    return
 
 def load() -> None:
     backButton = Button((100, 100), (180, 60))

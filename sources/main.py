@@ -173,7 +173,7 @@ with proto("Game") as Game:
 
 with proto("CameraHandler") as CameraHandler:
     @CameraHandler
-    def new(self):
+    def new(self) -> None:
         self.active = False
         self.x = 0
         self.y = 0
@@ -185,7 +185,7 @@ with proto("CameraHandler") as CameraHandler:
         return
 
     @CameraHandler
-    def reset(self):
+    def reset(self) -> None:
         self.active = False
         self.x = 0
         self.y = 0
@@ -199,19 +199,20 @@ with proto("CameraHandler") as CameraHandler:
 Game.load()
 
 @Events.observe
-def window(w):
+def window(w) -> None:
     for i in buttons:
         buttons.remove(i)
     Game.space = []
+    return
 
 @Events.observe
-def hovering(button):
+def hovering(button) -> None:
     if not button in buttons:
         buttons.append(button)
     return
 
 @Events.observe
-def unhovering(button):
+def unhovering(button) -> None:
     if button in buttons:
         buttons.remove(button)
     return
@@ -270,9 +271,11 @@ def mousebuttondown(event) -> None:
 
 def update() -> None:
     Game.update()
+    return
 
 def draw() -> None:
     Game.draw()
+    return
 
 # Boucle principale
 def gameLoop() -> None:
@@ -320,6 +323,7 @@ def gameLoop() -> None:
 
         draw()
         update()
+    return
 
 gameLoop()
 

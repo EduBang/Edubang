@@ -311,6 +311,8 @@ with proto("Input") as Input:
         if button != 1: return
         if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
             self.onPressed()
+        else:
+            self.focus = False
         return
     
     def mousebuttonupI(self, event) -> None:
@@ -602,9 +604,9 @@ def process_collide(corps1, corps2):
 
     mass = corps1.mass + corps2.mass
     radius = sqrt(((pi * corps1.radius ** 2) + (pi * corps2.radius ** 2)) / pi)
-    color = mergeColor(corps1,corps2)
-    vInitialX = (corps1.mass * sum_vector_cinetic_energy_corps1[0] + corps2.mass * sum_vector_cinetic_energy_corps2[0]) / mass
-    vInitialY = (corps1.mass * sum_vector_cinetic_energy_corps1[1] + corps2.mass * sum_vector_cinetic_energy_corps2[1]) / mass
+    color = mergeColor(corps1, corps2)
+    vInitialX = (sum_vector_cinetic_energy_corps1[0] + sum_vector_cinetic_energy_corps2[0]) / mass
+    vInitialY = (sum_vector_cinetic_energy_corps1[1] + sum_vector_cinetic_energy_corps2[1]) / mass
 
     corps = corps1
     hasChanged = False
@@ -652,7 +654,7 @@ def loadStars(n: int = 100, position: tuple[int, int] = (-1000, 1000)) -> list[t
 # endregion
 
 # region Vecteur
-def draw_velocity_vector(screen, corps):
+def draw_velocity_vector(screen, corps) -> None:
     if len(corps.path) > 1:
         corps_velocity = Physics.get_velocity(corps.path[-2], corps.path[-1], Game.dt)
         unit_vector_mouv = Vectors.get_unit_vector_mouv(corps.path[-2], corps.path[-1])
@@ -667,8 +669,9 @@ def draw_velocity_vector(screen, corps):
         endY = startY + velocity_vector[1] * k
 
         pg.draw.line(screen, (0, 255, 0), (startX, startY), (endX, endY), 5)
+    return
     
-def draw_cinetic_energy_vector(screen, corps):
+def draw_cinetic_energy_vector(screen, corps) -> None:
     if len(corps.path) > 1:
         unit_vector_mouv = Vectors.get_unit_vector_mouv(corps.path[-2], corps.path[-1])
         cinetic_energy = Game.normalizeCinetic(corps)
@@ -683,12 +686,14 @@ def draw_cinetic_energy_vector(screen, corps):
         endY = startY + cinetic_energy_vector[1] * k
 
         pg.draw.line(screen, (255, 0, 0), (startX, startY), (endX, endY), 5)
+    return
 
-def draw_attraction_norm(screen, ): #  chanp gravitation = G*(mass_obj_select / d2)
+def draw_attraction_norm(screen, ) -> None: #  chanp gravitation = G*(mass_obj_select / d2)
     list_attraction_norm = []
     
     for corps in Game.space:
           
         list_attraction_norm.append(Physics.gravitation_constant * (corps.mass / Physics.get_distance(pg.mouse.get_pos(), corps)))
+    return
         
 # endregion x = float((self.pos[0] + camera.x / camera.zoom) * camera.zoom)

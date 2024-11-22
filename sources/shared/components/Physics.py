@@ -1,18 +1,18 @@
 from math import sqrt
 from proto import proto
 
-gravitation_constant = 6.67e-11
+gravitation_constant: int = 6.67e-11
 
 with proto("Physics") as Physics:
     @Physics
-    def get_attraction(self, mass1, mass2, d):
+    def get_attraction(self, mass1, mass2, d) -> float:
         G = 6.67 * 10 ** -11
         if d == 0:
             return 0
         return G * (mass1 * mass2) / (d ** 2)
     
     @Physics
-    def get_velocity(self, pos_init, pos_final, dt):
+    def get_velocity(self, pos_init, pos_final, dt) -> float | int:
         velocity_vector = (pos_final[0] - pos_init[0], pos_final[1] - pos_init[1])
         norm_velocity_vector = sqrt(velocity_vector[0] ** 2 + velocity_vector[1] ** 2)
         if dt != 0:
@@ -23,7 +23,7 @@ with proto("Physics") as Physics:
         
     
     @Physics
-    def get_cinetic_energy(self, mass, velocity):
+    def get_cinetic_energy(self, mass, velocity) -> float:
         return 0.5 * mass * velocity ** 2 
     
 

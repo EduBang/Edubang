@@ -7,16 +7,17 @@ from main import Game
 
 with proto("Corps") as Corps:
     @Corps
-    def new(self, mass, radius, pos, color, v_initial_x, v_initial_y):
+    def new(self, mass, radius, pos, color, v_initial_x, v_initial_y) -> None:
         self.mass = mass # kilogramme
         self.radius = radius # kilomètre
         self.pos = pos
         self.color = color
         self.velocity = [v_initial_x, v_initial_y]  # Vitesse initiale
         self.path = []
+        return
     
     @Corps
-    def draw(self, screen, camera):
+    def draw(self, screen, camera) -> None:
         x = float((self.pos[0] + camera.x / camera.zoom) * camera.zoom)
         y = float((self.pos[1] + camera.y / camera.zoom) * camera.zoom)
         if pi * (self.radius * camera.zoom) ** 2 < 10: # Si le corps est trop petit sur l'écran, alors il va l'afficher avec une croix
@@ -28,9 +29,10 @@ with proto("Corps") as Corps:
                 screen.blit(surface, (x + 18, y - 30))
         else:
             pg.draw.circle(screen, self.color, (x, y), self.radius * camera.zoom)
+        return
     
     @Corps
-    def update_position(self, acc, dt):
+    def update_position(self, acc, dt) -> None:
         self.path.append(self.pos) # Laisser ce code ira consommer environ 4Mo de RAM par seconde pour 10 corps.
         if len(self.path) > 499: # On limite alors la liste du chemin à 100. C'est ajustable.
             self.path.pop(0)
@@ -40,4 +42,5 @@ with proto("Corps") as Corps:
         
         # Mise à jour de la position en fonction de la nouvelle vitesse (avec inertie)
         self.pos = (self.pos[0] + self.velocity[0] * dt, self.pos[1] + self.velocity[1] * dt)
+        return
 
