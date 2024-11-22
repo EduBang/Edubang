@@ -94,6 +94,8 @@ def mousebuttondown(event) -> None:
 
 def loader() -> None:
     Game.Camera.active = True
+    Game.Camera.x = 100
+    Game.Camera.y = 500
     dk.active = True
 
     space, size = loadSpace(dk.perlin)
