@@ -178,7 +178,7 @@ with proto("CameraHandler") as CameraHandler:
         self.x = 0
         self.y = 0
         self.speed = 5
-        self.zoom = 0.00_1
+        self.zoom = 0.00_000_1
         self.maxZoom = 10_000_000
         self.minZoom = 0.00_000_01
         self.focus = None
@@ -190,7 +190,7 @@ with proto("CameraHandler") as CameraHandler:
         self.x = 0
         self.y = 0
         self.speed = 5
-        self.zoom = 0.00_1
+        self.zoom = 0.00_000_1
         self.maxZoom = 10_000_000
         self.minZoom = 0.00_000_01
         self.focus = None
@@ -317,7 +317,7 @@ def gameLoop() -> None:
             pg.mouse.set_cursor(pg.SYSTEM_CURSOR_ARROW)
 
         Game.deltaTime = clock.tick(60) / 1000
-        
+
         draw()
         update()
 

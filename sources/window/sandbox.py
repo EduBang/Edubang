@@ -102,25 +102,28 @@ def loader():
     
     dk.stars = loadStars(1500, (-3000, 3000))
 
+    # La constante d'EduBang
+    # valeur de calibrage, origine à déterminer
+    x = 10750
+
     soleil = Corps(1.9885e30, 696342, (0, 0), (255, 255, 0), 0, 0)
     soleil.name = "Soleil"
-    mercure = Corps(3.3011e23, 2439.7, (57_909_050, 0), (127, 127, 127), 0, -47.362)
+    mercure = Corps(3.3011e23, 2439.7, (57_909_050, 0), (127, 127, 127), 0, -47.362 * x)
     mercure.name = "Mercure"
-    venus = Corps(4.8675e24, 6051.8, (108_209_500, 0), (255, 127, 127), 0, -35.02571)
+    venus = Corps(4.8675e24, 6051.8, (108_209_500, 0), (255, 127, 127), 0, -35.02571 * x)
     venus.name = "Vénus"
-    terre = Corps(5.9736e24, 6371.008, (149_597_887.5 , 0), (0, 0, 255), 0, -29.783)
+    terre = Corps(5.9736e24, 6371.008, (149_597_887.5 , 0), (0, 0, 255), 0, -29.783 * x)
     terre.name = "Terre"
-    mars = Corps(6.4185e23, 3389.5, (227_944_000, 0), (255, 50, 50), 0, -24.080)
+    mars = Corps(6.4185e23, 3389.5, (227_944_000, 0), (255, 50, 50), 0, -24.080 * x)
     mars.name = "Mars"
-    jupiter = Corps(1.8986e27, 69911, (778_340_000, 0), (255, 255, 230), 0, -13.0585)
+    jupiter = Corps(1.8986e27, 69911, (778_340_000, 0), (255, 255, 230), 0, -13.0585 * x)
     jupiter.name = "Jupiter"
-    saturne = Corps(5.6846e26, 58232, (1_426_700_000, 0), (255, 240, 240), 0, -9.6407)
+    saturne = Corps(5.6846e26, 58232, (1_426_700_000, 0), (255, 240, 240), 0, -9.6407 * x)
     saturne.name = "Saturne"
-    uranus = Corps(8.681e25, 25362, (2_870_700_000, 0), (100, 100, 200), 0, -6.796732)
+    uranus = Corps(8.681e25, 25362, (2_870_700_000, 0), (100, 100, 200), 0, -6.796732 * x)
     uranus.name = "Uranus"
-    neptune = Corps(1.0243e26, 24622, (4_498_400_000, 0), (100, 100, 255), 0, -5.43248)
+    neptune = Corps(1.0243e26, 24622, (4_498_400_000, 0), (100, 100, 255), 0, -5.43248 * x)
     neptune.name = "Neptune"
-
     Game.space.append(soleil)
     Game.space.append(mercure)
     Game.space.append(venus)
@@ -154,14 +157,14 @@ def loader():
     textShowPath = Text("Afficher les trajectoires", (40, 108), color=(255, 255, 255))
     interface.append(textShowPath)
 
-    showPath = CheckBox((280, 100), False)
+    showPath = CheckBox((300, 100), False)
     showPath.trajectoire = None
     interface.append(showPath)
     
-    textShowAttractionNorm = Text("Afficher la norme d'attraction", (40, 50), color=(255, 255, 255))
+    textShowAttractionNorm = Text("Afficher la norme d'attraction", (40, 158), color=(255, 255, 255))
     interface.append(textShowAttractionNorm)
 
-    showAttractionNorm = CheckBox((280, 50), False)
+    showAttractionNorm = CheckBox((360, 150), False)
     showAttractionNorm.attraction_norm = None
     interface.append(showAttractionNorm)
 
