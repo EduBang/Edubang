@@ -7,13 +7,13 @@ from shared.utils.utils import updateCorps, process_collide, Captors, Button, Co
 
 
 
-def playSandbox():
+def goSandbox():
     Game.reset()
     Game.select("sandbox")
 
-def goKeybind():
+def goSettings():
     Game.reset()
-    Game.select("keybind")
+    Game.select("settings")
 
 def quitFunction():
     Game.running = False
@@ -72,13 +72,13 @@ def load(*args, **kwargs):
 
     sandbox = Button((100, 100), (180, 60))
     sandbox.text = "Play Sandbox"
-    sandbox.onPressed = playSandbox
+    sandbox.onPressed = goSandbox
     interface.append(sandbox)
 
-    keybindButton = Button((100, 200), (180, 60))
-    keybindButton.text = "Keybind"
-    keybindButton.onPressed = goKeybind
-    interface.append(keybindButton)
+    settingsButton = Button((100, 200), (180, 60))
+    settingsButton.text = "Settings"
+    settingsButton.onPressed = goSettings
+    interface.append(settingsButton)
 
     quitButton = Button((100, 300), (180, 60))
     quitButton.text = "Quit"

@@ -24,7 +24,7 @@ def backFunction():
         f.close()
     Game.keybinds = newKeybinds
     Game.resetKeys()
-    Game.select("menu")
+    Game.select("settings")
 
 def load() -> None:
     backButton = Button((100, 100), (180, 60))

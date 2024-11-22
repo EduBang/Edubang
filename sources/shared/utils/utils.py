@@ -691,4 +691,4 @@ def draw_attraction_norm(screen, ): #  chanp gravitation = G*(mass_obj_select / 
           
         list_attraction_norm.append(Physics.gravitation_constant * (corps.mass / Physics.get_distance(pg.mouse.get_pos(), corps)))
         
-# endregionx = float((self.pos[0] + camera.x / camera.zoom) * camera.zoom)
+# endregion x = float((self.pos[0] + camera.x / camera.zoom) * camera.zoom)

@@ -100,7 +100,7 @@ def loader():
     img = img.resize((5 * size, 5 * size), Image.Resampling.LANCZOS)
     dk.image = pg.image.fromstring(img.tobytes(), img.size, img.mode)
     
-    dk.stars = loadStars(2000, (-3000, 3000))
+    dk.stars = loadStars(1500, (-3000, 3000))
 
     soleil = Corps(1.9885e30, 696342, (0, 0), (255, 255, 0), 0, 0)
     soleil.name = "Soleil"
