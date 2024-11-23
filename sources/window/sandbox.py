@@ -40,11 +40,10 @@ def window(w) -> None:
         kill(dk.process)
         dk.process = None
     return
-    
-
 
 @Events.observe
 def keydown(event) -> None:
+    if Game.window != "sandbox": return
     key = Game.getKeyFromCode(event.key)
     if key:
         Game.keys[key] = True
@@ -110,6 +109,9 @@ def loader() -> None:
     # La constante d'EduBang
     # valeur de calibrage, origine à déterminer
     C_EDUBANG = 10750
+
+    # 2'46"33 timeScale 1
+    # 166.33
 
     soleil = Corps(1.9885e30, 696342, (0, 0), (255, 255, 0), 0, 0)
     soleil.name = "Soleil"
