@@ -11,6 +11,8 @@ from main import Game #, medium
 from shared.utils.utils import updateCorps, process_collide, Captors, Corps, MessageBox, Path, DataKeeper, Input, Text, CheckBox, SizeViewer, loadSpace, loadStars, draw_velocity_vector, draw_cinetic_energy_vector
 
 dk = DataKeeper()
+dk.pause = False
+dk.timeScale = None
 dk.active = False
 dk.loadingFinished = False
 dk.loadingImages = []
@@ -60,6 +62,17 @@ def keydown(event) -> None:
     if Game.keys["resetCamera"]:
         Game.Camera.reset()
         Game.Camera.active = True
+    if Game.keys["pause"]:
+        dk.pause = not dk.pause
+        if dk.pause:
+            dk.timeScale = Game.timeScale
+            for element in interface:
+                if hasattr(element, "numberOnly"):
+                    element.text = "0"
+        else:
+            for element in interface:
+                if hasattr(element, "numberOnly"):
+                    element.text = str(dk.timeScale)
     key = event.key
     if not dk.active: return
     if key == pg.K_ESCAPE:
@@ -111,7 +124,6 @@ def loader() -> None:
     C_EDUBANG = 10750
 
     # 2'46"33 timeScale 1
-    # 166.33
 
     soleil = Corps(1.9885e30, 696342, (0, 0), (255, 255, 0), 0, 0)
     soleil.name = "Soleil"
@@ -165,14 +177,14 @@ def loader() -> None:
     textShowPath = Text("Afficher les trajectoires", (40, 108), color=(255, 255, 255))
     interface.append(textShowPath)
 
-    showPath = CheckBox((300, 100), False)
+    showPath = CheckBox((335, 100), False)
     showPath.trajectoire = None
     interface.append(showPath)
     
     textShowAttractionNorm = Text("Afficher la norme d'attraction", (40, 158), color=(255, 255, 255))
     interface.append(textShowAttractionNorm)
 
-    showAttractionNorm = CheckBox((360, 150), False)
+    showAttractionNorm = CheckBox((410, 150), False)
     showAttractionNorm.attraction_norm = None
     interface.append(showAttractionNorm)
 
@@ -240,6 +252,12 @@ def draw(screen) -> None:
         element.draw(screen)
         if hasattr(element, "numberOnly"):
             Game.timeScale = int(element.text) if element.text not in ["-", ""] else 0
+
+    if dk.pause:
+        width, height = screen.get_size()
+        text = Game.font.render("Simulation paused", False, (255, 255, 255))
+        tW, tH = Game.font.size("Simulation paused")
+        screen.blit(text, (width // 2 - tW // 2, height // 2 - tH // 2 - 200))
 
     mb.draw(screen)
     return

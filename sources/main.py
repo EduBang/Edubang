@@ -34,7 +34,7 @@ clock = pg.time.Clock()
 # medium = pg.font.SysFont("data/fonts/FixelText-Medium.otf", 30)
 # regular = pg.font.SysFont("data/fonts/FixelText-Regular.otf", 30)
 # light = pg.font.SysFont("data/fonts/FixelText-Light.otf", 30)
-font = pg.font.SysFont("Arial", 24)
+font = pg.font.Font("data/fonts/Montserrat/Montserrat-Regular.ttf", 24)
 
 with proto("Game") as Game:
     @Game

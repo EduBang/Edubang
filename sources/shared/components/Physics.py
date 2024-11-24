@@ -9,7 +9,7 @@ with proto("Physics") as Physics:
         G = 6.67 * 10 ** -11
         if d == 0:
             return 0
-        return G * (mass1 * mass2) / (d ** 2)
+        return G * (mass1 * mass2) / (d ** 2) # N
     
     @Physics
     def get_velocity(self, pos_init, pos_final, dt) -> float | int:
