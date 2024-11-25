@@ -123,8 +123,6 @@ def loader() -> None:
     # valeur de calibrage, origine à déterminer
     C_EDUBANG = 10750
 
-    # 2'46"33 timeScale 1
-
     soleil = Corps(1.9885e30, 696342, (0, 0), (255, 255, 0), 0, 0)
     soleil.name = "Soleil"
     mercure = Corps(3.3011e23, 2439.7, (57_909_050, 0), (127, 127, 127), 0, -47.362 * C_EDUBANG)
@@ -169,6 +167,8 @@ def loader() -> None:
         x = inputDT.position[0] + 5
         y = inputDT.position[1] + inputDT.size[1] // 2 - dim[1] // 2
         screen.blit(surface, (x, y))
+        text = inputDT.font.render("day/s", False, color)
+        screen.blit(text, (x + dim[0] + 8, y))
     inputDT.draw = inputDTdraw
     inputDT.font = font
     inputDT.numberOnly = True

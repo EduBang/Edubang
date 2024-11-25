@@ -319,7 +319,8 @@ def gameLoop() -> None:
         if len(buttons) == 0: # Si la souris ne hover plus rien
             pg.mouse.set_cursor(pg.SYSTEM_CURSOR_ARROW)
 
-        Game.deltaTime = clock.tick(60) / 1000
+        # Constante de calibrage du temps
+        Game.deltaTime = clock.tick(60) / (1000 * 2.195)
 
         draw()
         update()
