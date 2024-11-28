@@ -92,17 +92,17 @@ def load(*args, **kwargs) -> None:
         Game.space.append(mars)
 
     sandbox = Button((100, 100), (180, 60))
-    sandbox.text = "Play Sandbox"
+    sandbox.text = "Accéder au Sandbox"
     sandbox.onPressed = goSandbox
     interface.append(sandbox)
 
     settingsButton = Button((100, 200), (180, 60))
-    settingsButton.text = "Settings"
+    settingsButton.text = "Paramètres"
     settingsButton.onPressed = goSettings
     interface.append(settingsButton)
 
     quitButton = Button((100, 300), (180, 60))
-    quitButton.text = "Quit"
+    quitButton.text = "Quitter"
     quitButton.onPressed = quitFunction
     interface.append(quitButton)
     return
@@ -114,7 +114,7 @@ def draw(screen) -> None:
         corps.draw(screen, Game.Camera)
     
     for element in interface:
-        element.draw(screen)
+        element.draw()
     
     return
 

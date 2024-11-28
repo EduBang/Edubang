@@ -38,12 +38,12 @@ def backFunction() -> None:
 def load() -> None:
     backButton = Button((100, 100), (180, 60))
     backButton.scrollable = True
-    backButton.text = "Back to menu"
+    backButton.text = "Retour"
     backButton.onPressed = backFunction
     interface.append(backButton)
 
     keybindButton = Button((100, 200), (180, 60))
-    keybindButton.text = "Keybind"
+    keybindButton.text = "Contrôles"
     keybindButton.onPressed = goKeybind
     interface.append(keybindButton)
 
@@ -65,7 +65,7 @@ def load() -> None:
 def draw(screen) -> None:
     screen.fill((0, 0 ,0))
     for element in interface:
-        element.draw(screen)
+        element.draw()
     return
 
 def update() -> None:

@@ -7,9 +7,11 @@ from PIL import Image
 from eventListen import Events
 from nsi25perlin import PerlinNoise
 
-from main import Game #, medium
+from main import Game, getFont
 from shared.utils.utils import updateCorps, process_collide, Captors, Corps, MessageBox, Path, DataKeeper, Input, Text, CheckBox, SizeViewer, loadSpace, loadStars, draw_velocity_vector, draw_cinetic_energy_vector
+from shared.components.Prediction import Prediction
 
+prediction = Prediction(Game.space)
 dk = DataKeeper()
 dk.pause = False
 dk.timeScale = None
@@ -22,13 +24,13 @@ dk.image = None
 dk.stars = []
 dk.perlin = PerlinNoise(768)
 interface = []
-font = pg.font.SysFont("Comic Sans MS", 30)
-mb = MessageBox("Return to menu ?")
+mb = MessageBox("Retourner au menu ?")
+edubangIcon = pg.image.load("data/images/icon.png")
+subtitle = getFont("Bold")
 
 def kill(thread: Thread) -> None:
     threadId = thread.ident
     if not threadId: return
-
     pointer = pythonapi.PyThreadState_SetAsyncExc(c_long(threadId), py_object(SystemExit))
     if pointer > 1:
         pythonapi.PyThreadState_SetAsyncExc(threadId, 0)
@@ -106,7 +108,7 @@ def mousebuttondown(event) -> None:
 
 def loader() -> None:
     Game.Camera.active = True
-    Game.Camera.x = 100
+    Game.Camera.x = 1000
     Game.Camera.y = 500
     dk.active = True
 
@@ -141,7 +143,6 @@ def loader() -> None:
     uranus.name = "Uranus"
     neptune = Corps(1.0243e26, 24622, (4_498_400_000, 0), (100, 100, 255), 0, -5.43248 * C_EDUBANG)
     neptune.name = "Neptune"
-
     Game.space.append(soleil)
     Game.space.append(mercure)
     Game.space.append(venus)
@@ -152,43 +153,56 @@ def loader() -> None:
     Game.space.append(uranus)
     Game.space.append(neptune)
 
-    # km = Corps(1, 1, (0, 0), (255, 255, 255), 0, 0)
+    # km = Corps(10, 1, (0, 0), (255, 255, 255), 0, 0)
     # km.name = "1 Kilometer"
     # Game.space.append(km)
+    # km10 = Corps(100, 10, (100, 100), (255, 255, 255), 0, 0)
+    # km10.name = "10 Kilometer"
+    # Game.space.append(km10)
 
-    textDT = Text("TimeScale : ", (40, 40), color=(255, 255, 255), font=font)
+    textDT = Text("Échelle du temps : ", (20, 145), color=(255, 255, 255))
     interface.append(textDT)
 
-    inputDT = Input(str(Game.timeScale), (200, 40), (200, 40))
-    def inputDTdraw(screen):
+    inputDT = Input(str(Game.timeScale), (180, 145), (100, 40))
+    def inputDTdraw():
         color = (0, 0, 255) if inputDT.focus else (255, 255, 255)
-        surface = inputDT.font.render(inputDT.text, False, color)
-        dim = inputDT.font.size(inputDT.text)
-        x = inputDT.position[0] + 5
-        y = inputDT.position[1] + inputDT.size[1] // 2 - dim[1] // 2
-        screen.blit(surface, (x, y))
-        text = inputDT.font.render("day/s", False, color)
-        screen.blit(text, (x + dim[0] + 8, y))
+        surface = Game.font.render(inputDT.text, False, color)
+        dim = Game.font.size(inputDT.text)
+        x = inputDT.position[0]
+        y = inputDT.position[1] + inputDT.size[1] // 2 - dim[1] // 2 - 10
+        Game.screen.blit(surface, (x, y))
+        text = Game.font.render("jour/s", False, color)
+        Game.screen.blit(text, (x + dim[0] + 4, y))
     inputDT.draw = inputDTdraw
-    inputDT.font = font
     inputDT.numberOnly = True
     interface.append(inputDT)
 
-    textShowPath = Text("Afficher les trajectoires", (40, 108), color=(255, 255, 255))
+    textShowPath = Text("Afficher les trajectoires", (20, 245), color=(255, 255, 255))
     interface.append(textShowPath)
 
-    showPath = CheckBox((335, 100), False)
+    showPath = CheckBox((225, 241), False)
     showPath.trajectoire = None
     interface.append(showPath)
     
-    textShowAttractionNorm = Text("Afficher la norme d'attraction", (40, 158), color=(255, 255, 255))
+    textShowAttractionNorm = Text("Afficher la norme d'attraction", (20, 295), color=(255, 255, 255))
     interface.append(textShowAttractionNorm)
 
-    showAttractionNorm = CheckBox((410, 150), False)
+    showAttractionNorm = CheckBox((280, 291), False)
     showAttractionNorm.attraction_norm = None
     interface.append(showAttractionNorm)
 
-    sizeViewer = SizeViewer((10, 300))
+    textShowSV = Text("Règle de mesure", (20, 455), color=(255, 255, 255))
+    interface.append(textShowSV)
+
+    showSV = CheckBox((175, 451), False)
+    showSV.checked = True
+    showSV.sv = None
+    interface.append(showSV)
+
+    w, h = Game.screen.get_size()
+
+    sizeViewer = SizeViewer((w - 200, h - 50))
+    sizeViewer.measure = None
     interface.append(sizeViewer)
 
     dk.loadingFinished = True
@@ -209,13 +223,27 @@ def load(*args, **kwargs) -> None:
         dk.loadingImages.append(img)
     return
 
+def menu(screen) -> None:
+    width, height = screen.get_size()
+    pg.draw.rect(screen, (10, 9, 9), (0, 0, 350, height))
+    text = subtitle.render("Paramètres de simulation", False, (255, 255, 255))
+    screen.blit(text, (20, 100))
+    pg.draw.line(screen, (102, 102, 102), (20, 130), (100, 130))
+
+    text = subtitle.render("Paramètres d'affichage", False, (255, 255, 255))
+    screen.blit(text, (20, 200))
+    pg.draw.line(screen, (102, 102, 102), (20, 230), (100, 230))
+
+    text = subtitle.render("Outils", False, (255, 255, 255))
+    screen.blit(text, (20, 400))
+    pg.draw.line(screen, (102, 102, 102), (20, 430), (100, 430))
+
 def draw(screen) -> None:
     screen.fill((0, 0, 0))
-    if not dk.loadingFinished: # écran de chargement, à améliorer
-        # text = medium.render("Loading...", False, (255, 255, 255))
+    if not dk.loadingFinished:
         width, height = screen.get_size()
-        text = Game.font.render("Loading...", False, (255, 255, 255))
-        tW, tH = Game.font.size("Loading...")
+        text = Game.font.render("Chargement...", False, (255, 255, 255))
+        tW, tH = Game.font.size("Chargement...")
         screen.blit(text, (width // 2 - tW + 70, height // 2 - tH // 2))
         image = dk.loadingImages[dk.loadingImageIndex]
         screen.blit(image, (width // 2 - 108 // 2 - tW, height // 2 - 108 // 2))
@@ -238,6 +266,8 @@ def draw(screen) -> None:
             showPath = element.checked
         if hasattr(element, "attractionnorm"):
             showAttractionNorm = element.checked
+        if hasattr(element, "sv"):
+            showSV = element.checked
 
         
     for corps in Game.space:
@@ -247,19 +277,24 @@ def draw(screen) -> None:
 
         # draw_velocity_vector(screen, corps)
         # draw_cinetic_energy_vector(screen, corps)
+    
+    # prediction.predict(1)
+
+    menu(screen)
 
     for element in interface:
-        element.draw(screen)
+        if hasattr(element, "measure") and not showSV: continue
+        element.draw()
         if hasattr(element, "numberOnly"):
             Game.timeScale = int(element.text) if element.text not in ["-", ""] else 0
 
     if dk.pause:
         width, height = screen.get_size()
-        text = Game.font.render("Simulation paused", False, (255, 255, 255))
-        tW, tH = Game.font.size("Simulation paused")
+        text = Game.font.render("Simulation en pause", False, (255, 255, 255))
+        tW, tH = Game.font.size("Simulation en pause")
         screen.blit(text, (width // 2 - tW // 2, height // 2 - tH // 2 - 200))
 
-    mb.draw(screen)
+    mb.draw()
     return
 
 def update() -> None:

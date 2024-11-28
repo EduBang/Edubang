@@ -14,14 +14,16 @@ from shared.components.Captors import *
 
 # region Prototypes
 
+FOCUS_COLOR: tuple[int, int, int] = (13, 178, 190)
+
 with proto("Button") as Button:
-    def drawButton(self, screen) -> None:
-        pg.draw.rect(screen, (255, 255, 255), pg.Rect(self.position, self.size), 0, 8)
+    def drawButton(self) -> None:
+        pg.draw.rect(Game.screen, (255, 255, 255), pg.Rect(self.position, self.size), 0, 8)
         surface = Game.font.render(self.text, False, (0, 0, 0))
         width, height = Game.font.size(self.text)
         x = self.position[0] + (self.size[0] - width) / 2
         y = self.position[1] + (self.size[1] - height) / 2
-        screen.blit(surface, (x, y))
+        Game.screen.blit(surface, (x, y))
         return
     
     def mousemotionBTN(self, event) -> None:
@@ -84,12 +86,15 @@ with proto("Button") as Button:
         return
 
 with proto("CheckBox") as CheckBox:
-    def drawCheckBox(self, screen) -> None:
-        color = (0, 0, 255) if self.checked else (255, 255, 255)
-        pg.draw.rect(screen, color, pg.Rect(self.position, self.size), 0, 4)
-        if color == (0, 0, 255):
-            pg.draw.line(screen, (0, 0, 0), (self.position[0] + 7, self.position[1] + 20), (self.position[0] + 17, self.position[1] + 30), 5)
-            pg.draw.line(screen, (0, 0, 0), (self.position[0] + 17, self.position[1] + 30), (self.position[0] + 32, self.position[1] + 10), 5)
+    def drawCheckBox(self) -> None:
+        color = FOCUS_COLOR if self.checked else (255, 255, 255)
+        pg.draw.rect(Game.screen, color, pg.Rect(self.position, self.size), 0, 4)
+        if color == FOCUS_COLOR:
+            pos1 = (self.position[0] + 5.25, self.position[1] + 15)
+            pos2 = (self.position[0] + 12.75, self.position[1] + 22.5)
+            pos3 = (self.position[0] + 24, self.position[1] + 7.5)
+            pg.draw.line(Game.screen, (255, 255, 255), pos1, pos2, 4)
+            pg.draw.line(Game.screen, (255, 255, 255), pos2, pos3, 4)
         return
     
     def mousemotionCB(self, event) -> None:
@@ -140,7 +145,7 @@ with proto("CheckBox") as CheckBox:
     def new(self, position: tuple[int, int], checked: bool = False) -> None:
         self.checked = checked
         self.position = list(position)
-        self.size  = [40, 40]
+        self.size  = [30, 30]
         self.draw = MethodType(drawCheckBox, self)
         self.onReleased = lambda: None
         self.onHover = onHover
@@ -157,7 +162,7 @@ with proto("CheckBox") as CheckBox:
 
 with proto("MessageBox") as MessageBox:
     @MessageBox
-    def draw(self, screen) -> None:
+    def draw(self) -> None:
         if not self.active: return
         widthScreen, heightScreen = pg.display.get_surface().get_size()
         surface = Game.font.render(self.text, False, (0, 0, 0))
@@ -166,8 +171,8 @@ with proto("MessageBox") as MessageBox:
         y = heightScreen // 2
         xRect = x - (width + 20) // 2
         yRect = y - (height + 20) // 2
-        pg.draw.rect(screen, (255, 255, 255), pg.Rect((xRect , yRect), (width + 20, height + 20)))
-        screen.blit(surface, (xRect + 10, yRect + height // 2))
+        pg.draw.rect(Game.screen, (255, 255, 255), pg.Rect((xRect , yRect), (width + 20, height + 20)))
+        Game.screen.blit(surface, (xRect + 10, yRect + height // 2))
         return
     
     @MessageBox
@@ -177,14 +182,14 @@ with proto("MessageBox") as MessageBox:
         return
 
 with proto("KeyBind") as KeyBind:
-    def drawKeyBind(self, screen):
-        color = (0, 0, 255) if self.focus else (255, 255, 255)
-        pg.draw.rect(screen, color, pg.Rect(self.position, self.size), 0, 4)
+    def drawKeyBind(self):
+        color = FOCUS_COLOR if self.focus else (255, 255, 255)
+        pg.draw.rect(Game.screen, color, pg.Rect(self.position, self.size), 0, 4)
         surface = Game.font.render(chr(self.key), False, (0, 0, 0))
         width, height = Game.font.size(chr(self.key))
         x = self.position[0] + width // 2
         y = self.position[1] + height // 2
-        screen.blit(surface, (x, y))
+        Game.screen.blit(surface, (x, y))
         return
     
     def mousemotionKB(self, event) -> None:
@@ -261,9 +266,9 @@ with proto("KeyBind") as KeyBind:
 
 with proto("Text") as Text:
     @Text
-    def draw(self, screen) -> None:
+    def draw(self) -> None:
         surface = self.font.render(self.text, self.antialiasing, self.color)
-        screen.blit(surface, self.position)
+        Game.screen.blit(surface, self.position)
         return
 
     def mousewheelT(self, event) -> None:
@@ -286,14 +291,14 @@ with proto("Text") as Text:
         return
 
 with proto("Input") as Input:
-    def drawInput(self, screen) -> None:
-        color = (0, 0, 255) if self.focus else (255, 255, 255)
-        pg.draw.rect(screen, color, pg.Rect(self.position, self.size), 0, 4)
+    def drawInput(self) -> None:
+        color = FOCUS_COLOR if self.focus else (255, 255, 255)
+        pg.draw.rect(Game.screen, color, pg.Rect(self.position, self.size), 0, 4)
         surface = self.font.render(self.text, False, (0, 0, 0))
         dim = self.font.size(self.text)
         x = self.position[0] + 5
         y = self.position[1] + self.size[1] // 2 - dim[1] // 2
-        screen.blit(surface, (x, y))
+        Game.screen.blit(surface, (x, y))
         return
     
     def mousemotionI(self, event) -> None:
@@ -310,7 +315,8 @@ with proto("Input") as Input:
         x, y = event.pos
         if button != 1: return
         if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
-            self.onPressed()
+            self.focus = not self.focus
+            if self.focus: self.onPressed()
         else:
             self.focus = False
         return
@@ -320,7 +326,8 @@ with proto("Input") as Input:
         x, y = event.pos
         if button != 1: return
         if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
-            self.onReleased()
+            self.focus = not self.focus
+            if self.focus: self.onReleased()
         else:
             self.focus = False
         return
@@ -382,7 +389,7 @@ with proto("Input") as Input:
         return
 
 with proto("SlideBar") as SlideBar:
-    def drawSlideBar(self, screen) -> None:
+    def drawSlideBar(self) -> None:
         if self.active:
             pos = pg.mouse.get_pos()
             value = pos[0] - self.position[0]
@@ -392,9 +399,9 @@ with proto("SlideBar") as SlideBar:
                 value = self.values[0]
             self.value = value
 
-        pg.draw.rect(screen, (255, 255, 255), pg.Rect(self.position, self.size), 0, 8)
-        pg.draw.rect(screen, (0, 0, 250), pg.Rect(self.position, (self.value, 5)), 0, 8)
-        pg.draw.circle(screen, (0, 0, 250), (self.position[0] + self.value, self.position[1] + 2.5), 5)
+        pg.draw.rect(Game.screen, (255, 255, 255), pg.Rect(self.position, self.size), 0, 8)
+        pg.draw.rect(Game.screen, FOCUS_COLOR, pg.Rect(self.position, (self.value, 5)), 0, 8)
+        pg.draw.circle(Game.screen, FOCUS_COLOR, (self.position[0] + self.value, self.position[1] + 2.5), 5)
         return
     
     def mousemotionSB(self, event) -> None:
@@ -486,14 +493,14 @@ with proto("Path") as Path:
             pg.draw.circle(screen, color, (x, y), 1)
 
 with proto("SizeViewer") as SizeViewer:
-    def drawSizeViewer(self, screen):
+    def drawSizeViewer(self):
         width, text = getSize()
         x, y = self.position
-        pg.draw.rect(screen, (255, 255, 255), pg.Rect((x, y), (width, 2)))
-        pg.draw.rect(screen, (255, 255, 255), pg.Rect((x, y - 4), (2, 10)))
-        pg.draw.rect(screen, (255, 255, 255), pg.Rect((x + 100, y - 4), (2, 10)))
+        pg.draw.rect(Game.screen, (255, 255, 255), pg.Rect((x, y), (width, 2)))
+        pg.draw.rect(Game.screen, (255, 255, 255), pg.Rect((x, y - 8), (2, 10)))
+        pg.draw.rect(Game.screen, (255, 255, 255), pg.Rect((x + 100, y - 8), (2, 10)))
         surface = Game.font.render(text, False, (255, 255, 255))
-        screen.blit(surface, (x, y - 40))
+        Game.screen.blit(surface, (x, y + 10))
         w, h = Game.font.size(text)
         self.size = (w if w > 100 else 100, h + 60)
         return

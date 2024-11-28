@@ -27,14 +27,31 @@ pg.mixer.init()
 pg.mixer.music.set_endevent(MUSIC_END_EVENT)
 
 clock = pg.time.Clock()
-# black = pg.font.SysFont("data/fonts/FixelText/FixelText-black.otf", 30)
-# extrabold = pg.font.SysFont("data/FixelText/fonts/FixelText-ExtraBold.otf", 30)
-# bold = pg.font.SysFont("data/fonts/FixelText/FixelText-bold.otf", 30)
-# semibold = pg.font.SysFont("data/fonts/FixelText/FixelText-Semibold.otf", 30)
-# medium = pg.font.SysFont("data/fonts/FixelText/FixelText-Medium.otf", 30)
-# regular = pg.font.SysFont("data/fonts/FixelText/FixelText-Regular.otf", 30)
-# light = pg.font.SysFont("data/fonts/FixelText/FixelText-Light.otf", 30)
-font = pg.font.Font("data/fonts/Montserrat/Montserrat-Regular.ttf", 24)
+FONTS: dict[str, int] = {
+    "ThinItalic": "data/fonts/Montserrat/Montserrat-ThinItalic.ttf",
+    "Thin": "data/fonts/Montserrat/Montserrat-Thin.ttf",
+    "SemiBoldItalic": "data/fonts/Montserrat/Montserrat-SemiBoldItalic.ttf",
+    "SemiBold": "data/fonts/Montserrat/Montserrat-SemiBold.ttf",
+    "Regular": "data/fonts/Montserrat/Montserrat-Regular.ttf",
+    "MediumItalic": "data/fonts/Montserrat/Montserrat-MediumItalic.ttf",
+    "Medium": "data/fonts/Montserrat/Montserrat-Medium.ttf",
+    "LightItalic": "data/fonts/Montserrat/Montserrat-LightItalic.ttf",
+    "Light": "data/fonts/Montserrat/Montserrat-Light.ttf",
+    "Italic": "data/fonts/Montserrat/Montserrat-Italic.ttf",
+    "ExtraLightItalic": "data/fonts/Montserrat/Montserrat-ExtraLightItalic.ttf",
+    "ExtraLight": "data/fonts/Montserrat/Montserrat-ExtraLight.ttf",
+    "ExtraBoldItalic": "data/fonts/Montserrat/Montserrat-ExtraBoldItalic.ttf",
+    "ExtraBold": "data/fonts/Montserrat/Montserrat-ExtraBold.ttf",
+    "BoldItalic": "data/fonts/Montserrat/Montserrat-BoldItalic.ttf",
+    "Bold": "data/fonts/Montserrat/Montserrat-Bold.ttf",
+    "BlackItalic": "data/fonts/Montserrat/Montserrat-BlackItalic.ttf",
+    "Black": "data/fonts/Montserrat/Montserrat-Black.ttf"
+}
+
+def getFont(font, size: int = 16) -> pg.font.Font:
+    return pg.font.Font(FONTS[font], size)
+
+font = getFont("Medium")
 
 with proto("Game") as Game:
     @Game
@@ -60,6 +77,7 @@ with proto("Game") as Game:
         self.settings = {}
         self.musics = []
         self.music = None
+        self.screen = screen
 
         ws = [w for w in listdir("sources/window") if path.isfile(path.join("sources/window", w))]
         for w in ws:
