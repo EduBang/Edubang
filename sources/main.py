@@ -14,7 +14,7 @@ pg.init()
 
 # Initialisation
 pg.display.set_caption("EduBang")
-icon = pg.image.load("data/images/icon.png")
+icon = pg.image.load("data/images/appicon.png")
 pg.display.set_icon(icon)
 MUSIC_END_EVENT = pg.USEREVENT + 1
 buttons = []

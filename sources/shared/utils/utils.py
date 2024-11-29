@@ -1,6 +1,5 @@
 from types import MethodType
 from random import randint
-from math import cos, sin, radians
 
 import pygame as pg
 

@@ -3,7 +3,7 @@ from threading import Thread
 from os import path
 
 import pygame as pg
-from PIL import Image
+from PIL import Image, ImageFilter, ImageOps, ImageEnhance
 from eventListen import Events
 from nsi25perlin import PerlinNoise
 
@@ -25,8 +25,17 @@ dk.stars = []
 dk.perlin = PerlinNoise(768)
 interface = []
 mb = MessageBox("Retourner au menu ?")
-edubangIcon = pg.image.load("data/images/icon.png")
 subtitle = getFont("Bold")
+brand = Image.open("data/images/brand.png")
+brand = brand.resize((175, 41), Image.Resampling.BICUBIC)
+brand = pg.image.fromstring(brand.tobytes(), brand.size, brand.mode)
+icon = Image.open("data/images/icon.png")
+icon = icon.resize((398, 402), Image.Resampling.BICUBIC)
+icon = ImageOps.expand(icon, border=20, fill=(0, 0, 0, 0))
+icon = icon.filter(ImageFilter.GaussianBlur(10))
+enhancer = ImageEnhance.Brightness(icon)
+icon = enhancer.enhance(.075)
+icon = pg.image.fromstring(icon.tobytes(), icon.size, icon.mode)
 
 def kill(thread: Thread) -> None:
     threadId = thread.ident
@@ -226,6 +235,10 @@ def load(*args, **kwargs) -> None:
 def menu(screen) -> None:
     width, height = screen.get_size()
     pg.draw.rect(screen, (10, 9, 9), (0, 0, 350, height))
+
+    screen.blit(brand, (20, 20))
+    screen.blit(icon, (-150, height - 320))
+
     text = subtitle.render("Paramètres de simulation", False, (255, 255, 255))
     screen.blit(text, (20, 100))
     pg.draw.line(screen, (102, 102, 102), (20, 130), (100, 130))
