@@ -23,10 +23,6 @@ with proto("Corps") as Corps:
         if pi * (self.radius * camera.zoom) ** 2 < 10: # Si le corps est trop petit sur l'écran, alors il va l'afficher avec une croix
             pg.draw.line(screen, (255, 255, 255), (x - 8, y), (x + 8, y), 2)
             pg.draw.line(screen, (255, 255, 255), (x, y - 8), (x, y + 8), 2)
-            if hasattr(self, "name"): # s'il a l'attribut "name", alors il va l'afficher
-                pg.draw.line(screen, (255, 255, 255), (x + 4, y - 4), (x + 16, y - 16), 1)
-                surface = Game.font.render(self.name, False, (255, 255, 255))
-                screen.blit(surface, (x + 18, y - 30))
         else:
             pg.draw.circle(screen, self.color, (x, y), self.radius * camera.zoom)
         return

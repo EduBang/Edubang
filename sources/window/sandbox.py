@@ -152,6 +152,7 @@ def loader() -> None:
     uranus.name = "Uranus"
     neptune = Corps(1.0243e26, 24622, (4_498_400_000, 0), (100, 100, 255), 0, -5.43248 * C_EDUBANG)
     neptune.name = "Neptune"
+
     Game.space.append(soleil)
     Game.space.append(mercure)
     Game.space.append(venus)
@@ -186,17 +187,24 @@ def loader() -> None:
     inputDT.numberOnly = True
     interface.append(inputDT)
 
-    textShowPath = Text("Afficher les trajectoires", (20, 245), color=(255, 255, 255))
+    textShowName = Text("Afficher le nom des astres", (20, 245), color=(255, 255, 255))
+    interface.append(textShowName)
+
+    showNames = CheckBox((245, 241), True)
+    showNames.sn = None
+    interface.append(showNames)
+
+    textShowPath = Text("Afficher les trajectoires", (20, 295), color=(255, 255, 255))
     interface.append(textShowPath)
 
-    showPath = CheckBox((225, 241), False)
+    showPath = CheckBox((225, 291), False)
     showPath.trajectoire = None
     interface.append(showPath)
     
-    textShowAttractionNorm = Text("Afficher la norme d'attraction", (20, 295), color=(255, 255, 255))
+    textShowAttractionNorm = Text("Afficher la norme d'attraction", (20, 345), color=(255, 255, 255))
     interface.append(textShowAttractionNorm)
 
-    showAttractionNorm = CheckBox((280, 291), False)
+    showAttractionNorm = CheckBox((280, 341), False)
     showAttractionNorm.attraction_norm = None
     interface.append(showAttractionNorm)
 
@@ -263,6 +271,9 @@ def draw(screen) -> None:
         return
 
     showPath: bool = False
+    showAttractionNorm: bool = False
+    showSV: bool = False
+    showNames: bool = True
 
     image = dk.image
     size = image.get_size()
@@ -281,10 +292,20 @@ def draw(screen) -> None:
             showAttractionNorm = element.checked
         if hasattr(element, "sv"):
             showSV = element.checked
+        if hasattr(element, "sn"):
+            showNames = element.checked
 
         
     for corps in Game.space:
         corps.draw(screen, Game.Camera)
+        if showNames:
+            if hasattr(corps, "name"):
+                camera = Game.Camera
+                x = float((corps.pos[0] + camera.x / camera.zoom) * camera.zoom)
+                y = float((corps.pos[1] + camera.y / camera.zoom) * camera.zoom)
+                pg.draw.line(screen, (255, 255, 255), (x + 4, y - 4), (x + 16, y - 16), 1)
+                surface = Game.font.render(corps.name, False, (255, 255, 255))
+                screen.blit(surface, (x + 18, y - 30))
         if showPath:
             Path.draw_corps_path(screen, corps.path, corps.color) #ici check machin
 
