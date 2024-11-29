@@ -1,6 +1,7 @@
 from ctypes import pythonapi, c_long, py_object
 from threading import Thread
 from os import path
+from math import pi
 
 import pygame as pg
 from PIL import Image, ImageFilter, ImageOps, ImageEnhance
@@ -299,7 +300,7 @@ def draw(screen) -> None:
     for corps in Game.space:
         corps.draw(screen, Game.Camera)
         if showNames:
-            if hasattr(corps, "name"):
+            if hasattr(corps, "name") and pi * (corps.radius * Game.Camera.zoom) ** 2 < 10:
                 camera = Game.Camera
                 x = float((corps.pos[0] + camera.x / camera.zoom) * camera.zoom)
                 y = float((corps.pos[1] + camera.y / camera.zoom) * camera.zoom)
