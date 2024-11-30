@@ -91,9 +91,11 @@ with proto("Game") as Game:
             updateFunction = getattr(module, "update")
             self.windows[module_name] = [loadFunction, drawFunction, updateFunction]
 
-        with open("data/keybind.json", "r", encoding="utf-8") as f:
-            Game.keybinds = json.load(f)
-            f.close()
+        keybindsFiles = [path.join("data/settings", f) for f in listdir("data/settings") if path.isfile(path.join("data/settings", f))]
+        for keybindFile in keybindsFiles:
+            with open(keybindFile, "r", encoding="utf-8") as f:
+                Game.keybinds.update(json.load(f))
+                f.close()
 
         with open("data/settings.json", "r", encoding="utf-8") as f:
             Game.settings = json.load(f)
@@ -114,10 +116,8 @@ with proto("Game") as Game:
     def resetKeys(self) -> None:
         for key in self.keybinds:
             self.keys[key] = False
-        keys = self.keybinds.keys()
-        values = self.keybinds.values()
-        for v, k in zip(values, keys):
-            self.invertedKeybinds[v] = k
+        for k, v in self.keybinds.items():
+            self.invertedKeybinds[v["code"]] = k
         return
     
     @Game

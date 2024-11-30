@@ -12,7 +12,6 @@ from main import Game, getFont
 from shared.utils.utils import updateCorps, process_collide, Captors, Corps, MessageBox, Path, DataKeeper, Input, Text, CheckBox, SizeViewer, loadSpace, loadStars, draw_velocity_vector, draw_cinetic_energy_vector
 from shared.components.Prediction import Prediction
 
-prediction = Prediction(Game.space)
 dk = DataKeeper()
 dk.pause = False
 dk.timeScale = None
@@ -314,7 +313,7 @@ def draw(screen) -> None:
         # draw_cinetic_energy_vector(screen, corps)
         # draw_attraction_norm
     
-    # prediction.predict(1)
+    # Prediction.predict(Game, 5)
 
     menu(screen)
 

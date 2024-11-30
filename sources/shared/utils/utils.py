@@ -15,6 +15,12 @@ from shared.components.Captors import *
 
 FOCUS_COLOR: tuple[int, int, int] = (13, 178, 190)
 
+UNICODES: dict[int, str] = {
+    0x20: "espace",
+    0x400000e2: "alt",
+    0x400000e0: "ctrl"
+}
+
 with proto("Button") as Button:
     def drawButton(self) -> None:
         pg.draw.rect(Game.screen, (255, 255, 255), pg.Rect(self.position, self.size), 0, 8)
@@ -184,10 +190,9 @@ with proto("KeyBind") as KeyBind:
     def drawKeyBind(self):
         color = FOCUS_COLOR if self.focus else (255, 255, 255)
         pg.draw.rect(Game.screen, color, pg.Rect(self.position, self.size), 0, 4)
-        surface = Game.font.render(chr(self.key), False, (0, 0, 0))
-        width, height = Game.font.size(chr(self.key))
-        x = self.position[0] + width // 2
-        y = self.position[1] + height // 2
+        surface = self.font.render(self.keyname, False, (0, 0, 0))
+        x = self.position[0] + 10
+        y = self.position[1] + 10
         Game.screen.blit(surface, (x, y))
         return
     
@@ -228,8 +233,8 @@ with proto("KeyBind") as KeyBind:
 
     def keydownKB(self, event) -> None:
         if self.focus:
-            if 0 < event.key < 1114112:
-                self.key = event.key
+            self.key = event.key
+            self.keyname = UNICODES[event.key] if event.key in UNICODES else event.unicode 
             self.focus = False
         return
 
@@ -243,11 +248,13 @@ with proto("KeyBind") as KeyBind:
         return
 
     @KeyBind
-    def new(self, key: int, position: tuple[int, int]) -> None:
+    def new(self, key: int, keyname: str, position: tuple[int, int]) -> None:
         self.focus = False
         self.key = key
+        self.keyname = keyname
         self.position = list(position)
-        self.size  = [40, 40]
+        self.font = Game.font
+        self.size  = [80, 40]
         self.draw = MethodType(drawKeyBind, self)
         self.onReleased = lambda: None
         self.onHover = onHover
