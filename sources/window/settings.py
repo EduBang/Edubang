@@ -69,4 +69,9 @@ def draw(screen) -> None:
     return
 
 def update() -> None:
+    for element in interface:
+        setting = getattr(element, 'setting', None)
+        if not setting: continue
+        if setting == "volume":
+            pg.mixer.music.set_volume(element.value / 100)
     return
