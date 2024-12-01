@@ -311,7 +311,7 @@ def draw(screen) -> None:
 
         # draw_velocity_vector(screen, corps)
         # draw_cinetic_energy_vector(screen, corps)
-        # draw_attraction_norm
+        # draw_attraction_norm(screen)
     
     # Prediction.predict(Game, 5)
 

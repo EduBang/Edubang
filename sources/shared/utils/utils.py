@@ -702,14 +702,16 @@ def draw_cinetic_energy_vector(screen, corps) -> None:
 
         pg.draw.line(screen, (255, 0, 0), (startX, startY), (endX, endY), 5)
     return
-
-def draw_attraction_norm(screen, ) -> None: #  chanp gravitation = G*(mass_obj_select / d2)
+"""
+def draw_attraction_norm(screen) -> None: #  chanp gravitation = G*(mass_obj_select / d2)
     list_attraction_norm = []
     mouse_pos = pg.mouse.get_pos()
     
+    gravitation_constant: int = 6.67e-11 #test ...
+    
     for corps in Game.space: # fonction retournant une liste avec tout les vecteurs de norme d'attraction pour chaque astre
-        unit_vector = get_unit_vector(mouse_pos, corps.pos)
-        attraction_norm = Physics.gravitation_constant * (corps.mass / Physics.get_distance(mouse_pos, corps) ** 2)
+        unit_vector = Vectors.get_unit_vector(mouse_pos, corps.pos)
+        attraction_norm = gravitation_constant * (corps.mass / Physics.get_distance(mouse_pos, corps) ** 2)
         attraction_vector = (unit_vector[0] * attraction_norm, unit_vector[1] * attraction_norm)
         list_attraction_norm.append(attraction_vector) # la liste en question
         
@@ -718,11 +720,13 @@ def draw_attraction_norm(screen, ) -> None: #  chanp gravitation = G*(mass_obj_s
         for element in list_attraction_norm:
             attraction_vector_sum = (attraction_vector_sum[0] + element[0], attraction_vector_sum[1] + element[1])
         
-    endX = mouse_pos[0] + attraction_vector_sum[0] * 100
-    endY = mouse_pos[1] + attraction_vector_sum[1] * 100
+    endX = mouse_pos[0] + attraction_vector_sum[0] * 1000000 #je fais des teste pour voir si l'affichage fonctionne... pas encore a l'échelle
+    endY = mouse_pos[1] + attraction_vector_sum[1] * 1000000
         
     pg.draw.line(screen, (255, 255, 255), (mouse_pos[0], mouse_pos[1]), (endX, endY), 5)
+    list_attraction_norm.clear()
     
 
    
 # endregion x = float((self.pos[0] + camera.x / camera.zoom) * camera.zoom)
+"""
