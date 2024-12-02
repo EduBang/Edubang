@@ -288,7 +288,7 @@ def draw(screen) -> None:
     for element in interface:
         if hasattr(element, "trajectoire"):
             showPath = element.checked
-        if hasattr(element, "attractionnorm"):
+        if hasattr(element, "attraction_norm"):
             showAttractionNorm = element.checked
         if hasattr(element, "sv"):
             showSV = element.checked
@@ -307,11 +307,12 @@ def draw(screen) -> None:
                 surface = Game.font.render(corps.name, False, (255, 255, 255))
                 screen.blit(surface, (x + 18, y - 30))
         if showPath:
-            Path.draw_corps_path(screen, corps.path, corps.color) #ici check machin
+            Path.draw_corps_path(screen, corps.path, corps.color)
 
         # draw_velocity_vector(screen, corps)
         # draw_cinetic_energy_vector(screen, corps)
-        draw_attraction_norm(screen)
+        if showAttractionNorm:
+            draw_attraction_norm(screen)
     
     # Prediction.predict(Game, 5)
 

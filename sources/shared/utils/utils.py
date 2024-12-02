@@ -8,7 +8,7 @@ from proto import proto
 from eventListen import Events
 from shared.components.Vectors import *
 from shared.components.Corps import *
-from shared.components.Physics.Physics import *
+from shared.components.Physics import *
 from shared.components.Captors import *
 
 # region Prototypes
@@ -581,7 +581,7 @@ with proto("SizeViewer") as SizeViewer:
 
 # Fonction permettant de mettre à jour la postion entre 2 corps.
 def updateCorps(a, b) -> float:
-    distance = Vectors.get_distance(a, b) # pixel
+    distance = Vectors.get_distance(a.pos, b.pos) # pixel
     attraction = Physics.get_attraction(a.mass, b.mass, distance) # N
     unitVectorA = Vectors.get_unit_vector(a.pos, b.pos)
     unitVectorB = Vectors.get_unit_vector(b.pos, a.pos)
@@ -711,7 +711,7 @@ def draw_attraction_norm(screen) -> None: #  chanp gravitation = G*(mass_obj_sel
     
     for corps in Game.space: # fonction retournant une liste avec tout les vecteurs de norme d'attraction pour chaque astre
         unit_vector = Vectors.get_unit_vector(mouse_pos, corps.pos)
-        attraction_norm = gravitation_constant * (corps.mass / Physics.get_distance(mouse_pos, corps) ** 2)
+        attraction_norm = gravitation_constant * (corps.mass / Vectors.get_distance(mouse_pos, corps.pos) ** 2)
         attraction_vector = (unit_vector[0] * attraction_norm, unit_vector[1] * attraction_norm)
         list_attraction_norm.append(attraction_vector) # la liste en question
         

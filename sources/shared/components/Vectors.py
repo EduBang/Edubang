@@ -5,8 +5,8 @@ from proto import proto
 with proto("Vectors") as Vectors:
     
     @Vectors
-    def get_distance(self, corps1, corps2) -> float:
-        return sqrt(((corps1.pos[0] - corps2.pos[0]) ** 2) + ((corps1.pos[1] - corps2.pos[1]) ** 2))
+    def get_distance(self, pos1, pos2) -> float:
+        return sqrt(((pos1[0] - pos2[0]) ** 2) + ((pos1[1] - pos2[1]) ** 2))
     
     @Vectors
     def get_unit_vector(self, pos1, pos2) -> tuple[float, float]:
