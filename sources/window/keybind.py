@@ -17,23 +17,7 @@ def window(w) -> None:
 
 def backFunction() -> None:
     newKeybinds = {}
-    # with open("data/keybind.json", "w", encoding="utf-8") as f:
-    #     for keybind in interface:
-    #         if not hasattr(keybind, "kb"):
-    #             continue
-    #         newKeybinds[getattr(keybind, "kb")] = keybind.key
-    #     f.write(json.dumps(newKeybinds))
-    #     f.close()
     for keybind in interface:
-        """
-        "pause": {
-            "name": "Mettre la simulation en pause",
-            "code": 32,
-            "key": "espace"
-        }
-        """
-
-        # ('cameraUp', {'name': 'Déplacement vers le haut', 'code': 122, 'key': 'z'})
         kb = getattr(keybind, "kb", None)
         if not kb: continue
 
@@ -60,26 +44,10 @@ def backFunction() -> None:
     return
 
 def load() -> None:
-    w, h = Game.screen.get_size()
     backButton = Button((600, 100), (180, 60))
     backButton.text = "Retour"
     backButton.onPressed = backFunction
     interface.append(backButton)
-
-    # keybindsFiles = [f for f in listdir("data/settings") if path.isfile(path.join("data/settings", f))]
-    # for keybindFile in keybindsFiles:
-    #     with open(keybindFile, "r", encoding="utf-8") as f:
-    #         dk.keybinds.update(json.load(f))
-    #         f.close()
-
-    # for i, kb in enumerate(dk.keybinds):
-    #     keybind = KeyBind(dk.keybinds[kb]["code"], (250, 100 * (i + 1) + 100))
-    #     keybind.kb = kb
-    #     keybind.scrollable = True
-    #     text = Text(kb["name"], (100, 100 * (i + 1) + 110), color=(255, 255, 255))
-    #     text.scrollable = True
-    #     interface.append(keybind)
-    #     interface.append(text)
 
     keybindsFiles = [path.join("data/settings", f) for f in listdir("data/settings") if path.isfile(path.join("data/settings", f))]
     for i, keybindFile in enumerate(keybindsFiles):

@@ -21,6 +21,8 @@ UNICODES: dict[int, str] = {
     0x400000e0: "ctrl"
 }
 
+SCROLL_SPEED: int = 20
+
 with proto("Button") as Button:
     def drawButton(self) -> None:
         pg.draw.rect(Game.screen, (255, 255, 255), pg.Rect(self.position, self.size), 0, 8)
@@ -58,7 +60,7 @@ with proto("Button") as Button:
 
     def mousewheelBTN(self, event) -> None:
         if not self.scrollable: return
-        self.offsetY = 10 * event.y
+        self.offsetY = SCROLL_SPEED * event.y
         self.position[1] += self.offsetY
         return
 
@@ -129,7 +131,7 @@ with proto("CheckBox") as CheckBox:
     
     def mousewheelCB(self, event) -> None:
         if not self.scrollable: return
-        self.offsetY = 10 * event.y
+        self.offsetY = SCROLL_SPEED * event.y
         self.position[1] += self.offsetY
         return
 
@@ -223,7 +225,7 @@ with proto("KeyBind") as KeyBind:
     
     def mousewheelKB(self, event) -> None:
         if not self.scrollable: return
-        self.offsetY = 10 * event.y
+        self.offsetY = SCROLL_SPEED * event.y
         self.position[1] += self.offsetY
         return
 
@@ -279,7 +281,7 @@ with proto("Text") as Text:
 
     def mousewheelT(self, event) -> None:
         if not self.scrollable: return
-        self.offsetY = 10 * event.y
+        self.offsetY = SCROLL_SPEED * event.y
         self.position[1] += self.offsetY
         return
 
@@ -340,7 +342,7 @@ with proto("Input") as Input:
     
     def mousewheelI(self, event) -> None:
         if not self.scrollable: return
-        self.offsetY = 10 * event.y
+        self.offsetY = SCROLL_SPEED * event.y
         self.position[1] += self.offsetY
         return
 
@@ -441,7 +443,7 @@ with proto("SlideBar") as SlideBar:
     
     def mousewheelSB(self, event) -> None:
         if not self.scrollable: return
-        self.offsetY = 10 * event.y
+        self.offsetY = SCROLL_SPEED * event.y
         self.position[1] += self.offsetY
         return
 
@@ -704,27 +706,26 @@ def draw_cinetic_energy_vector(screen, corps) -> None:
     return
 
 def draw_attraction_norm(screen) -> None: #  chanp gravitation = G*(mass_obj_select / d2)
-    list_attraction_norm = []
     mouse_pos = pg.mouse.get_pos()
     
     gravitation_constant: int = 6.67e-11 #test ...
-    
+
+    attraction_vector_sum = (0, 0)
+
     for corps in Game.space: # fonction retournant une liste avec tout les vecteurs de norme d'attraction pour chaque astre
-        unit_vector = Vectors.get_unit_vector(mouse_pos, corps.pos)
-        attraction_norm = gravitation_constant * (corps.mass / Vectors.get_distance(mouse_pos, corps.pos) ** 2)
+
+        x = (-Game.Camera.x + mouse_pos[0]) / Game.Camera.zoom
+        y = (-Game.Camera.y + mouse_pos[1]) / Game.Camera.zoom
+
+        unit_vector = Vectors.get_unit_vector((x, y), corps.pos)
+        attraction_norm = gravitation_constant * (corps.mass / (Vectors.get_distance((x, y), corps.pos) * 1000 / Game.Camera.zoom) ** 2)
         attraction_vector = (unit_vector[0] * attraction_norm, unit_vector[1] * attraction_norm)
-        list_attraction_norm.append(attraction_vector) # la liste en question
-        
-        attraction_vector_sum = (0, 0)
-        
-        for element in list_attraction_norm:
-            attraction_vector_sum = (attraction_vector_sum[0] + element[0], attraction_vector_sum[1] + element[1])
-        
-    endX = mouse_pos[0] + attraction_vector_sum[0] * 1000000 #je fais des teste pour voir si l'affichage fonctionne... pas encore a l'échelle
-    endY = mouse_pos[1] + attraction_vector_sum[1] * 1000000
+        attraction_vector_sum = (attraction_vector_sum[0] + attraction_vector[0], attraction_vector_sum[1] + attraction_vector[1])
+
+    endX = -(x + attraction_vector_sum[0]) #je fais des teste pour voir si l'affichage fonctionne... pas encore a l'échelle
+    endY = -(y + attraction_vector_sum[1])
         
     pg.draw.line(screen, (255, 255, 255), (mouse_pos[0], mouse_pos[1]), (endX, endY), 5)
-    list_attraction_norm.clear()
     
 
    
