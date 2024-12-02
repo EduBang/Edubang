@@ -8,7 +8,7 @@ from proto import proto
 from eventListen import Events
 from shared.components.Vectors import *
 from shared.components.Corps import *
-from shared.components.Physics import *
+from shared.components.Physics.Physics import *
 from shared.components.Captors import *
 
 # region Prototypes
@@ -702,7 +702,7 @@ def draw_cinetic_energy_vector(screen, corps) -> None:
 
         pg.draw.line(screen, (255, 0, 0), (startX, startY), (endX, endY), 5)
     return
-"""
+
 def draw_attraction_norm(screen) -> None: #  chanp gravitation = G*(mass_obj_select / d2)
     list_attraction_norm = []
     mouse_pos = pg.mouse.get_pos()
@@ -729,4 +729,3 @@ def draw_attraction_norm(screen) -> None: #  chanp gravitation = G*(mass_obj_sel
 
    
 # endregion x = float((self.pos[0] + camera.x / camera.zoom) * camera.zoom)
-"""

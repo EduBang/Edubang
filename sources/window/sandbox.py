@@ -9,7 +9,7 @@ from eventListen import Events
 from nsi25perlin import PerlinNoise
 
 from main import Game, getFont
-from shared.utils.utils import updateCorps, process_collide, Captors, Corps, MessageBox, Path, DataKeeper, Input, Text, CheckBox, SizeViewer, loadSpace, loadStars, draw_velocity_vector, draw_cinetic_energy_vector
+from shared.utils.utils import updateCorps, process_collide, Captors, Corps, MessageBox, Path, DataKeeper, Input, Text, CheckBox, SizeViewer, loadSpace, loadStars, draw_velocity_vector, draw_cinetic_energy_vector, draw_attraction_norm
 from shared.components.Prediction import Prediction
 
 dk = DataKeeper()
@@ -311,7 +311,7 @@ def draw(screen) -> None:
 
         # draw_velocity_vector(screen, corps)
         # draw_cinetic_energy_vector(screen, corps)
-        # draw_attraction_norm(screen)
+        draw_attraction_norm(screen)
     
     # Prediction.predict(Game, 5)
 
