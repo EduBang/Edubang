@@ -707,23 +707,28 @@ def draw_cinetic_energy_vector(screen, corps) -> None:
 
 def draw_attraction_norm(screen) -> None: #  chanp gravitation = G*(mass_obj_select / d2)
     mouse_pos = pg.mouse.get_pos()
+    print(f"Pointeur : {pg.mouse.get_pos()}")
     
     gravitation_constant: int = 6.67e-11 #test ...
 
     attraction_vector_sum = (0, 0)
 
-    for corps in Game.space: # fonction retournant une liste avec tout les vecteurs de norme d'attraction pour chaque astre
+    x = (Game.Camera.x + mouse_pos[0]) / Game.Camera.zoom #simule la position du pointeur dans l'espace
+    y = (Game.Camera.y + mouse_pos[1]) / Game.Camera.zoom
+    print(f"Simu : {x, y}")
 
-        x = (-Game.Camera.x + mouse_pos[0]) / Game.Camera.zoom
-        y = (-Game.Camera.y + mouse_pos[1]) / Game.Camera.zoom
+
+
+    for corps in Game.space:
+
 
         unit_vector = Vectors.get_unit_vector((x, y), corps.pos)
         attraction_norm = gravitation_constant * (corps.mass / (Vectors.get_distance((x, y), corps.pos) * 1000 / Game.Camera.zoom) ** 2)
         attraction_vector = (unit_vector[0] * attraction_norm, unit_vector[1] * attraction_norm)
         attraction_vector_sum = (attraction_vector_sum[0] + attraction_vector[0], attraction_vector_sum[1] + attraction_vector[1])
 
-    endX = -(x + attraction_vector_sum[0]) #je fais des teste pour voir si l'affichage fonctionne... pas encore a l'échelle
-    endY = -(y + attraction_vector_sum[1])
+    endX = (mouse_pos[0] + attraction_vector_sum[0]) #je fais des tests pour voir si l'affichage fonctionne... pas encore a l'échelle
+    endY = (mouse_pos[1] + attraction_vector_sum[1])
         
     pg.draw.line(screen, (255, 255, 255), (mouse_pos[0], mouse_pos[1]), (endX, endY), 5)
     
