@@ -134,11 +134,11 @@ def loader() -> None:
     # valeur de calibrage, origine à déterminer
     C_EDUBANG = 10750
 
-    soleil = Corps(1.9885e24, 696342, (0, 0), (255, 255, 0), 0, 0)
+    soleil = Corps(1.9885e30, 696342, (0, 0), (255, 255, 0), 0, 0)
     soleil.name = "Soleil"
     mercure = Corps(3.3011e23, 2439.7, (57_909_050, 0), (127, 127, 127), 0, -47.362 * C_EDUBANG)
     mercure.name = "Mercure"
-    venus = Corps(4.8675e30, 6051.8, (108_209_500, 0), (255, 127, 127), 0, -35.02571 * C_EDUBANG)
+    venus = Corps(4.8675e24, 6051.8, (108_209_500, 0), (255, 127, 127), 0, -35.02571 * C_EDUBANG)
     venus.name = "Vénus"
     terre = Corps(5.9736e24, 6371.008, (149_597_887.5 , 0), (0, 0, 255), 0, -29.783 * C_EDUBANG)
     terre.name = "Terre"
