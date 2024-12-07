@@ -633,7 +633,6 @@ def processMergingNames(a, b, c) -> None:
             x1 = b
         x2 = b if x1 == a else a
         dominationIndex = x2.mass * 100 / x1.mass
-        print(dominationIndex)
         if 10 < dominationIndex: # si la masse des astres ne sontpas  à 25% proches
             c.name = x1
         else:
