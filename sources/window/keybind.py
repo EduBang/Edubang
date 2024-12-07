@@ -56,7 +56,7 @@ def load() -> None:
             keybinds = json.load(f)
             f.close()
         title = Text(keybindFile.split("\\")[1][:-5], (200, 100 * ((i * 8) + 1)), color=(255, 255, 255))
-        title.font = getFont("Black", 24)
+        title.font = getFont("Bold", 24)
         title.scrollable = True
         interface.append(title)
         for j, k in enumerate(keybinds):

@@ -606,6 +606,39 @@ def mergeColor(a, b) -> tuple[int, int, int]:
     blue = (surfaceA * a.color[2] + surfaceB * b.color[2]) / (surfaceA + surfaceB)
     return (red, green, blue)
 
+# Fonction permettant de fusionner le nom de 2 astres selon leur masse
+def mergeNames(d1: tuple[int, str], d2: tuple[int, str]) -> str:
+    m1, n1 = d1
+    m2, n2 = d2
+    mass: int = m1 + m2
+    p1: float = round(m1 * 100 / mass, -1)
+    p2: float = 100 - p1
+    i1: int = int(p1 / 100 * len(n1))
+    i2: int = int(p2 / 100 * len(n2))
+    if len(n2) > i2 + 1:
+        nr2: str = n2[(i2 + 2):] if i2 != 0 else n2[i2 + 1] + n2[(i2 + 2):]
+    else:
+        nr2: str = n2[i2:]
+    result: str = n1[:i1] + nr2
+    return result
+
+def processMergingNames(a, b, c) -> None:
+    aName = getattr(a, "name", None)
+    bName = getattr(b, "name", None)
+    if aName or bName:
+        c.name = aName or bName
+    if aName and bName:
+        x1 = a
+        if a.mass < b.mass:
+            x1 = b
+        x2 = b if x1 == a else a
+        dominationIndex = x2.mass * 100 / x1.mass
+        print(dominationIndex)
+        if 10 < dominationIndex: # si la masse des astres ne sontpas  à 25% proches
+            c.name = x1
+        else:
+            c.name = mergeNames((x1.mass, x1.name), (x2.mass, x2.name))
+        return
 
 def process_collide(corps1, corps2):
     cinetic_energy_corps1 = Physics.get_cinetic_energy(corps1.mass, Physics.get_velocity(corps1.path[-2], corps1.path[-1], Game.deltaTime * Game.timeScale))
@@ -635,6 +668,7 @@ def process_collide(corps1, corps2):
     corps.color = color
     corps.velocity = [vInitialX, vInitialY]
     corps.path = []
+    processMergingNames(corps1, corps2, corps)
     if Game.Camera.focus in [corps1, corps2]:
         Game.Camera.focus = corps
     return corps1 if hasChanged else corps2
@@ -707,28 +741,26 @@ def draw_cinetic_energy_vector(screen, corps) -> None:
 
 def draw_attraction_norm(screen) -> None: #  chanp gravitation = G*(mass_obj_select / d2)
     mouse_pos = pg.mouse.get_pos()
-    print(f"Pointeur : {pg.mouse.get_pos()}")
+    # print(f"Pointeur : {mouse_pos}")
     
     gravitation_constant: int = 6.67e-11 #test ...
 
-    attraction_vector_sum = (0, 0)
+    attraction_vector_sum = mouse_pos
 
     x = (Game.Camera.x + mouse_pos[0]) / Game.Camera.zoom #simule la position du pointeur dans l'espace
     y = (Game.Camera.y + mouse_pos[1]) / Game.Camera.zoom
-    print(f"Simu : {x, y}")
+    # print(f"Simu : {x, y}")
 
 
 
     for corps in Game.space:
-
-
         unit_vector = Vectors.get_unit_vector((x, y), corps.pos)
         attraction_norm = gravitation_constant * (corps.mass / (Vectors.get_distance((x, y), corps.pos) * 1000 / Game.Camera.zoom) ** 2)
         attraction_vector = (unit_vector[0] * attraction_norm, unit_vector[1] * attraction_norm)
         attraction_vector_sum = (attraction_vector_sum[0] + attraction_vector[0], attraction_vector_sum[1] + attraction_vector[1])
 
-    endX = (mouse_pos[0] + attraction_vector_sum[0]) #je fais des tests pour voir si l'affichage fonctionne... pas encore a l'échelle
-    endY = (mouse_pos[1] + attraction_vector_sum[1])
+    endX = (attraction_vector_sum[0] + Game.Camera.x / Game.Camera.zoom) * Game.Camera.zoom # je fais des tests pour voir si l'affichage fonctionne... pas encore a l'échelle
+    endY = (attraction_vector_sum[1] + Game.Camera.y / Game.Camera.zoom) * Game.Camera.zoom
         
     pg.draw.line(screen, (255, 255, 255), (mouse_pos[0], mouse_pos[1]), (endX, endY), 5)
     

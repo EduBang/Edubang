@@ -28,24 +28,18 @@ pg.mixer.music.set_endevent(MUSIC_END_EVENT)
 
 clock = pg.time.Clock()
 FONTS: dict[str, int] = {
-    "ThinItalic": "data/fonts/Montserrat/Montserrat-ThinItalic.ttf",
-    "Thin": "data/fonts/Montserrat/Montserrat-Thin.ttf",
-    "SemiBoldItalic": "data/fonts/Montserrat/Montserrat-SemiBoldItalic.ttf",
-    "SemiBold": "data/fonts/Montserrat/Montserrat-SemiBold.ttf",
-    "Regular": "data/fonts/Montserrat/Montserrat-Regular.ttf",
-    "MediumItalic": "data/fonts/Montserrat/Montserrat-MediumItalic.ttf",
-    "Medium": "data/fonts/Montserrat/Montserrat-Medium.ttf",
-    "LightItalic": "data/fonts/Montserrat/Montserrat-LightItalic.ttf",
-    "Light": "data/fonts/Montserrat/Montserrat-Light.ttf",
-    "Italic": "data/fonts/Montserrat/Montserrat-Italic.ttf",
-    "ExtraLightItalic": "data/fonts/Montserrat/Montserrat-ExtraLightItalic.ttf",
-    "ExtraLight": "data/fonts/Montserrat/Montserrat-ExtraLight.ttf",
-    "ExtraBoldItalic": "data/fonts/Montserrat/Montserrat-ExtraBoldItalic.ttf",
-    "ExtraBold": "data/fonts/Montserrat/Montserrat-ExtraBold.ttf",
-    "BoldItalic": "data/fonts/Montserrat/Montserrat-BoldItalic.ttf",
-    "Bold": "data/fonts/Montserrat/Montserrat-Bold.ttf",
-    "BlackItalic": "data/fonts/Montserrat/Montserrat-BlackItalic.ttf",
-    "Black": "data/fonts/Montserrat/Montserrat-Black.ttf"
+    "SemiBoldItalic": "data/fonts/Open_Sans/OpenSans-SemiBoldItalic.ttf",
+    "SemiBold": "data/fonts/Open_Sans/OpenSans-SemiBold.ttf",
+    "Regular": "data/fonts/Open_Sans/OpenSans-Regular.ttf",
+    "MediumItalic": "data/fonts/Open_Sans/OpenSans-MediumItalic.ttf",
+    "Medium": "data/fonts/Open_Sans/OpenSans-Medium.ttf",
+    "LightItalic": "data/fonts/Open_Sans/OpenSans-LightItalic.ttf",
+    "Light": "data/fonts/Open_Sans/OpenSans-Light.ttf",
+    "Italic": "data/fonts/Open_Sans/OpenSans-Italic.ttf",
+    "ExtraBoldItalic": "data/fonts/Open_Sans/OpenSans-ExtraBoldItalic.ttf",
+    "ExtraBold": "data/fonts/Open_Sans/OpenSans-ExtraBold.ttf",
+    "BoldItalic": "data/fonts/Open_Sans/OpenSans-BoldItalic.ttf",
+    "Bold": "data/fonts/Open_Sans/OpenSans-Bold.ttf",
 }
 
 def getFont(font, size: int = 16) -> pg.font.Font:
