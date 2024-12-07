@@ -300,7 +300,7 @@ with proto("Text") as Text:
 
 with proto("Input") as Input:
     def drawInput(self) -> None:
-        color = FOCUS_COLOR if self.focus else (255, 255, 255)
+        color = FOCUS_COLOR if self.focus and self.active else (255, 255, 255)
         pg.draw.rect(Game.screen, color, pg.Rect(self.position, self.size), 0, 4)
         surface = self.font.render(self.text, False, (0, 0, 0))
         dim = self.font.size(self.text)
@@ -322,6 +322,7 @@ with proto("Input") as Input:
         button = event.button
         x, y = event.pos
         if button != 1: return
+        if not self.active: return
         if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
             self.focus = not self.focus
             if self.focus: self.onPressed()
@@ -333,6 +334,7 @@ with proto("Input") as Input:
         button = event.button
         x, y = event.pos
         if button != 1: return
+        if not self.active: return
         if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
             self.focus = not self.focus
             if self.focus: self.onReleased()
@@ -351,6 +353,7 @@ with proto("Input") as Input:
         return
 
     def keydownI(self, event) -> None:
+        if not self.active: return
         if self.focus:
             if event.key in [pg.K_RETURN, pg.K_ESCAPE, pg.K_TAB]:
                 self.focus = False
@@ -369,11 +372,13 @@ with proto("Input") as Input:
 
     @Input
     def onPressed(self) -> None:
+        if not self.active: return
         self.focus = True
         return
 
     @Input
     def new(self, text: str, position: tuple[int, int], size: tuple[int, int]) -> None:
+        self.active = True
         self.focus = False
         self.text = text
         self.position = position
@@ -633,7 +638,7 @@ def processMergingNames(a, b, c) -> None:
             x1 = b
         x2 = b if x1 == a else a
         dominationIndex = x2.mass * 100 / x1.mass
-        if 10 < dominationIndex: # si la masse des astres ne sontpas  à 25% proches
+        if 10 < dominationIndex: # si la masse des astres ne sont pas à 25% proches
             c.name = x1
         else:
             c.name = mergeNames((x1.mass, x1.name), (x2.mass, x2.name))

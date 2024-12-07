@@ -61,11 +61,13 @@ def keydown(event) -> None:
     if key:
         Game.keys[key] = True
     if Game.keys["increaseTime"]:
+        if dk.pause: return
         for i in interface:
             if not hasattr(i, "numberOnly"): continue
             txt = i.text
             i.text = str(int(txt if txt != "" else "0") + 1)
     if Game.keys["decreaseTime"]:
+        if dk.pause: return
         for i in interface:
             if not hasattr(i, "numberOnly"): continue
             txt = i.text
@@ -230,14 +232,14 @@ def loader() -> None:
     return
 
 def load(*args, **kwargs) -> None:
-    dk.loadingFinished = False
-    process = Thread(target=loader)
-    process.start()
-    dk.process = process
     for i in range(60):
         img = pg.image.load(path.join("./data/videos/loadingScreen", "%s.jpg" % i))
         img = pg.transform.scale(img, (108, 108))
         dk.loadingImages.append(img)
+    dk.loadingFinished = False
+    process = Thread(target=loader)
+    process.start()
+    dk.process = process
     return
 
 def menu(screen) -> None:
@@ -323,6 +325,9 @@ def draw(screen) -> None:
         element.draw()
         if hasattr(element, "numberOnly"):
             Game.timeScale = int(element.text) if element.text not in ["-", ""] else 0
+            element.active = not dk.pause
+            if element.focus and dk.pause:
+                element.focus = False
 
     if dk.pause:
         width, height = screen.get_size()

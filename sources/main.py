@@ -64,7 +64,7 @@ with proto("Game") as Game:
         self.Camera = CameraHandler()
         self.window = ""
         self.windows = {}
-        self.font = font #regular
+        self.font = font
         self.keybinds = {}
         self.keys = {}
         self.invertedKeybinds = {}
