@@ -3,9 +3,9 @@ from random import randint
 from eventListen import Events
 
 from main import Game
-from shared.utils.utils import updateCorps, process_collide, Captors, Button, Corps
-
-
+from shared.utils.utils import updateCorps, process_collide, Button
+from shared.components.Corps import Corps
+from shared.components.Captors import Captors
 
 def goSandbox() -> None:
     Game.reset()
@@ -115,7 +115,7 @@ def draw(screen) -> None:
     
     for element in interface:
         element.draw()
-    
+
     return
 
 def update() -> None:

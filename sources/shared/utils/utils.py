@@ -1,15 +1,14 @@
 from types import MethodType
 from random import randint
+from math import pi, sqrt
 
 import pygame as pg
 
 from main import Game
 from proto import proto
 from eventListen import Events
-from shared.components.Vectors import *
-from shared.components.Corps import *
-from shared.components.Physics import *
-from shared.components.Captors import *
+from shared.components.Vectors import Vectors
+from shared.components.Physics import Physics
 
 # region Prototypes
 
@@ -771,3 +770,17 @@ def draw_attraction_norm(screen) -> None: #  chanp gravitation = G*(mass_obj_sel
 
    
 # endregion x = float((self.pos[0] + camera.x / camera.zoom) * camera.zoom)
+
+# region converter
+
+def screenPosToSpacePos(pos: tuple[float, float]) -> tuple[float, float]:
+    x = (Game.Camera.x + pos[0]) / Game.Camera.zoom
+    y = (Game.Camera.y + pos[1]) / Game.Camera.zoom
+    return (x, y)
+
+def spacePosToScreenPos(pos: tuple[float, float]) -> tuple[float, float]:
+    x = (pos[0] + Game.Camera.x / Game.Camera.zoom) * Game.Camera.zoom
+    y = (pos[1] + Game.Camera.y / Game.Camera.zoom) * Game.Camera.zoom
+    return (x, y)
+
+# endregion

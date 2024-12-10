@@ -3,7 +3,7 @@ from math import pi
 from proto import proto
 import pygame as pg
 
-from main import Game
+from ..utils.utils import spacePosToScreenPos
 
 with proto("Corps") as Corps:
     @Corps
@@ -18,8 +18,7 @@ with proto("Corps") as Corps:
     
     @Corps
     def draw(self, screen, camera) -> None:
-        x = float((self.pos[0] + camera.x / camera.zoom) * camera.zoom)
-        y = float((self.pos[1] + camera.y / camera.zoom) * camera.zoom)
+        x, y = spacePosToScreenPos(self.pos)
         if pi * (self.radius * camera.zoom) ** 2 < 10: # Si le corps est trop petit sur l'écran, alors il va l'afficher avec une croix
             pg.draw.line(screen, (255, 255, 255), (x - 8, y), (x + 8, y), 2)
             pg.draw.line(screen, (255, 255, 255), (x, y - 8), (x, y + 8), 2)

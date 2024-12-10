@@ -9,7 +9,9 @@ from eventListen import Events
 from nsi25perlin import PerlinNoise
 
 from main import Game, getFont
-from shared.utils.utils import updateCorps, process_collide, Captors, Corps, MessageBox, Path, DataKeeper, Input, Text, CheckBox, SizeViewer, loadSpace, loadStars, draw_velocity_vector, draw_cinetic_energy_vector, draw_attraction_norm
+from shared.utils.utils import updateCorps, process_collide, MessageBox, Path, DataKeeper, Input, Text, CheckBox, SizeViewer, loadSpace, loadStars, draw_velocity_vector, draw_cinetic_energy_vector, draw_attraction_norm
+from shared.components.Corps import Corps
+from shared.components.Captors import Captors
 from shared.components.Prediction import Prediction
 
 dk = DataKeeper()
@@ -47,6 +49,7 @@ def kill(thread: Thread) -> None:
 
 @Events.observe
 def window(w) -> None:
+    if w != "sandbox": return
     interface.clear()
     isAlive = getattr(dk.process, "is_alive", False)
     if isAlive:
@@ -154,7 +157,7 @@ def loader() -> None:
     uranus.name = "Uranus"
     neptune = Corps(1.0243e26, 24622, (4_498_400_000, 0), (100, 100, 255), 0, -5.43248 * C_EDUBANG)
     neptune.name = "Neptune"
-
+    
     Game.space.append(soleil)
     Game.space.append(mercure)
     Game.space.append(venus)
@@ -227,7 +230,6 @@ def loader() -> None:
     dk.loadingFinished = True
     dk.loadingImages = []
     dk.loadingImageIndex = 0
-    dk.process = None
 
     return
 
@@ -297,7 +299,8 @@ def draw(screen) -> None:
         if hasattr(element, "sn"):
             showNames = element.checked
 
-        
+    Prediction.predict(Game, 25)
+    
     for corps in Game.space:
         corps.draw(screen, Game.Camera)
         if showNames:
@@ -315,8 +318,6 @@ def draw(screen) -> None:
         # draw_cinetic_energy_vector(screen, corps)
         if showAttractionNorm:
             draw_attraction_norm(screen)
-    
-    # Prediction.predict(Game, 5)
 
     menu(screen)
 
