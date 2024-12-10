@@ -4,7 +4,7 @@ from math import pi, sqrt
 from importlib import util
 from random import choice
 
-environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide" # pouir cacher le message de PyGame quand le programme se lance
+environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide" # pour cacher le message de PyGame quand le programme se lance
 
 import pygame as pg
 from proto import proto

@@ -6,6 +6,7 @@ from main import Game
 from shared.utils.utils import updateCorps, process_collide, Button
 from shared.components.Corps import Corps
 from shared.components.Captors import Captors
+from shared.components.Prediction import Prediction
 
 def goSandbox() -> None:
     Game.reset()
@@ -112,6 +113,8 @@ def draw(screen) -> None:
 
     for corps in Game.space:
         corps.draw(screen, Game.Camera)
+
+    Prediction.predict(Game, 10, 10)
     
     for element in interface:
         element.draw()

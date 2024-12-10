@@ -10,11 +10,10 @@ from .Physics import Physics
 with proto("Prediction") as Prediction:
 
     @Prediction
-    def predict(self, game, n: int = 0) -> None:
+    def predict(self, game, n: int = 0, k: int = 100) -> None:
         space = [{"pos": i.pos, "velocity": i.velocity, "mass": i.mass} for i in deepcopy(game.space)]
 
-        k = 100
-        dt = game.deltaTime * game.timeScale
+        dt = 5e-2
 
         for i in range(n):
             for a in space:
