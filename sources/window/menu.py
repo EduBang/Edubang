@@ -114,7 +114,7 @@ def draw(screen) -> None:
     for corps in Game.space:
         corps.draw(screen, Game.Camera)
 
-    Prediction.predict(Game, 10, 10)
+    Prediction.predict(Game, 100, 1)
     
     for element in interface:
         element.draw()
