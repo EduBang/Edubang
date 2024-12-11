@@ -15,7 +15,7 @@ with proto("Prediction") as Prediction:
     def predict(self, game, n: int = 0, k: int = 100) -> None:
         space = [{"pos": i.pos, "velocity": i.velocity, "mass": i.mass, "corps": i} for i in deepcopy(game.space)]
 
-        dt = 5e-2
+        dt = 5e-2 * (1 if game.timeScale > 0 else 0 if game.timeScale == 0 else -1)
 
         poses = {}
         futureCollided = []
