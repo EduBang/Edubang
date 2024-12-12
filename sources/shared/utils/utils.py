@@ -797,3 +797,15 @@ def spacePosToScreenPos(pos: tuple[float, float]) -> tuple[float, float]:
     return (x, y)
 
 # endregion
+
+def updateSpaceship(a, b) -> float:
+    distance = Vectors.get_distance(a.pos, b.pos) # pixel
+    attraction = Physics.get_attraction(a.mass, b.mass, distance)
+    unitVectorA = Vectors.get_unit_vector(a.pos, b.pos)
+    unitVectorB = Vectors.get_unit_vector(b.pos, a.pos)
+    accA = [(unitVectorA[0] * attraction / a.mass) + unitVectorA[1] * attraction / a.mass]
+    accB = [unitVectorB[0] * attraction / b.mass, unitVectorB[1] * attraction / b.mass]
+
+    a.update_position(accA, Game.deltaTime * Game.timeScale)
+    b.update_position(accB, Game.deltaTime * Game.timeScale)
+    return distance

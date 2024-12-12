@@ -39,3 +39,4 @@ with proto("Space_ship") as Space_ship:
         self.pos = (x, y)
         return
     
+
