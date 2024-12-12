@@ -1,16 +1,15 @@
 import json
 from os import listdir, path, environ
-from math import pi, sqrt
+from sys import exit
+from math import pi
 from importlib import util
 from random import choice
 
-environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide" # pour cacher le message de PyGame quand le programme se lance
+environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
 
 import pygame as pg
 from proto import proto
 from eventListen import Events
-
-from shared.components.Physics import Physics
 
 pg.init()
 
@@ -51,9 +50,9 @@ font = getFont("Medium")
 
 with proto("Game") as Game:
     @Game
-    def quit_algo(self) -> None:
+    def quit(self) -> None:
         pg.quit()
-        quit()
+        exit(0)
         return
 
     @Game
@@ -61,6 +60,7 @@ with proto("Game") as Game:
 
         self.timeScale = 1 # seconde
         self.deltaTime = 0 # seconde
+        self.DT = self.deltaTime * self.timeScale
         self.running = True
         self.space = []
         self.Camera = CameraHandler()
@@ -149,29 +149,6 @@ with proto("Game") as Game:
         self.timeScale = 1
         self.space = []
         return
-
-    @Game
-    def normalizeCinetic(self, corps = None) -> dict:
-        values = {}
-        for i in self.space:
-            cinetic_energy = Physics.get_cinetic_energy(i.mass, Physics.get_velocity(i.path[-2], i.path[-1], Game.dt))
-            values[i] = cinetic_energy
-
-        valuesList = values.values()
-        originalMin = min(valuesList)
-        originalMax = max(valuesList)
-
-        d = {}
-        if originalMax - originalMin == 0:
-            for value in values:
-                d[value] = 0
-        else:
-            for value in values:
-                d[value] = (values[value] - originalMin) / (originalMax - originalMin) * 100
-
-        if corps and corps in d:
-            return d[corps]
-        return d
 
     @Game
     def changeMusic(self) -> None:
@@ -271,11 +248,11 @@ def mousebuttondown(event) -> None:
             sqx = (x - xC) ** 2
             sqy = (y - yC) ** 2
             if pi * (corps.radius * Game.Camera.zoom) ** 2 < 10:
-                if sqrt(sqx + sqy) < 10:
+                if (sqx + sqy) ** .5 < 10:
                     Game.Camera.focus = corps
                     Game.Camera.zoom = 1
                     break
-            if sqrt(sqx + sqy) < corps.radius * Game.Camera.zoom:
+            if (sqx + sqy) ** .5 < corps.radius * Game.Camera.zoom:
                 Game.Camera.focus = corps
                 Game.Camera.zoom = 1
                 break
@@ -292,36 +269,35 @@ def draw() -> None:
     return
 
 # Boucle principale
-def gameLoop() -> None:
+def main() -> None:
     while Game.running:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 Game.running = False
-
             if event.type == pg.KEYDOWN:
-                Events.trigger("keydown", event) # key, unicode
+                Events.trigger("keydown", event)
             if event.type == pg.KEYUP:
-                Events.trigger("keyup", event) # key
+                Events.trigger("keyup", event)
             if event.type == pg.MOUSEWHEEL:
-                Events.trigger("mousewheel", event) # x, y
+                Events.trigger("mousewheel", event)
             if event.type == pg.MOUSEBUTTONDOWN:
-                Events.trigger("mousebuttondown", event) # pos, button
+                Events.trigger("mousebuttondown", event)
             if event.type == pg.MOUSEBUTTONUP:
-                Events.trigger("mousebuttonup", event) # pos, button
+                Events.trigger("mousebuttonup", event)
             if event.type == pg.MOUSEMOTION:
-                Events.trigger("mousemotion", event) # pos
+                Events.trigger("mousemotion", event)
             if event.type == MUSIC_END_EVENT:
                 Game.changeMusic()
                 Game.playMusic()
 
         if Game.Camera.active:
-            if Game.keys["cameraUp"]: # faire monter la caméra
+            if Game.keys["cameraUp"]:
                 Game.Camera.y += Game.Camera.speed
-            if Game.keys["cameraLeft"]: # faire aller la caméra à gauche
+            if Game.keys["cameraLeft"]:
                 Game.Camera.x += Game.Camera.speed
-            if Game.keys["cameraDown"]: # faire descendre la caméra
+            if Game.keys["cameraDown"]:
                 Game.Camera.y -= Game.Camera.speed
-            if Game.keys["cameraRight"]: # faire aller la caméra à droite
+            if Game.keys["cameraRight"]:
                 Game.Camera.x -= Game.Camera.speed
 
             if Game.Camera.focus is not None:
@@ -330,16 +306,17 @@ def gameLoop() -> None:
                 Game.Camera.x = midScreenX - Game.Camera.focus.pos[0] * Game.Camera.zoom
                 Game.Camera.y = midScreenY - Game.Camera.focus.pos[1] * Game.Camera.zoom
 
-        if len(buttons) == 0: # Si la souris ne hover plus rien
+        if len(buttons) == 0:
             pg.mouse.set_cursor(pg.SYSTEM_CURSOR_ARROW)
 
         # Constante de calibrage du temps
-        Game.deltaTime = clock.tick(60) / (1000 * 2.195)
+        Game.deltaTime = clock.tick(60) / 2195 # (1000 * 2.195)
+        Game.DT = Game.deltaTime * Game.timeScale
 
         draw()
         update()
     return
 
-gameLoop()
+main()
 
-Game.quit_algo()
+Game.quit()

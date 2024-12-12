@@ -1,4 +1,5 @@
-import json
+from json import dumps
+from json import load as loadJson
 from os import listdir, path
 
 from eventListen import Events
@@ -8,7 +9,7 @@ from shared.utils.utils import Button, DataKeeper, KeyBind, Text
 
 dk = DataKeeper()
 
-interface = []
+interface: list = []
 
 @Events.observe
 def window(w) -> None:
@@ -16,7 +17,7 @@ def window(w) -> None:
     return
 
 def backFunction() -> None:
-    newKeybinds = {}
+    newKeybinds: dict = {}
     for keybind in interface:
         kb = getattr(keybind, "kb", None)
         if not kb: continue
@@ -28,11 +29,11 @@ def backFunction() -> None:
         }
 
         with open(keybind.file, "r", encoding="utf-8") as rf:
-            content = json.load(rf)
+            content = loadJson(rf)
             rf.close()
         content.update({kb[0]: nkb})
         with open(keybind.file, "w", encoding="utf-8") as wf:
-            wf.write(json.dumps(content))
+            wf.write(dumps(content))
             wf.close()
         
         newKeybinds[kb[0]] = nkb
@@ -53,7 +54,7 @@ def load() -> None:
     for i, keybindFile in enumerate(keybindsFiles):
         keybinds = {}
         with open(keybindFile, "r", encoding="utf-8") as f:
-            keybinds = json.load(f)
+            keybinds = loadJson(f)
             f.close()
         title = Text(keybindFile.split("\\")[1][:-5], (200, 100 * ((i * 8) + 1)), color=(255, 255, 255))
         title.font = getFont("Bold", 24)

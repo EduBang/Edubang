@@ -3,7 +3,7 @@ from random import randint
 from eventListen import Events
 
 from main import Game
-from shared.utils.utils import updateCorps, process_collide, Button
+from shared.utils.utils import updateCorps, process_collide, Button, C_EDUBANG
 from shared.components.Corps import Corps
 from shared.components.Captors import Captors
 from shared.components.Prediction import Prediction
@@ -38,14 +38,10 @@ def load(*args, **kwargs) -> None:
                     randint(10, 50),
                     (randint(10, 1100), randint(10, 1100)),
                     (randint(0, 255), randint(0, 255), randint(0, 255)),
-                    randint(-100, 100) / 10000, randint(-100, 100) / 10000
+                    randint(-100, 100) / 1000, randint(-100, 100) / 1000
                     )
             Game.space.append(a)
     elif randint(0, 1) == 0:
-        # La constante d'EduBang
-        # valeur de calibrage, origine à déterminer
-        C_EDUBANG = 10750
-
         soleil = Corps(1.9885e30, 696342, (0, 0), (255, 255, 0), 0, 0)
         soleil.name = "Soleil"
         mercure = Corps(3.3011e23, 2439.7, (57_909_050, 0), (127, 127, 127), 0, -47.362 * C_EDUBANG)
@@ -81,7 +77,7 @@ def load(*args, **kwargs) -> None:
         Game.Camera.y = 500
     elif randint(0, 1) == 0:
         Game.Camera.zoom = 1
-        a = Corps(6e17, 10, (100, 500), (255, 0, 0), 0, 0)
+        a = Corps(6e15, 10, (100, 500), (255, 0, 0), 0, 0)
         b = Corps(6e17, 100, (600, 500), (0, 0, 255), 0, 0)
         Game.space.append(a)
         Game.space.append(b)

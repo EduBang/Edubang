@@ -1,6 +1,6 @@
 from types import MethodType
 from random import randint
-from math import pi, sqrt
+from math import pi
 
 import pygame as pg
 
@@ -9,6 +9,12 @@ from proto import proto
 from eventListen import Events
 from shared.components.Vectors import Vectors
 from shared.components.Physics import Physics
+
+type EnergyInfos = tuple[int, tuple[int, int], tuple[int, int]]
+
+# La constante d'EduBang
+# valeur de calibrage, origine à déterminer
+C_EDUBANG = 10750
 
 # region Prototypes
 
@@ -587,27 +593,25 @@ with proto("SizeViewer") as SizeViewer:
 
 # Fonction permettant de mettre à jour la postion entre 2 corps.
 def updateCorps(a, b) -> float:
-    distance = Vectors.get_distance(a.pos, b.pos) # pixel
-    attraction = Physics.get_attraction(a.mass, b.mass, distance) # N
-    unitVectorA = Vectors.get_unit_vector(a.pos, b.pos)
-    unitVectorB = Vectors.get_unit_vector(b.pos, a.pos)
-    accA = [unitVectorA[0] * attraction / a.mass, unitVectorA[1] * attraction / a.mass]
-    accB = [unitVectorB[0] * attraction / b.mass, unitVectorB[1] * attraction / b.mass]
+    distance: float = Vectors.get_distance(a.pos, b.pos)
+    attraction: float = Physics.get_attraction(a.mass, b.mass, distance)
+    unitVectorA: tuple[float] = Vectors.get_unit_vector(a.pos, b.pos)
+    unitVectorB: tuple[float] = (-unitVectorA[0], -unitVectorA[1])
+    accA: tuple[float, float] = (unitVectorA[0] * attraction / a.mass, unitVectorA[1] * attraction / a.mass)
+    accB: tuple[float, float] = (unitVectorB[0] * attraction / b.mass, unitVectorB[1] * attraction / b.mass)
 
-    # faut que acc en px/s
-
-    a.update_position(accA, Game.deltaTime * Game.timeScale)
-    b.update_position(accB, Game.deltaTime * Game.timeScale)
+    a.update_position(accA, Game.DT)
+    b.update_position(accB, Game.DT)
     return distance
 
 # Fonction permettant de mélanger les couleurs de 2 corps selon la surface
 def mergeColor(a, b) -> tuple[int, int, int]:
     # C'est un calcul de moyenne pondérée
-    surfaceA = pi * a.radius ** 2
-    surfaceB = pi * b.radius ** 2
-    red = (surfaceA * a.color[0] + surfaceB * b.color[0]) / (surfaceA + surfaceB)
-    green = (surfaceA * a.color[1] + surfaceB * b.color[1]) / (surfaceA + surfaceB)
-    blue = (surfaceA * a.color[2] + surfaceB * b.color[2]) / (surfaceA + surfaceB)
+    surfaceA: float = pi * a.radius ** 2
+    surfaceB: float = pi * b.radius ** 2
+    red: float = (surfaceA * a.color[0] + surfaceB * b.color[0]) / (surfaceA + surfaceB)
+    green: float = (surfaceA * a.color[1] + surfaceB * b.color[1]) / (surfaceA + surfaceB)
+    blue: float = (surfaceA * a.color[2] + surfaceB * b.color[2]) / (surfaceA + surfaceB)
     return (red, green, blue)
 
 # Fonction permettant de fusionner le nom de 2 astres selon leur masse
@@ -643,33 +647,42 @@ def processMergingNames(a, b, c) -> None:
             c.name = mergeNames((x1.mass, x1.name), (x2.mass, x2.name))
         return
 
-def process_collide(corps1, corps2):
-    cinetic_energy_corps1 = Physics.get_cinetic_energy(corps1.mass, Physics.get_velocity(corps1.path[-2], corps1.path[-1], Game.deltaTime * Game.timeScale))
-    cinetic_energy_corps2 = Physics.get_cinetic_energy(corps2.mass, Physics.get_velocity(corps2.path[-2], corps2.path[-1], Game.deltaTime * Game.timeScale))
-    unit_vector_mouv_corps1 = Vectors.get_unit_vector_mouv(corps1.path[-2], corps1.path[-1])
-    unit_vector_mouv_corps2 = Vectors.get_unit_vector_mouv(corps2.path[-2], corps2.path[-1])
-    
-    cinetic_energy_vector_corps1 = cinetic_energy_corps1 * unit_vector_mouv_corps1[0], cinetic_energy_corps1 * unit_vector_mouv_corps1[1]
-    cinetic_energy_vector_corps2 = cinetic_energy_corps2 * unit_vector_mouv_corps2[0], cinetic_energy_corps2 * unit_vector_mouv_corps2[1]
-    
-    sum_vector_cinetic_energy_corps1 = (cinetic_energy_vector_corps1[0] / corps1.mass, cinetic_energy_vector_corps1[1] / corps1.mass)
-    sum_vector_cinetic_energy_corps2 = (cinetic_energy_vector_corps2[0] / corps2.mass, cinetic_energy_vector_corps2[1] / corps2.mass)
+def mergeEnergy(d1: EnergyInfos, d2: EnergyInfos) -> tuple[float, float]:
+    mass: int = d1[0] + d2[0]
 
-    mass = corps1.mass + corps2.mass
-    radius = sqrt(((pi * corps1.radius ** 2) + (pi * corps2.radius ** 2)) / pi)
-    color = mergeColor(corps1, corps2)
-    vInitialX = (sum_vector_cinetic_energy_corps1[0] + sum_vector_cinetic_energy_corps2[0]) / mass
-    vInitialY = (sum_vector_cinetic_energy_corps1[1] + sum_vector_cinetic_energy_corps2[1]) / mass
+    cineticEnergyCorps1: float = Physics.get_cinetic_energy(d1[0], Physics.get_velocity(d1[1], d1[2], Game.DT))
+    cineticEnergyCorps2: float = Physics.get_cinetic_energy(d2[0], Physics.get_velocity(d2[1], d2[2], Game.DT))
+
+    unitVectorMouvCorps1: float = Vectors.get_unit_vector_mouv(d1[1], d1[2])
+    unitVectorMouvCorps2: float = Vectors.get_unit_vector_mouv(d2[1], d2[2])
+
+    cineticEnergyVectorCorps1: float = cineticEnergyCorps1 * unitVectorMouvCorps1[0], cineticEnergyCorps1 * unitVectorMouvCorps1[1]
+    cineticEnergyVectorCorps2: float = cineticEnergyCorps2 * unitVectorMouvCorps2[0], cineticEnergyCorps2 * unitVectorMouvCorps2[1]
+    
+    sumVectorCineticEnergyCorps1: float = (cineticEnergyVectorCorps1[0] / d1[0], cineticEnergyVectorCorps1[1] / d1[0])
+    sumVectorCineticEnergyCorps2: float = (cineticEnergyVectorCorps2[0] / d2[0], cineticEnergyVectorCorps2[1] / d2[0])
+
+    x: float = (sumVectorCineticEnergyCorps1[0] + sumVectorCineticEnergyCorps2[0]) / mass
+    y: float = (sumVectorCineticEnergyCorps1[1] + sumVectorCineticEnergyCorps2[1]) / mass
+
+    return (x, y)
+
+def process_collide(corps1, corps2):
+    x, y = mergeEnergy((corps1.mass, corps1.pos, corps1.path[-1]), (corps2.mass, corps2.pos, corps2.path[-1]))
+
+    mass: int = corps1.mass + corps2.mass
+    radius: float = (((pi * corps1.radius ** 2) + (pi * corps2.radius ** 2)) / pi) ** .5
+    color: tuple[float, float, float] = mergeColor(corps1, corps2)
 
     corps = corps1
-    hasChanged = False
-    if corps2.radius > corps1.radius:
+    hasChanged: bool = False
+    if corps2.mass > corps1.mass:
         corps = corps2
         hasChanged = True
     corps.mass = mass
     corps.radius = radius
     corps.color = color
-    corps.velocity = [vInitialX, vInitialY]
+    corps.velocity = [x, y]
     corps.path = []
     processMergingNames(corps1, corps2, corps)
     if Game.Camera.focus in [corps1, corps2]:
@@ -774,13 +787,13 @@ def draw_attraction_norm(screen) -> None: #  chanp gravitation = G*(mass_obj_sel
 # region converter
 
 def screenPosToSpacePos(pos: tuple[float, float]) -> tuple[float, float]:
-    x = (Game.Camera.x + pos[0]) / Game.Camera.zoom
-    y = (Game.Camera.y + pos[1]) / Game.Camera.zoom
+    x: float = (Game.Camera.x + pos[0]) / Game.Camera.zoom
+    y: float = (Game.Camera.y + pos[1]) / Game.Camera.zoom
     return (x, y)
 
 def spacePosToScreenPos(pos: tuple[float, float]) -> tuple[float, float]:
-    x = (pos[0] + Game.Camera.x / Game.Camera.zoom) * Game.Camera.zoom
-    y = (pos[1] + Game.Camera.y / Game.Camera.zoom) * Game.Camera.zoom
+    x: float = (pos[0] + Game.Camera.x / Game.Camera.zoom) * Game.Camera.zoom
+    y: float = (pos[1] + Game.Camera.y / Game.Camera.zoom) * Game.Camera.zoom
     return (x, y)
 
 # endregion

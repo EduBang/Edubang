@@ -1,4 +1,5 @@
-import json
+from json import dumps
+from json import load as loadJson
 
 from eventListen import Events
 import pygame as pg
@@ -8,7 +9,7 @@ from shared.utils.utils import Button, DataKeeper, SlideBar, Text
 
 dk = DataKeeper()
 
-interface = []
+interface: list = []
 
 def saveSettings() -> None:
     settings = {}
@@ -17,7 +18,7 @@ def saveSettings() -> None:
             if not hasattr(element, "setting"):
                 continue
             settings[getattr(element, "setting")] = int(element.value)
-        f.write(json.dumps(settings))
+        f.write(dumps(settings))
         f.close()
     Game.settings = settings
     pg.mixer.music.set_volume(settings["volume"] / 100)
@@ -53,7 +54,7 @@ def load() -> None:
     interface.append(keybindButton)
 
     with open("data/settings.json", "r", encoding="utf-8") as f:
-        dk.settings = json.load(f)
+        dk.settings = loadJson(f)
         f.close()
 
     for i, setting in enumerate(dk.settings):

@@ -37,8 +37,8 @@ with proto("Corps") as Corps:
         self.velocity[0] += acc[0] * dt
         self.velocity[1] += acc[1] * dt
         
-        x = self.pos[0] + self.velocity[0] * dt
-        y = self.pos[1] + self.velocity[1] * dt
+        x: float = self.pos[0] + self.velocity[0] * dt
+        y: float = self.pos[1] + self.velocity[1] * dt
 
         # Mise à jour de la position en fonction de la nouvelle vitesse (avec inertie)
         self.pos = (x, y)
