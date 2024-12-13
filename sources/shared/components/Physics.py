@@ -6,7 +6,7 @@ with proto("Physics") as Physics:
     @Physics
     def get_attraction(self, mass1, mass2, d) -> float:
         if d == 0:
-            return 0
+            return .0
         return G * (mass1 * mass2) / (d ** 2)
     
     @Physics

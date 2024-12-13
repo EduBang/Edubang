@@ -1,4 +1,4 @@
-import json
+from json import load as loadJson
 from os import listdir, path, environ
 from sys import exit
 from math import pi
@@ -90,11 +90,11 @@ with proto("Game") as Game:
         keybindsFiles = [path.join("data/settings", f) for f in listdir("data/settings") if path.isfile(path.join("data/settings", f))]
         for keybindFile in keybindsFiles:
             with open(keybindFile, "r", encoding="utf-8") as f:
-                Game.keybinds.update(json.load(f))
+                Game.keybinds.update(loadJson(f))
                 f.close()
 
         with open("data/settings.json", "r", encoding="utf-8") as f:
-            Game.settings = json.load(f)
+            Game.settings = loadJson(f)
             f.close()
 
         musics = [path.join("data/musics", f) for f in listdir("data/musics") if path.isfile(path.join("data/musics", f))]
@@ -243,8 +243,8 @@ def mousebuttondown(event) -> None:
     if button == 1: # clique gauche
         if not Game.Camera.active: return
         for corps in Game.space:
-            xC = float((corps.pos[0] + Game.Camera.x / Game.Camera.zoom) * Game.Camera.zoom)
-            yC = float((corps.pos[1] + Game.Camera.y / Game.Camera.zoom) * Game.Camera.zoom)
+            xC = (corps.pos[0] + Game.Camera.x / Game.Camera.zoom) * Game.Camera.zoom
+            yC = (corps.pos[1] + Game.Camera.y / Game.Camera.zoom) * Game.Camera.zoom
             sqx = (x - xC) ** 2
             sqy = (y - yC) ** 2
             if pi * (corps.radius * Game.Camera.zoom) ** 2 < 10:
@@ -313,8 +313,8 @@ def main() -> None:
         Game.deltaTime = clock.tick(60) / 2195 # (1000 * 2.195)
         Game.DT = Game.deltaTime * Game.timeScale
 
-        draw()
         update()
+        draw()
     return
 
 main()

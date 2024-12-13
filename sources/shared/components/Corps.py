@@ -33,7 +33,7 @@ with proto("Corps") as Corps:
             self.path.pop(0)
         # Mise à jour de la vitesse (conserve l'inertie)
 
-        # selon prgm, acc en px/s
+        # selon prgm, acc en km/s
         self.velocity[0] += acc[0] * dt
         self.velocity[1] += acc[1] * dt
         

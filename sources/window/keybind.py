@@ -13,6 +13,7 @@ interface: list = []
 
 @Events.observe
 def window(w) -> None:
+    if w != "keybind": return
     interface.clear()
     return
 

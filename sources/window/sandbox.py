@@ -287,7 +287,7 @@ def draw(screen) -> None:
     for star in dk.stars:
         x = int(star[0] + Game.Camera.x / 7)
         y = int(star[1] + Game.Camera.y / 7)
-        screen.set_at((x, y), dk.stars[star])
+        screen.set_at((x, y), (255, 255, 255))
 
     for element in interface:
         if hasattr(element, "trajectoire"):
@@ -299,15 +299,15 @@ def draw(screen) -> None:
         if hasattr(element, "sn"):
             showNames = element.checked
 
-    Prediction.predict(Game, 25)
+    Prediction.predict(Game, 20)
     
     for corps in Game.space:
         corps.draw(screen, Game.Camera)
         if showNames:
             if hasattr(corps, "name") and pi * (corps.radius * Game.Camera.zoom) ** 2 < 10:
                 camera = Game.Camera
-                x = float((corps.pos[0] + camera.x / camera.zoom) * camera.zoom)
-                y = float((corps.pos[1] + camera.y / camera.zoom) * camera.zoom)
+                x = (corps.pos[0] + camera.x / camera.zoom) * camera.zoom
+                y = (corps.pos[1] + camera.y / camera.zoom) * camera.zoom
                 pg.draw.line(screen, (255, 255, 255), (x + 4, y - 4), (x + 16, y - 16), 1)
                 surface = Game.font.render(corps.name, False, (255, 255, 255))
                 screen.blit(surface, (x + 18, y - 30))
@@ -347,12 +347,11 @@ def update() -> None:
 
     for corps in Game.space:
         for otherCorps in Game.space:
-            if corps == otherCorps:
-                continue
-            distance = updateCorps(corps, otherCorps)
+            if corps == otherCorps: continue
+            distance: float = updateCorps(corps, otherCorps)
             if Captors.collide(corps, otherCorps, distance):
                 removedCorps = process_collide(corps, otherCorps)
                 Game.space.remove(removedCorps)
         
-        corps.update_position([0, 0], Game.deltaTime * Game.timeScale)
+        corps.update_position([0, 0], Game.DT)
     return

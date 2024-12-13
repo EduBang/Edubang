@@ -14,9 +14,13 @@ with proto("Prediction") as Prediction:
 
     @Prediction
     def predict(self, game, n: int = 0, k: int = 100) -> None:
-        space = [{"pos": i.pos, "velocity": i.velocity, "mass": i.mass, "corps": i} for i in deepcopy(game.space)]
+        if game.timeScale == 0: return
+
+        space = [{"pos": i.pos, "velocity": i.velocity, "mass": i.mass, "corps": j} for i, j in zip(deepcopy(game.space), game.space)]
 
         dt = 5e-2 * (1 if game.timeScale > 0 else 0 if game.timeScale == 0 else -1)
+
+        k *= dt
 
         poses: dict = {}
         futureCollided: list = []
@@ -39,21 +43,17 @@ with proto("Prediction") as Prediction:
                     distance: float = Vectors.get_distance(pos, b["pos"])
                     attraction: float = Physics.get_attraction(mass, b["mass"], distance)
                     unitVector: tuple[float, float] = Vectors.get_unit_vector(pos, b["pos"])
+                    acc: tuple[float, float] = (unitVector[0] * attraction / mass, unitVector[1] * attraction / mass)
 
-                    accA: tuple[float, float] = (unitVector[0] * attraction / mass, unitVector[1] * attraction / mass)
-
-                    velocity[0] += accA[0] * dt * k
-                    velocity[1] += accA[1] * dt * k
+                    velocity[0] += acc[0] * k
+                    velocity[1] += acc[1] * k
                     
-                    x += velocity[0] * dt * k
-                    y += velocity[1] * dt * k
-
-                startX, startY = spacePosToScreenPos(pos)
-                endX, endY = spacePosToScreenPos((x, y))
+                    x += velocity[0] * k
+                    y += velocity[1] * k
 
                 poses[a["corps"]].append((x, y))
 
-                pg.draw.line(game.screen, (155, 155, 155), (startX, startY), (endX, endY), 2)
+                pg.draw.line(game.screen, (155, 155, 155), spacePosToScreenPos(pos), spacePosToScreenPos((x, y)), 2)
 
                 a["pos"] = (x, y)
 
@@ -65,15 +65,14 @@ with proto("Prediction") as Prediction:
                     if j in futureCollided: continue
                     if i == j: continue
                     lastPosJ: tuple[float, float] = poses[j][-1]
-                    d = Vectors.get_distance(lastPosI, lastPosJ)
+                    d: float = Vectors.get_distance(lastPosI, lastPosJ)
                     if Captors.collide(i, j, d):
                         x, y = lastPosI if i.mass > j.mass else lastPosJ
-                        radius = (((pi * i.radius ** 2) + (pi * j.radius ** 2)) / pi) ** .5
-                        color = mergeColor(i, j)
+                        radius: float = (((pi * i.radius ** 2) + (pi * j.radius ** 2)) / pi) ** .5
                         pg.draw.circle(game.screen, (255, 255, 255), spacePosToScreenPos((x, y)), radius, 1)
                         futureCollided.append(i)
                         futureCollided.append(j)
-                        c = Corps(i.mass + j.mass, radius, (x, y), color, *mergeEnergy((i.mass, i.pos, lastPosI), (j.mass, j.pos, lastPosJ)))
+                        c = Corps(i.mass + j.mass, radius, (x, y), (0, 0, 0), *mergeEnergy((i.mass, i.pos, lastPosI), (j.mass, j.pos, lastPosJ)))
                         space.append(
                             {
                             "pos": c.pos,

@@ -33,6 +33,7 @@ def goKeybind() -> None:
 
 @Events.observe
 def window(w) -> None:
+    if w != "settings": return
     interface.clear()
     return
 

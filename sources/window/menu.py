@@ -71,7 +71,7 @@ def load(*args, **kwargs) -> None:
         Game.space.append(uranus)
         Game.space.append(neptune)
 
-        Game.timeScale = 20
+        Game.timeScale = 30
         Game.Camera.zoom = 0.00_000_4
         Game.Camera.x = 100
         Game.Camera.y = 500
@@ -120,12 +120,11 @@ def draw(screen) -> None:
 def update() -> None:
     for corps in Game.space:
         for otherCorps in Game.space:
-            if corps == otherCorps:
-                continue
-            distance = updateCorps(corps, otherCorps)
+            if corps == otherCorps: continue
+            distance: float = updateCorps(corps, otherCorps)
             if Captors.collide(corps, otherCorps, distance):
                 removedCorps = process_collide(corps, otherCorps)
                 Game.space.remove(removedCorps)
         
-        corps.update_position([0, 0], Game.deltaTime * Game.timeScale)
+        corps.update_position([0, 0], Game.DT)
     return

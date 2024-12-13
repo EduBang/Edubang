@@ -8,7 +8,7 @@ from main import Game
 from proto import proto
 from eventListen import Events
 from shared.components.Vectors import Vectors
-from shared.components.Physics import Physics
+from shared.components.Physics import Physics, G
 
 type EnergyInfos = tuple[int, tuple[int, int], tuple[int, int]]
 
@@ -713,9 +713,9 @@ def loadSpace(perlin) -> tuple[dict[tuple, tuple], int]:
     return (galaxy, perlin.size)
 
 def loadStars(n: int = 100, position: tuple[int, int] = (-1000, 1000)) -> list[tuple[int, int]]:
-    stars = {}
+    stars = []
     for i in range(n):
-        stars[(randint(position[0], position[1]), randint(position[0], position[1]))] = (255, 255, 255)
+        stars.append((randint(position[0], position[1]), randint(position[0], position[1])))
     return stars
 
 # endregion
@@ -756,33 +756,31 @@ def draw_cinetic_energy_vector(screen, corps) -> None:
     return
 
 def draw_attraction_norm(screen) -> None: #  chanp gravitation = G*(mass_obj_select / d2)
-    mouse_pos = pg.mouse.get_pos()
+    mouse_pos: tuple[int, int] = pg.mouse.get_pos()
     # print(f"Pointeur : {mouse_pos}")
-    
-    gravitation_constant: int = 6.67e-11 #test ...
 
-    attraction_vector_sum = mouse_pos
+    attraction_vector_sum: tuple[int, int] = mouse_pos
 
-    x = (Game.Camera.x + mouse_pos[0]) / Game.Camera.zoom #simule la position du pointeur dans l'espace
-    y = (Game.Camera.y + mouse_pos[1]) / Game.Camera.zoom
+    x: int = (Game.Camera.x + mouse_pos[0]) / Game.Camera.zoom #simule la position du pointeur dans l'espace
+    y: int = (Game.Camera.y + mouse_pos[1]) / Game.Camera.zoom
     # print(f"Simu : {x, y}")
 
 
 
     for corps in Game.space:
-        unit_vector = Vectors.get_unit_vector((x, y), corps.pos)
-        attraction_norm = gravitation_constant * (corps.mass / (Vectors.get_distance((x, y), corps.pos) * 1000 / Game.Camera.zoom) ** 2)
+        unit_vector: tuple[float, float] = Vectors.get_unit_vector((x, y), corps.pos)
+        attraction_norm = G * (corps.mass / (Vectors.get_distance((x, y), corps.pos) * 1000 / Game.Camera.zoom) ** 2)
         attraction_vector = (unit_vector[0] * attraction_norm, unit_vector[1] * attraction_norm)
         attraction_vector_sum = (attraction_vector_sum[0] + attraction_vector[0], attraction_vector_sum[1] + attraction_vector[1])
 
-    endX = (attraction_vector_sum[0] + Game.Camera.x / Game.Camera.zoom) * Game.Camera.zoom # je fais des tests pour voir si l'affichage fonctionne... pas encore a l'échelle
-    endY = (attraction_vector_sum[1] + Game.Camera.y / Game.Camera.zoom) * Game.Camera.zoom
+    endX: float = (attraction_vector_sum[0] + Game.Camera.x / Game.Camera.zoom) * Game.Camera.zoom # je fais des tests pour voir si l'affichage fonctionne... pas encore a l'échelle
+    endY: float = (attraction_vector_sum[1] + Game.Camera.y / Game.Camera.zoom) * Game.Camera.zoom
         
     pg.draw.line(screen, (255, 255, 255), (mouse_pos[0], mouse_pos[1]), (endX, endY), 5)
     
 
    
-# endregion x = float((self.pos[0] + camera.x / camera.zoom) * camera.zoom)
+# endregion
 
 # region converter
 
@@ -799,12 +797,12 @@ def spacePosToScreenPos(pos: tuple[float, float]) -> tuple[float, float]:
 # endregion
 
 def updateSpaceship(a, b) -> float:
-    distance = Vectors.get_distance(a.pos, b.pos) # pixel
-    attraction = Physics.get_attraction(a.mass, b.mass, distance)
-    unitVectorA = Vectors.get_unit_vector(a.pos, b.pos)
-    unitVectorB = Vectors.get_unit_vector(b.pos, a.pos)
-    accA = [(unitVectorA[0] * attraction / a.mass) + unitVectorA[1] * attraction / a.mass]
-    accB = [unitVectorB[0] * attraction / b.mass, unitVectorB[1] * attraction / b.mass]
+    distance: float = Vectors.get_distance(a.pos, b.pos) # pixel
+    attraction: float = Physics.get_attraction(a.mass, b.mass, distance)
+    unitVectorA: tuple[float, float] = Vectors.get_unit_vector(a.pos, b.pos)
+    unitVectorB: tuple[float, float] = (-unitVectorA[0], -unitVectorA[1])
+    accA: tuple[float, float] = [(unitVectorA[0] * attraction / a.mass) + unitVectorA[1] * attraction / a.mass]
+    accB: tuple[float, float] = [unitVectorB[0] * attraction / b.mass, unitVectorB[1] * attraction / b.mass]
 
     a.update_position(accA, Game.deltaTime * Game.timeScale)
     b.update_position(accB, Game.deltaTime * Game.timeScale)
