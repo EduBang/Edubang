@@ -318,6 +318,7 @@ def draw(screen) -> None:
                 screen.blit(surface, (x + 18, y - 30))
         if showPath:
             Path.draw_corps_path(screen, corps.path, corps.color)
+        
 
         # draw_velocity_vector(screen, corps)
         # draw_cinetic_energy_vector(screen, corps)
