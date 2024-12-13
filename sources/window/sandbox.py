@@ -13,6 +13,7 @@ from shared.utils.utils import updateCorps, process_collide, MessageBox, Path, D
 from shared.components.Corps import Corps
 from shared.components.Captors import Captors
 from shared.components.Prediction import Prediction
+from shared.components.Spaceship import Space_ship
 
 dk = DataKeeper()
 dk.pause = False
@@ -158,6 +159,10 @@ def loader() -> None:
     neptune = Corps(1.0243e26, 24622, (4_498_400_000, 0), (100, 100, 255), 0, -5.43248 * C_EDUBANG)
     neptune.name = "Neptune"
     
+    #ship = Space_ship.new((1000, 1000), 2000, 0, 0, 0)
+    #ship.name = "Spaceship"
+    
+    #Game.space.append(ship)
     Game.space.append(soleil)
     Game.space.append(mercure)
     Game.space.append(venus)
