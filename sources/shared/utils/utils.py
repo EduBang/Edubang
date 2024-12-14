@@ -541,7 +541,7 @@ with proto("SizeViewer") as SizeViewer:
     def mousemotionSV(self, event) -> None:
         x, y = event.pos
         if self.focus:
-            self.position = (x - self.size[0] // 2, y)
+            self.position = [x - self.size[0] // 2, y]
         if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
             Events.trigger("hovering", self)
         else:
@@ -554,7 +554,7 @@ with proto("SizeViewer") as SizeViewer:
         if button != 1: return
         if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
             self.focus = True
-            self.position = (x - self.size[0] // 2, y)
+            self.position = [x - self.size[0] // 2, y]
         return
     
     def mousebuttonupSV(self, event) -> None:
@@ -694,21 +694,16 @@ def process_collide(corps1, corps2):
 # region Fond espace
 
 def loadSpace(perlin) -> tuple[dict[tuple, tuple], int]:
-    noise_matrix = [[perlin.noise(x / 80, y / 80) for y in range(perlin.size)] for x in range(perlin.size)]
-
     galaxy = {}
 
     # Code qui génère les amas de galaxies
     for x in range(perlin.size):
         for y in range(perlin.size):
-            noise_x = int(x)
-            noise_y = int(y)
-            noise_val = noise_matrix[noise_x][noise_y]
+            value = perlin.noise(x / 80, y / 80)
 
             # Si le "bruit" est fort, il va générer une galaxie.
-            if noise_val > 0.15:
-                color = (int(70 * noise_val), int(20 * noise_val), int(70 * noise_val * 0.8))
-                galaxy[(x, y)] = color
+            if value > 0.15:
+                galaxy[(x, y)] = (int(70 * value), int(20 * value), int(70 * value * 0.8))
 
     return (galaxy, perlin.size)
 

@@ -9,7 +9,7 @@ from eventListen import Events
 from nsi25perlin import PerlinNoise
 
 from main import Game, getFont
-from shared.utils.utils import updateCorps, process_collide, MessageBox, Path, DataKeeper, Input, Text, CheckBox, SizeViewer, loadSpace, loadStars, draw_velocity_vector, draw_cinetic_energy_vector, draw_attraction_norm
+from shared.utils.utils import C_EDUBANG, updateCorps, process_collide, MessageBox, Path, DataKeeper, Input, Text, CheckBox, SizeViewer, loadSpace, loadStars, draw_velocity_vector, draw_cinetic_energy_vector, draw_attraction_norm
 from shared.components.Corps import Corps
 from shared.components.Captors import Captors
 from shared.components.Prediction import Prediction
@@ -26,8 +26,11 @@ dk.process = None
 dk.image = None
 dk.stars = []
 dk.perlin = PerlinNoise(768)
+
 interface: list = []
+
 mb = MessageBox("Retourner au menu ?")
+
 subtitle = getFont("Bold")
 brand = Image.open("data/images/brand.png")
 brand = brand.resize((175, 41), Image.Resampling.BICUBIC)
@@ -268,10 +271,37 @@ def menu(screen) -> None:
     screen.blit(text, (20, 400))
     pg.draw.line(screen, (102, 102, 102), (20, 430), (100, 430))
 
+def stats(corps) -> None:
+    screen = Game.screen
+    width, height = screen.get_size()
+
+    pg.draw.rect(screen, (10, 9, 9), (width - 350, 0, 350, height))
+    pg.draw.rect(screen, (0, 0, 0), (width - 340, 10, 330, 150))
+    pg.draw.circle(screen, corps.color, (width - 165, 75), 20)
+    if hasattr(corps, "name"):
+        text = Game.font.render(corps.name, False, (255, 255, 255))
+        screen.blit(text, (width - 330, 170))
+    text = subtitle.render("Caractéristiques orbitaux", False, (255, 255, 255))
+    screen.blit(text, (width - 330, 210))
+
+    velocity = round(((corps.velocity[0] / C_EDUBANG) ** 2 + (corps.velocity[1] / C_EDUBANG) ** 2) ** .5, 3)
+    text = Game.font.render("Vitesse orbitale : %s km/s" % velocity, False, (255, 255, 255))
+    screen.blit(text, (width - 330, 240))
+
+    text = subtitle.render("Caractéristiques physiques", False, (255, 255, 255))
+    screen.blit(text, (width - 330, 500))
+
+    text = Game.font.render("Rayon : %s km" % int(corps.radius), False, (255, 255, 255))
+    screen.blit(text, (width - 330, 530))
+
+    text = Game.font.render("Masse : %s kg" % corps.mass, False, (255, 255, 255))
+    screen.blit(text, (width - 330, 560))
+    return
+
 def draw(screen) -> None:
     screen.fill((0, 0, 0))
+    width, height = screen.get_size()
     if not dk.loadingFinished:
-        width, height = screen.get_size()
         text = Game.font.render("Chargement...", False, (255, 255, 255))
         tW, tH = Game.font.size("Chargement...")
         screen.blit(text, (width // 2 - tW + 70, height // 2 - tH // 2))
@@ -307,8 +337,8 @@ def draw(screen) -> None:
     Prediction.predict(Game, 20)
     
     if Game.Camera.focus is not None:
-        midScreenX = screen.get_width() // 2
-        midScreenY = screen.get_height() // 2
+        midScreenX = width // 2
+        midScreenY = height // 2
         Game.Camera.x = midScreenX - Game.Camera.focus.pos[0] * Game.Camera.zoom
         Game.Camera.y = midScreenY - Game.Camera.focus.pos[1] * Game.Camera.zoom
 
@@ -335,12 +365,17 @@ def draw(screen) -> None:
 
     for element in interface:
         if hasattr(element, "measure") and not showSV: continue
+        if Game.Camera.focus and hasattr(element, "measure") and element.position[0] > width - 500:
+            element.position[0] = width - 500
         element.draw()
         if hasattr(element, "numberOnly"):
             Game.timeScale = int(element.text) if element.text not in ["-", ""] else 0
             element.active = not dk.pause
             if element.focus and dk.pause:
                 element.focus = False
+    
+    if Game.Camera.focus:
+        stats(Game.Camera.focus)
 
     if dk.pause:
         width, height = screen.get_size()
