@@ -250,11 +250,11 @@ def mousebuttondown(event) -> None:
             if pi * (corps.radius * Game.Camera.zoom) ** 2 < 10:
                 if (sqx + sqy) ** .5 < 10:
                     Game.Camera.focus = corps
-                    Game.Camera.zoom = 1
+                    Game.Camera.zoom = 1 / corps.radius * 51
                     break
             if (sqx + sqy) ** .5 < corps.radius * Game.Camera.zoom:
                 Game.Camera.focus = corps
-                Game.Camera.zoom = 1
+                Game.Camera.zoom = 1 / corps.radius * 51
                 break
         else:
             Game.Camera.focus = None
@@ -300,21 +300,15 @@ def main() -> None:
             if Game.keys["cameraRight"]:
                 Game.Camera.x -= Game.Camera.speed
 
-            if Game.Camera.focus is not None:
-                midScreenX = screen.get_width() // 2
-                midScreenY = screen.get_height() // 2
-                Game.Camera.x = midScreenX - Game.Camera.focus.pos[0] * Game.Camera.zoom
-                Game.Camera.y = midScreenY - Game.Camera.focus.pos[1] * Game.Camera.zoom
-
         if len(buttons) == 0:
             pg.mouse.set_cursor(pg.SYSTEM_CURSOR_ARROW)
 
         # Constante de calibrage du temps
         Game.deltaTime = clock.tick(60) / 2195 # (1000 * 2.195)
         Game.DT = Game.deltaTime * Game.timeScale
-
-        update()
+        
         draw()
+        update()
     return
 
 main()

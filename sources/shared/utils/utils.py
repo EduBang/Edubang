@@ -584,7 +584,7 @@ with proto("SizeViewer") as SizeViewer:
             "window": MethodType(windowSV, self)
             })
         return
-        
+
 
 
 # endregion

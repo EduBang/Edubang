@@ -1,7 +1,6 @@
 from proto import proto
-from math import cos, sin, radians
+from math import cos, sin, radians, pi
 
-pi = 3.141592653589793
 with proto("Angles") as Angles:
     
     @Angles

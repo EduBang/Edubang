@@ -159,10 +159,10 @@ def loader() -> None:
     neptune = Corps(1.0243e26, 24622, (4_498_400_000, 0), (100, 100, 255), 0, -5.43248 * C_EDUBANG)
     neptune.name = "Neptune"
     
-    #ship = Space_ship.new((1000, 1000), 2000, 0, 0, 0)
-    #ship.name = "Spaceship"
+    # ship = Space_ship.new((1000, 1000), 2000, 0, 0, 0)
+    # ship.name = "Spaceship"
     
-    #Game.space.append(ship)
+    # Game.space.append(ship)
     Game.space.append(soleil)
     Game.space.append(mercure)
     Game.space.append(venus)
@@ -306,6 +306,12 @@ def draw(screen) -> None:
 
     Prediction.predict(Game, 20)
     
+    if Game.Camera.focus is not None:
+        midScreenX = screen.get_width() // 2
+        midScreenY = screen.get_height() // 2
+        Game.Camera.x = midScreenX - Game.Camera.focus.pos[0] * Game.Camera.zoom
+        Game.Camera.y = midScreenY - Game.Camera.focus.pos[1] * Game.Camera.zoom
+
     for corps in Game.space:
         corps.draw(screen, Game.Camera)
         if showNames:
