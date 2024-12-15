@@ -9,7 +9,14 @@ from eventListen import Events
 from nsi25perlin import PerlinNoise
 
 from main import Game, getFont
-from shared.utils.utils import C_EDUBANG, updateCorps, process_collide, MessageBox, Path, DataKeeper, Input, Text, CheckBox, SizeViewer, loadSpace, loadStars, draw_velocity_vector, draw_cinetic_energy_vector, draw_attraction_norm
+from shared.utils.utils import (
+    C_EDUBANG, updateCorps, process_collide,
+    MessageBox, Path, DataKeeper,
+    Input, Text, CheckBox,
+    Button, SizeViewer, loadSpace,
+    loadStars, draw_velocity_vector,
+    draw_cinetic_energy_vector, draw_attraction_norm, scientificNotation
+)
 from shared.components.Corps import Corps
 from shared.components.Captors import Captors
 from shared.components.Prediction import Prediction
@@ -27,6 +34,13 @@ dk.image = None
 dk.stars = []
 dk.perlin = PerlinNoise(768)
 
+def stopFocusFn() -> None:
+    Game.Camera.focus = None
+    Events.trigger("unhovering", dk.stopFocus)
+    return
+
+dk.stopFocus = None
+
 interface: list = []
 
 mb = MessageBox("Retourner au menu ?")
@@ -42,6 +56,12 @@ icon = icon.filter(ImageFilter.GaussianBlur(10))
 enhancer = ImageEnhance.Brightness(icon)
 icon = enhancer.enhance(.075)
 icon = pg.image.fromstring(icon.tobytes(), icon.size, icon.mode)
+
+showPath: bool = False
+showAttractionNorm: bool = False
+showSV: bool = False
+showNames: bool = True
+showPrediction: bool = False
 
 def kill(thread: Thread) -> None:
     threadId = thread.ident
@@ -81,6 +101,8 @@ def keydown(event) -> None:
             i.text = str(int(txt if txt != "" else "0") - 1)
     if Game.keys["resetCamera"]:
         Game.Camera.reset()
+        Game.Camera.x = 1000
+        Game.Camera.y = 500
         Game.Camera.active = True
     if Game.keys["pause"]:
         dk.pause = not dk.pause
@@ -221,10 +243,17 @@ def loader() -> None:
     showAttractionNorm.attraction_norm = None
     interface.append(showAttractionNorm)
 
-    textShowSV = Text("Règle de mesure", (20, 455), color=(255, 255, 255))
+    textShowPrediction = Text("Afficher les prédictions", (20, 395), color=(255, 255, 255))
+    interface.append(textShowPrediction)
+
+    showPrediction = CheckBox((280, 391), False)
+    showPrediction.prediction = None
+    interface.append(showPrediction)
+
+    textShowSV = Text("Règle de mesure", (20, 555), color=(255, 255, 255))
     interface.append(textShowSV)
 
-    showSV = CheckBox((175, 451), False)
+    showSV = CheckBox((175, 551), False)
     showSV.checked = True
     showSV.sv = None
     interface.append(showSV)
@@ -234,6 +263,13 @@ def loader() -> None:
     sizeViewer = SizeViewer((w - 200, h - 50))
     sizeViewer.measure = None
     interface.append(sizeViewer)
+
+    stopFocus = Button((w - 340, h - 60), (330, 50))
+    stopFocus.text = "Désactiver le suivi"
+    stopFocus.onPressed = stopFocusFn
+    stopFocus.active = False
+    interface.append(stopFocus)
+    dk.stopFocus = stopFocus
 
     dk.loadingFinished = True
     dk.loadingImages = []
@@ -268,8 +304,8 @@ def menu(screen) -> None:
     pg.draw.line(screen, (102, 102, 102), (20, 230), (100, 230))
 
     text = subtitle.render("Outils", False, (255, 255, 255))
-    screen.blit(text, (20, 400))
-    pg.draw.line(screen, (102, 102, 102), (20, 430), (100, 430))
+    screen.blit(text, (20, 500))
+    pg.draw.line(screen, (102, 102, 102), (20, 530), (100, 530))
 
 def stats(corps) -> None:
     screen = Game.screen
@@ -294,8 +330,10 @@ def stats(corps) -> None:
     text = Game.font.render("Rayon : %s km" % int(corps.radius), False, (255, 255, 255))
     screen.blit(text, (width - 330, 530))
 
-    text = Game.font.render("Masse : %s kg" % corps.mass, False, (255, 255, 255))
+    text = Game.font.render("Masse :", False, (255, 255, 255))
     screen.blit(text, (width - 330, 560))
+
+    scientificNotation(corps.mass, (width - 267, 560), end="kg")
     return
 
 def draw(screen) -> None:
@@ -308,11 +346,6 @@ def draw(screen) -> None:
         image = dk.loadingImages[dk.loadingImageIndex]
         screen.blit(image, (width // 2 - 108 // 2 - tW, height // 2 - 108 // 2))
         return
-
-    showPath: bool = False
-    showAttractionNorm: bool = False
-    showSV: bool = False
-    showNames: bool = True
 
     image = dk.image
     size = image.get_size()
@@ -333,14 +366,19 @@ def draw(screen) -> None:
             showSV = element.checked
         if hasattr(element, "sn"):
             showNames = element.checked
+        if hasattr(element, "prediction"):
+            showPrediction = element.checked
 
-    Prediction.predict(Game, 20)
-    
-    if Game.Camera.focus is not None:
+    if Game.Camera.focus:
+        dk.stopFocus.active = True
+        dk.stopFocus.position = [width - 340, height - 60]
         midScreenX = width // 2
         midScreenY = height // 2
         Game.Camera.x = midScreenX - Game.Camera.focus.pos[0] * Game.Camera.zoom
         Game.Camera.y = midScreenY - Game.Camera.focus.pos[1] * Game.Camera.zoom
+    else:
+        if hasattr(dk.stopFocus, "active"):
+            dk.stopFocus.active = False
 
     for corps in Game.space:
         corps.draw(screen, Game.Camera)
@@ -358,10 +396,17 @@ def draw(screen) -> None:
 
         # draw_velocity_vector(screen, corps)
         # draw_cinetic_energy_vector(screen, corps)
-        if showAttractionNorm:
-            draw_attraction_norm(screen)
+
+    if showAttractionNorm:
+        draw_attraction_norm(screen)
+
+    if showPrediction:
+        Prediction.predict(Game, 20)
 
     menu(screen)
+
+    if Game.Camera.focus:
+        stats(Game.Camera.focus)
 
     for element in interface:
         if hasattr(element, "measure") and not showSV: continue
@@ -373,9 +418,6 @@ def draw(screen) -> None:
             element.active = not dk.pause
             if element.focus and dk.pause:
                 element.focus = False
-    
-    if Game.Camera.focus:
-        stats(Game.Camera.focus)
 
     if dk.pause:
         width, height = screen.get_size()

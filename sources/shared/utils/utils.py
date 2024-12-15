@@ -4,7 +4,7 @@ from math import pi
 
 import pygame as pg
 
-from main import Game
+from main import Game, getFont
 from proto import proto
 from eventListen import Events
 from shared.components.Vectors import Vectors
@@ -15,6 +15,8 @@ type EnergyInfos = tuple[int, tuple[int, int], tuple[int, int]]
 # La constante d'EduBang
 # valeur de calibrage, origine à déterminer
 C_EDUBANG = 10750
+
+exponentFont = getFont("Medium", 12)
 
 # region Prototypes
 
@@ -30,6 +32,7 @@ SCROLL_SPEED: int = 20
 
 with proto("Button") as Button:
     def drawButton(self) -> None:
+        if not self.active: return 
         pg.draw.rect(Game.screen, (255, 255, 255), pg.Rect(self.position, self.size), 0, 8)
         surface = Game.font.render(self.text, False, (0, 0, 0))
         width, height = Game.font.size(self.text)
@@ -39,6 +42,7 @@ with proto("Button") as Button:
         return
     
     def mousemotionBTN(self, event) -> None:
+        if not self.active: return
         x, y = event.pos
         if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
             self.onHover()
@@ -48,6 +52,7 @@ with proto("Button") as Button:
         return
 
     def mousebuttondownBTN(self, event) -> None:
+        if not self.active: return
         button = event.button
         x, y = event.pos
         if button != 1: return
@@ -56,6 +61,7 @@ with proto("Button") as Button:
         return
     
     def mousebuttonupBTN(self, event) -> None:
+        if not self.active: return
         button = event.button
         x, y = event.pos
         if button != 1: return
@@ -64,6 +70,7 @@ with proto("Button") as Button:
         return
 
     def mousewheelBTN(self, event) -> None:
+        if not self.active: return
         if not self.scrollable: return
         self.offsetY = SCROLL_SPEED * event.y
         self.position[1] += self.offsetY
@@ -88,6 +95,7 @@ with proto("Button") as Button:
         self.onHover = onHover
         self.scrollable = False
         self.offsetY = 0
+        self.active = True
         Events.group(self, {
             "mousemotion": MethodType(mousemotionBTN, self),
             "mousebuttondown": MethodType(mousebuttondownBTN, self),
@@ -777,7 +785,7 @@ def draw_attraction_norm(screen) -> None: #  chanp gravitation = G*(mass_obj_sel
    
 # endregion
 
-# region converter
+# region Converter
 
 def screenPosToSpacePos(pos: tuple[float, float]) -> tuple[float, float]:
     x: float = (Game.Camera.x + pos[0]) / Game.Camera.zoom
@@ -791,6 +799,8 @@ def spacePosToScreenPos(pos: tuple[float, float]) -> tuple[float, float]:
 
 # endregion
 
+# region Autre
+
 def updateSpaceship(a, b) -> float:
     distance: float = Vectors.get_distance(a.pos, b.pos) # pixel
     attraction: float = Physics.get_attraction(a.mass, b.mass, distance)
@@ -802,3 +812,25 @@ def updateSpaceship(a, b) -> float:
     a.update_position(accA, Game.deltaTime * Game.timeScale)
     b.update_position(accB, Game.deltaTime * Game.timeScale)
     return distance
+
+def scientificNotation(value, position, *, end: str | None = None) -> None:
+    strMass: list[str, str] = value.__str__().split("e")
+    mantisse: str = strMass[0]
+    exponent: str = strMass[1][1:]
+
+    renderedMantisse: str = "%s x 10" % mantisse
+
+    text = Game.font.render(renderedMantisse, False, (255, 255, 255))
+    w1, h1 = Game.font.size(renderedMantisse)
+    Game.screen.blit(text, (position[0], position[1]))
+    
+    text = exponentFont.render(exponent, False, (255, 255, 255))
+    w2, h2 = Game.font.size(exponent)
+    Game.screen.blit(text, (position[0] + w1, position[1] - 3))
+
+    if end:
+        text = Game.font.render(end, False, (255, 255, 255))
+        Game.screen.blit(text, (position[0] + w1 + w2, position[1]))
+    return
+
+# endregion

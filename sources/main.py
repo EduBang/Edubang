@@ -256,8 +256,6 @@ def mousebuttondown(event) -> None:
                 Game.Camera.focus = corps
                 Game.Camera.zoom = 1 / corps.radius * 51
                 break
-        else:
-            Game.Camera.focus = None
     return
 
 def update() -> None:
