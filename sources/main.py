@@ -46,8 +46,6 @@ FONTS: dict[str, int] = {
 def getFont(font, size: int = 16) -> pg.font.Font:
     return pg.font.Font(FONTS[font], size)
 
-font = getFont("Medium")
-
 with proto("Game") as Game:
     @Game
     def quit(self) -> None:
@@ -66,7 +64,7 @@ with proto("Game") as Game:
         self.Camera = CameraHandler()
         self.window = ""
         self.windows = {}
-        self.font = font
+        self.font = getFont("Medium")
         self.keybinds = {}
         self.keys = {}
         self.invertedKeybinds = {}
@@ -258,35 +256,28 @@ def mousebuttondown(event) -> None:
                 break
     return
 
-def update() -> None:
-    Game.update()
-    return
-
-def draw() -> None:
-    Game.draw()
-    return
-
 # Boucle principale
 def main() -> None:
     while Game.running:
         for event in pg.event.get():
-            if event.type == pg.QUIT:
-                Game.running = False
-            if event.type == pg.KEYDOWN:
-                Events.trigger("keydown", event)
-            if event.type == pg.KEYUP:
-                Events.trigger("keyup", event)
-            if event.type == pg.MOUSEWHEEL:
-                Events.trigger("mousewheel", event)
-            if event.type == pg.MOUSEBUTTONDOWN:
-                Events.trigger("mousebuttondown", event)
-            if event.type == pg.MOUSEBUTTONUP:
-                Events.trigger("mousebuttonup", event)
-            if event.type == pg.MOUSEMOTION:
-                Events.trigger("mousemotion", event)
-            if event.type == MUSIC_END_EVENT:
-                Game.changeMusic()
-                Game.playMusic()
+            match event.type:
+                case pg.QUIT:
+                    Game.running = False
+                case pg.KEYDOWN:
+                    Events.trigger("keydown", event)
+                case pg.KEYUP:
+                    Events.trigger("keyup", event)
+                case pg.MOUSEWHEEL:
+                    Events.trigger("mousewheel", event)
+                case pg.MOUSEBUTTONDOWN:
+                    Events.trigger("mousebuttondown", event)
+                case pg.MOUSEBUTTONUP:
+                    Events.trigger("mousebuttonup", event)
+                case pg.MOUSEMOTION:
+                    Events.trigger("mousemotion", event)
+                case MUSIC_END_EVENT:
+                    Game.changeMusic()
+                    Game.playMusic()
 
         if Game.Camera.active:
             if Game.keys["cameraUp"]:
@@ -305,8 +296,8 @@ def main() -> None:
         Game.deltaTime = clock.tick(60) / 2195 # (1000 * 2.195)
         Game.DT = Game.deltaTime * Game.timeScale
         
-        draw()
-        update()
+        Game.draw()
+        Game.update()
     return
 
 main()

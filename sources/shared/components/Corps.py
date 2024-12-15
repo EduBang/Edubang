@@ -43,4 +43,3 @@ with proto("Corps") as Corps:
         # Mise à jour de la position en fonction de la nouvelle vitesse (avec inertie)
         self.pos = (x, y)
         return
-

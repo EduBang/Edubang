@@ -22,7 +22,3 @@ with proto("Physics") as Physics:
     @Physics
     def get_cinetic_energy(self, mass, velocity) -> float:
         return 0.5 * mass * velocity ** 2 
-    
-
- 
-        

@@ -4,7 +4,7 @@ from math import pi
 from proto import proto
 import pygame as pg
 
-from ..utils.utils import spacePosToScreenPos, mergeEnergy, mergeColor
+from ..utils.utils import spacePosToScreenPos, mergeEnergy
 from .Vectors import Vectors
 from .Physics import Physics
 from .Captors import Captors
@@ -16,11 +16,9 @@ with proto("Prediction") as Prediction:
     def predict(self, game, n: int = 0, k: int = 100) -> None:
         if game.timeScale == 0: return
 
-        space = [{"pos": i.pos, "velocity": i.velocity, "mass": i.mass, "corps": j} for i, j in zip(deepcopy(game.space), game.space)]
+        space = [{"pos": tuple(i.pos), "velocity": list(i.velocity), "mass": int(i.mass), "corps": i} for i in game.space]
 
-        dt = 5e-2 * (1 if game.timeScale > 0 else 0 if game.timeScale == 0 else -1)
-
-        k *= dt
+        k *= (5e-2 if game.timeScale > 0 else -5e-2)
 
         poses: dict = {}
         futureCollided: list = []
@@ -33,13 +31,11 @@ with proto("Prediction") as Prediction:
             for a in space:
                 if a["corps"] in futureCollided: continue
                 velocity = a["velocity"]
-                pos = a["pos"]
+                x, y = pos = a["pos"]
                 mass = a["mass"]
-                x, y = pos
                 for b in space:
-                    if b["corps"] in futureCollided: continue
-                    if a == b: continue
-                    
+                    if b["corps"] in futureCollided or a == b: continue
+ 
                     distance: float = Vectors.get_distance(pos, b["pos"])
                     attraction: float = Physics.get_attraction(mass, b["mass"], distance)
                     unitVector: tuple[float, float] = Vectors.get_unit_vector(pos, b["pos"])
@@ -59,11 +55,9 @@ with proto("Prediction") as Prediction:
 
             for i in poses:
                 if i in futureCollided: continue
-                data: dict = poses[i]
-                lastPosI: tuple[float, float] = data[-1]
+                lastPosI: tuple[float, float] = poses[i][-1]
                 for j in poses:
-                    if j in futureCollided: continue
-                    if i == j: continue
+                    if j in futureCollided or i == j: continue
                     lastPosJ: tuple[float, float] = poses[j][-1]
                     d: float = Vectors.get_distance(lastPosI, lastPosJ)
                     if Captors.collide(i, j, d):

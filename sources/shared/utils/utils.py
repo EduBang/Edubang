@@ -593,8 +593,6 @@ with proto("SizeViewer") as SizeViewer:
             })
         return
 
-
-
 # endregion
 
 # region Fonctions physiques
