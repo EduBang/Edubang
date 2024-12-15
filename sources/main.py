@@ -260,24 +260,23 @@ def mousebuttondown(event) -> None:
 def main() -> None:
     while Game.running:
         for event in pg.event.get():
-            match event.type:
-                case pg.QUIT:
-                    Game.running = False
-                case pg.KEYDOWN:
-                    Events.trigger("keydown", event)
-                case pg.KEYUP:
-                    Events.trigger("keyup", event)
-                case pg.MOUSEWHEEL:
-                    Events.trigger("mousewheel", event)
-                case pg.MOUSEBUTTONDOWN:
-                    Events.trigger("mousebuttondown", event)
-                case pg.MOUSEBUTTONUP:
-                    Events.trigger("mousebuttonup", event)
-                case pg.MOUSEMOTION:
-                    Events.trigger("mousemotion", event)
-                case MUSIC_END_EVENT:
-                    Game.changeMusic()
-                    Game.playMusic()
+            if event.type == pg.QUIT:
+                Game.running = False
+            if event.type == pg.KEYDOWN:
+                Events.trigger("keydown", event)
+            if event.type == pg.KEYUP:
+                Events.trigger("keyup", event)
+            if event.type == pg.MOUSEWHEEL:
+                Events.trigger("mousewheel", event)
+            if event.type == pg.MOUSEBUTTONDOWN:
+                Events.trigger("mousebuttondown", event)
+            if event.type == pg.MOUSEBUTTONUP:
+                Events.trigger("mousebuttonup", event)
+            if event.type == pg.MOUSEMOTION:
+                Events.trigger("mousemotion", event)
+            if event.type == MUSIC_END_EVENT:
+                Game.changeMusic()
+                Game.playMusic()
 
         if Game.Camera.active:
             if Game.keys["cameraUp"]:
