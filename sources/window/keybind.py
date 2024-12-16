@@ -25,7 +25,7 @@ def backFunction() -> None:
 
         nkb = {
             "name": kb[1]["name"],
-            "code": keybind.key,
+            "code": keybind.keys,
             "key": keybind.keyname
         }
 
@@ -38,7 +38,6 @@ def backFunction() -> None:
             wf.close()
         
         newKeybinds[kb[0]] = nkb
-
 
     Game.keybinds = newKeybinds
     Game.resetKeys()

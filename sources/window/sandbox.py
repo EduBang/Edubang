@@ -84,7 +84,17 @@ def window(w) -> None:
 @Events.observe
 def keydown(event) -> None:
     if Game.window != "sandbox": return
-    key = Game.getKeyFromCode(event.key)
+    keys = []
+    
+    mods = pg.key.get_mods()
+    if mods & pg.KMOD_LCTRL:
+        keys.append(0x400000e0)
+    if mods & pg.KMOD_LALT:
+        keys.append(0x400000e2)
+    keys.append(event.key)
+
+    key = Game.getKeyFromCode(keys)
+
     if key:
         Game.keys[key] = True
     if Game.keys["increaseTime"]:
@@ -115,19 +125,30 @@ def keydown(event) -> None:
             for element in interface:
                 if hasattr(element, "numberOnly"):
                     element.text = str(dk.timeScale)
+    if Game.keys["resetSimulation"]:
+        for a, d in zip(Game.space, [(0, 0), (57_909_050, -47.362),
+                                  (108_209_500, -35.02571), (149_597_887.5, -29.783),
+                                  (227_944_000, -24.080), (778_340_000, -13.0585),
+                                  (1_426_700_000, -9.6407), (2_870_700_000, -6.796732),
+                                  (4_498_400_000, -5.43248)]):
+            a.pos = (d[0], 0)
+            a.velocity = [0, d[1] * C_EDUBANG]
     key = event.key
     if not dk.active: return
     if key == pg.K_ESCAPE:
-        if mb.active:
-            mb.active = False
-            dk.active = False
-            dk.loadingFinished = False
-            dk.image = None
-            dk.stars = []
-            Game.reset()
-            Game.select("menu") # double échap pour quitter
+        if Game.Camera.focus:
+            Game.Camera.focus = None
         else:
-            mb.active = True
+            if mb.active:
+                mb.active = False
+                dk.active = False
+                dk.loadingFinished = False
+                dk.image = None
+                dk.stars = []
+                Game.reset()
+                Game.select("menu")
+            else:
+                mb.active = True
     else:
         mb.active = False
         
@@ -136,16 +157,22 @@ def keydown(event) -> None:
     elif key == pg.K_KP_MINUS:
         Game.Camera.zoom /= 1.05
 
-    keys = pg.key.get_pressed()
-    if keys[pg.K_LCTRL] and keys[pg.K_r]:
-        for a, d in zip(Game.space, [(0, 0), (57_909_050, -47.362),
-                                  (108_209_500, -35.02571), (149_597_887.5, -29.783),
-                                  (227_944_000, -24.080), (778_340_000, -13.0585),
-                                  (1_426_700_000, -9.6407), (2_870_700_000, -6.796732),
-                                  (4_498_400_000, -5.43248)]):
-            a.pos = (d[0], 0)
-            a.velocity = [0, d[1] * C_EDUBANG]
+    return
 
+@Events.observe
+def keydown(event) -> None:
+    keys = []
+    
+    mods = pg.key.get_mods()
+    if mods & pg.KMOD_LCTRL:
+        keys.append(0x400000e0)
+    if mods & pg.KMOD_LALT:
+        keys.append(0x400000e2)
+    keys.append(event.key)
+
+    key = Game.getKeyFromCode(keys)
+    if key:
+        Game.keys[key] = True
     return
 
 @Events.observe
@@ -231,6 +258,7 @@ def loader() -> None:
         Game.screen.blit(text, (x + dim[0] + 4, y))
     inputDT.draw = inputDTdraw
     inputDT.numberOnly = True
+    inputDT.resetOnClick = True
     interface.append(inputDT)
 
     textShowName = Text("Afficher le nom des astres", (20, 245), color=(255, 255, 255))
@@ -444,6 +472,16 @@ def update() -> None:
         dk.loadingImageIndex += 1
         if dk.loadingImageIndex > 59:
             dk.loadingImageIndex = 0
+
+    if Game.Camera.active:
+        if Game.keys["cameraUp"]:
+            Game.Camera.y += Game.Camera.speed
+        if Game.keys["cameraLeft"]:
+            Game.Camera.x += Game.Camera.speed
+        if Game.keys["cameraDown"]:
+            Game.Camera.y -= Game.Camera.speed
+        if Game.keys["cameraRight"]:
+            Game.Camera.x -= Game.Camera.speed
 
     for corps in Game.space:
         for otherCorps in Game.space:

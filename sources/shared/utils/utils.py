@@ -205,7 +205,7 @@ with proto("KeyBind") as KeyBind:
     def drawKeyBind(self):
         color = FOCUS_COLOR if self.focus else (255, 255, 255)
         pg.draw.rect(Game.screen, color, pg.Rect(self.position, self.size), 0, 4)
-        surface = self.font.render(self.keyname, False, (0, 0, 0))
+        surface = self.font.render(" + ".join(self.keyname), False, (0, 0, 0))
         x = self.position[0] + 10
         y = self.position[1] + 10
         Game.screen.blit(surface, (x, y))
@@ -248,9 +248,24 @@ with proto("KeyBind") as KeyBind:
 
     def keydownKB(self, event) -> None:
         if self.focus:
-            self.key = event.key
-            self.keyname = UNICODES[event.key] if event.key in UNICODES else event.unicode 
-            self.focus = False
+            self.keys = []
+            self.keyname = []
+            mods = pg.key.get_mods()
+            if mods & pg.KMOD_LCTRL and mods & pg.KMOD_LALT:
+                self.keyname.append("ctrl")
+                self.keyname.append("alt")
+                self.keys.append(0x400000e0)
+                self.keys.append(0x400000e2)
+            elif mods & pg.KMOD_LCTRL:
+                self.keyname.append("ctrl")
+                self.keys.append(0x400000e0)
+            elif mods & pg.KMOD_LALT:
+                self.keyname.append("alt")
+                self.keys.append(0x400000e2)
+            if event.key not in [0x400000e0, 0x400000e2]:
+                self.keyname.append("espace" if event.key in UNICODES else event.unicode if event.key > 0x110000 else chr(event.key))
+                self.keys.append(event.key)
+                self.focus = False
         return
 
     def onHover() -> None:
@@ -263,9 +278,9 @@ with proto("KeyBind") as KeyBind:
         return
 
     @KeyBind
-    def new(self, key: int, keyname: str, position: tuple[int, int]) -> None:
+    def new(self, keys: list[int], keyname: str, position: tuple[int, int]) -> None:
         self.focus = False
-        self.key = key
+        self.keys = keys
         self.keyname = keyname
         self.position = list(position)
         self.font = Game.font
@@ -338,7 +353,9 @@ with proto("Input") as Input:
         if not self.active: return
         if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
             self.focus = not self.focus
-            if self.focus: self.onPressed()
+            if self.focus:
+                self.onPressed()
+                if self.resetOnClick: self.text = ""
         else:
             self.focus = False
         return
@@ -403,6 +420,7 @@ with proto("Input") as Input:
         self.font = Game.font
         self.numberOnly = False
         self.scrollable = False
+        self.resetOnClick = False
         self.offsetY = 0
         Events.group(self, {
             "mousemotion": MethodType(mousemotionI, self),
@@ -488,7 +506,7 @@ with proto("SlideBar") as SlideBar:
         self.active = False
         self.values = [0, 100]
         self.value = self.values[0]
-        self.position = position
+        self.position = list(position)
         self.size = (100, 5)
         self.draw = MethodType(drawSlideBar, self)
         self.onHover = onHover

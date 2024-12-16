@@ -108,18 +108,20 @@ with proto("Game") as Game:
 
     @Game
     def resetKeys(self) -> None:
+        self.invertedKeybinds = {}
         for key in self.keybinds:
             self.keys[key] = False
         for k, v in self.keybinds.items():
-            self.invertedKeybinds[v["code"]] = k
+            self.invertedKeybinds[tuple(v["code"])] = k
         return
     
     @Game
-    def getKeyFromCode(self, code: int, default = None) -> str:
-        return self.invertedKeybinds[code] if code in self.invertedKeybinds else default
+    def getKeyFromCode(self, keys: list[int], default = None) -> str:
+        keys = tuple(keys)
+        return self.invertedKeybinds[keys] if keys in self.invertedKeybinds else default
     
     @Game
-    def getCodeFromKey(self, key: str, default = None) -> int:
+    def getCodeFromKey(self, key: str, default = None) -> list[int]:
         return self.keybinds[key] if key in self.keybinds else default
 
     @Game
@@ -208,16 +210,32 @@ def unhovering(button) -> None:
 
 @Events.observe
 def keydown(event) -> None:
-    code = event.key
-    key = Game.getKeyFromCode(code)
+    keys = []
+    
+    mods = pg.key.get_mods()
+    if mods & pg.KMOD_LCTRL:
+        keys.append(0x400000e0)
+    if mods & pg.KMOD_LALT:
+        keys.append(0x400000e2)
+    keys.append(event.key)
+
+    key = Game.getKeyFromCode(keys)
     if key:
         Game.keys[key] = True
     return
 
 @Events.observe
 def keyup(event) -> None:
-    code = event.key
-    key = Game.getKeyFromCode(code)
+    keys = []
+
+    mods = pg.key.get_mods()
+    if mods & pg.KMOD_LCTRL:
+        keys.append(0x400000e0)
+    if mods & pg.KMOD_LALT:
+        keys.append(0x400000e2)
+    keys.append(event.key)
+
+    key = Game.getKeyFromCode(keys)
     if key:
         Game.keys[key] = False
     return
@@ -277,16 +295,6 @@ def main() -> None:
             if event.type == MUSIC_END_EVENT:
                 Game.changeMusic()
                 Game.playMusic()
-
-        if Game.Camera.active:
-            if Game.keys["cameraUp"]:
-                Game.Camera.y += Game.Camera.speed
-            if Game.keys["cameraLeft"]:
-                Game.Camera.x += Game.Camera.speed
-            if Game.keys["cameraDown"]:
-                Game.Camera.y -= Game.Camera.speed
-            if Game.keys["cameraRight"]:
-                Game.Camera.x -= Game.Camera.speed
 
         if len(buttons) == 0:
             pg.mouse.set_cursor(pg.SYSTEM_CURSOR_ARROW)

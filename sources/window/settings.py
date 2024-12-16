@@ -44,7 +44,6 @@ def backFunction() -> None:
 
 def load() -> None:
     backButton = Button((100, 100), (180, 60))
-    backButton.scrollable = True
     backButton.text = "Retour"
     backButton.onPressed = backFunction
     interface.append(backButton)
@@ -62,9 +61,7 @@ def load() -> None:
         sb = SlideBar((250, 200 * (i + 1) + 125))
         sb.setting = setting
         sb.value = int(dk.settings[setting])
-        sb.scrollable = True
         text = Text(setting, (100, 200 * (i + 1) + 110), color=(255, 255, 255))
-        text.scrollable = True
         interface.append(sb)
         interface.append(text)
     return
