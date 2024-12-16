@@ -135,6 +135,17 @@ def keydown(event) -> None:
         Game.Camera.zoom *= 1.05
     elif key == pg.K_KP_MINUS:
         Game.Camera.zoom /= 1.05
+
+    keys = pg.key.get_pressed()
+    if keys[pg.K_LCTRL] and keys[pg.K_r]:
+        for a, d in zip(Game.space, [(0, 0), (57_909_050, -47.362),
+                                  (108_209_500, -35.02571), (149_597_887.5, -29.783),
+                                  (227_944_000, -24.080), (778_340_000, -13.0585),
+                                  (1_426_700_000, -9.6407), (2_870_700_000, -6.796732),
+                                  (4_498_400_000, -5.43248)]):
+            a.pos = (d[0], 0)
+            a.velocity = [0, d[1] * C_EDUBANG]
+
     return
 
 @Events.observe
