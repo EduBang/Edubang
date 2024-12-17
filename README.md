@@ -5,5 +5,5 @@ Nous avons pour objectif de faire découvrir l'astronomie pour les jeunes avec s
 
 ## Python
 
-Edubang doit être exécuté sur Windows.
+Edubang peut être exécuté sur Windows, MacOs et Linux.
 Edubang nécessite une version de Python supérieur ou égale à **3.12.5**.
