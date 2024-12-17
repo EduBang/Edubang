@@ -1,9 +1,26 @@
-# Edubang
 
-Edubang est un logiciel de simulation d'astronomie créé par _Anaël CHEVILLARD_, _Sacha FRÉGUIN_ et _Néji LIM_. <br/>
-Nous avons pour objectif de faire découvrir l'astronomie pour les jeunes avec ses concepts tels que la formation des planètes, les lois de Newton, les systèmes stellaires, etc.
+![EduBang Logo](https://cdn.faune67.fr/assets/edubang_logo.png)
 
-## Python
 
-Edubang peut être exécuté sur Windows, MacOs et Linux.
-Edubang nécessite une version de Python supérieur ou égale à **3.12.5**.
+# EduBang
+
+
+Edubang est un projet développé en Python dans le cadre des Trophées NSI, permettant de simuler des interactions spatiales entre astres selon la loi universelle de la gravitation de Newton. Ce logiciel offre une représentation réaliste des trajectoires et forces gravitationnelles dans l’espace.
+
+Il permet de créer des systèmes solaires personnalisés en ajoutant des astres (étoiles, planètes, lunes) avec des paramètres définis comme la masse, la position ou la vitesse. Cette personnalisation offre une grande liberté créative pour explorer différents scénarios.
+
+Edubang propose aussi un espace d’expérimentation où les utilisateurs peuvent modifier les caractéristiques physiques des astres et observer les conséquences sur le système, renforçant ainsi la compréhension des lois de la gravité par la pratique.
+
+Conçu pour être intuitif et captivant, Edubang s’adresse aux élèves, enseignants et passionnés d’astronomie, combinant apprentissage scientifique et plaisir de la découverte.
+
+## Authors
+
+- [Anaël Chevillard](https://github.com/anaelchevillard)
+- [Sacha Freguin](https://github.com/AS-Pic)
+- [Néji Lim](https://github.com/ArticOff)
+
+
+## License
+
+[GPLv3](https://opensource.org/licenses/)
+
