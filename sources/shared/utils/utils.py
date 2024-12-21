@@ -251,15 +251,10 @@ with proto("KeyBind") as KeyBind:
             self.keys = []
             self.keyname = []
             mods = pg.key.get_mods()
-            if mods & pg.KMOD_LCTRL and mods & pg.KMOD_LALT:
-                self.keyname.append("ctrl")
-                self.keyname.append("alt")
-                self.keys.append(0x400000e0)
-                self.keys.append(0x400000e2)
-            elif mods & pg.KMOD_LCTRL:
+            if mods & pg.KMOD_LCTRL:
                 self.keyname.append("ctrl")
                 self.keys.append(0x400000e0)
-            elif mods & pg.KMOD_LALT:
+            if mods & pg.KMOD_LALT:
                 self.keyname.append("alt")
                 self.keys.append(0x400000e2)
             if event.key not in [0x400000e0, 0x400000e2]:
@@ -657,18 +652,12 @@ def mergeNames(d1: tuple[int, str], d2: tuple[int, str]) -> str:
 def processMergingNames(a, b, c) -> None:
     aName = getattr(a, "name", None)
     bName = getattr(b, "name", None)
-    if aName or bName:
-        c.name = aName or bName
+    c.name = aName or bName
     if aName and bName:
-        x1 = a
-        if a.mass < b.mass:
-            x1 = b
+        x1 = a if a.mass < b.mass else b
         x2 = b if x1 == a else a
-        dominationIndex = x2.mass * 100 / x1.mass
-        if 10 < dominationIndex: # si la masse des astres ne sont pas à 25% proches
-            c.name = x1
-        else:
-            c.name = mergeNames((x1.mass, x1.name), (x2.mass, x2.name))
+        dominationIndex: float = x2.mass * 100 / x1.mass
+        c.name = x1 if 10 < dominationIndex else mergeNames((x1.mass, x1.name), (x2.mass, x2.name))
         return
 
 def mergeEnergy(d1: EnergyInfos, d2: EnergyInfos) -> tuple[float, float]:
@@ -773,11 +762,13 @@ def draw_cinetic_energy_vector(screen, corps) -> None:
 
         pg.draw.line(screen, (255, 0, 0), (startX, startY), (endX, endY), 5)
     return
-def draw_text(screen, text, position, font, color=(255, 255, 255)):
 
+def draw_text(screen, text, position, font, color=(255, 255, 255)):
     rendered_text = font.render(text, True, color)
     screen.blit(rendered_text, position)
+    return
 
+font = pg.font.Font(None, 24)
 
 def draw_attraction_norm(screen) -> None:
 
@@ -785,24 +776,21 @@ def draw_attraction_norm(screen) -> None:
     mouse_pos: tuple[int, int] = pg.mouse.get_pos()
 
     # Initialisation du vecteur résultant (au départ centré sur la souris)
-    attraction_vector_sum: tuple[float, float] = (0.0, 0.0)
+    attraction_vector_sum: tuple[float, float] = (.0, .0)
 
     # Conversion de la position écran vers la position espace
-    x: float = (mouse_pos[0] - 1280 / 2) / Game.Camera.zoom + Game.Camera.x
-    y: float = (mouse_pos[1] - 720 / 2) / Game.Camera.zoom + Game.Camera.y
-
-    # Constante gravitationnelle
-    G = 6.67430e-11
+    # x: float = (mouse_pos[0] - 1280 / 2) / Game.Camera.zoom + Game.Camera.x
+    # y: float = (mouse_pos[1] - 720 / 2) / Game.Camera.zoom + Game.Camera.y
+    mouseSpacePos: tuple[float, float] = screenPosToSpacePos(mouse_pos)
 
     # Calcul de l'attraction gravitationnelle pour chaque corps
     for corps in Game.space:
-        unit_vector: tuple[float, float] = Vectors.get_unit_vector((x, y), corps.pos)
-        distance = Vectors.get_distance((x, y), corps.pos)
+        attraction_norm: float = .0
+        unit_vector: tuple[float, float] = Vectors.get_unit_vector(mouseSpacePos, corps.pos)
+        distance = Vectors.get_distance(mouseSpacePos, corps.pos)
 
         if distance > 0:  # Éviter la division par zéro
             attraction_norm = G * (corps.mass / ((distance * 1000 / Game.Camera.zoom) ** 2))
-        else:
-            attraction_norm = 0
 
         attraction_vector = (
             unit_vector[0] * attraction_norm,
@@ -815,20 +803,16 @@ def draw_attraction_norm(screen) -> None:
         )
 
     # Calcul des coordonnées de la fin du vecteur résultant (espace -> écran)
-    endX: float = (attraction_vector_sum[0] + Game.Camera.x / Game.Camera.zoom) * Game.Camera.zoom
-    endY: float = (attraction_vector_sum[1] + Game.Camera.y / Game.Camera.zoom) * Game.Camera.zoom
+    # endX: float = (attraction_vector_sum[0] + Game.Camera.x / Game.Camera.zoom) * Game.Camera.zoom
+    # endY: float = (attraction_vector_sum[1] + Game.Camera.y / Game.Camera.zoom) * Game.Camera.zoom
 
+    pg.draw.line(screen, (255, 255, 255), mouse_pos, spacePosToScreenPos(attraction_vector_sum), 5)
 
-    pg.draw.line(screen, (255, 255, 255), mouse_pos, (endX, endY), 5)
-
-    
-    font = pg.font.Font(None, 24)
-    screen_width = screen.get_width()
-    screen_height = screen.get_height()
+    screen_width, screen_height = screen.get_size()
 
     # Coordonnées fixes pour le bas et au centre
     draw_text(screen, f"Pointeur écran : {mouse_pos}", (screen_width // 2 - 100, screen_height - 60), font)
-    draw_text(screen, f"Position espace : ({x:.2f}, {y:.2f})", (screen_width // 2 - 150, screen_height - 40), font)
+    draw_text(screen, f"Position espace : ({mouseSpacePos[0]:.2f}, {mouseSpacePos[1]:.2f})", (screen_width // 2 - 150, screen_height - 40), font)
     draw_text(screen, 
               f"Vecteur de norme : ({attraction_vector_sum[0]:.2e}, {attraction_vector_sum[1]:.2e})", 
               (screen_width // 2 - 200, screen_height - 20), font)
