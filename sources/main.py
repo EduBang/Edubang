@@ -1,5 +1,6 @@
 from json import load as loadJson
 from os import listdir, path, environ
+from platform import system
 from sys import exit
 from math import pi
 from importlib import util
@@ -72,6 +73,7 @@ with proto("Game") as Game:
         self.musics = []
         self.music = None
         self.screen = screen
+        self.os = system()
 
         ws = [w for w in listdir("sources/window") if path.isfile(path.join("sources/window", w))]
         for w in ws:

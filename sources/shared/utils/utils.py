@@ -28,6 +28,16 @@ UNICODES: dict[int, str] = {
     0x400000e0: "ctrl"
 }
 
+UNICODES_DARWIN: dict[int, str] = {
+    0x31: "espace",
+    0x37: "alt",
+    0x3b: "cmd"
+}
+
+Game.ctrl = pg.KMOD_LCTRL if Game.os == "Windows" else pg.KMOD_META
+C_UNICODES = UNICODES if Game.os == "Windows" else UNICODES_DARWIN
+fnKeys: tuple = (0x400000e2 if Game.os == "Windows" else 0x37, 0x400000e0 if Game.os == "Windows" else 0x3b)
+
 SCROLL_SPEED: int = 20
 
 with proto("Button") as Button:
@@ -251,14 +261,14 @@ with proto("KeyBind") as KeyBind:
             self.keys = []
             self.keyname = []
             mods = pg.key.get_mods()
-            if mods & pg.KMOD_LCTRL:
-                self.keyname.append("ctrl")
-                self.keys.append(0x400000e0)
+            if mods & Game.ctrl:
+                self.keyname.append("ctrl" if Game.os == "Windows" else "cmd")
+                self.keys.append(fnKeys[1])
             if mods & pg.KMOD_LALT:
                 self.keyname.append("alt")
-                self.keys.append(0x400000e2)
-            if event.key not in [0x400000e0, 0x400000e2]:
-                self.keyname.append("espace" if event.key in UNICODES else event.unicode if event.key > 0x110000 else chr(event.key))
+                self.keys.append(fnKeys[0])
+            if event.key not in fnKeys:
+                self.keyname.append("espace" if event.key in C_UNICODES else event.unicode if event.key > 0x110000 else chr(event.key))
                 self.keys.append(event.key)
                 self.focus = False
         return
@@ -279,7 +289,7 @@ with proto("KeyBind") as KeyBind:
         self.keyname = keyname
         self.position = list(position)
         self.font = Game.font
-        self.size  = [80, 40]
+        self.size  = [120, 40]
         self.draw = MethodType(drawKeyBind, self)
         self.onReleased = lambda: None
         self.onHover = onHover
