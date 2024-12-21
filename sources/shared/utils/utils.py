@@ -773,32 +773,66 @@ def draw_cinetic_energy_vector(screen, corps) -> None:
 
         pg.draw.line(screen, (255, 0, 0), (startX, startY), (endX, endY), 5)
     return
+def draw_text(screen, text, position, font, color=(255, 255, 255)):
 
-def draw_attraction_norm(screen) -> None: #  chanp gravitation = G*(mass_obj_select / d2)
+    rendered_text = font.render(text, True, color)
+    screen.blit(rendered_text, position)
+
+
+def draw_attraction_norm(screen) -> None:
+
+    # Récupérer la position de la souris
     mouse_pos: tuple[int, int] = pg.mouse.get_pos()
-    # print(f"Pointeur : {mouse_pos}")
 
-    attraction_vector_sum: tuple[int, int] = mouse_pos
+    # Initialisation du vecteur résultant (au départ centré sur la souris)
+    attraction_vector_sum: tuple[float, float] = (0.0, 0.0)
 
-    x: int = (Game.Camera.x + mouse_pos[0]) / Game.Camera.zoom #simule la position du pointeur dans l'espace
-    y: int = (Game.Camera.y + mouse_pos[1]) / Game.Camera.zoom
-    # print(f"Simu : {x, y}")
+    # Conversion de la position écran vers la position espace
+    x: float = (mouse_pos[0] - 1280 / 2) / Game.Camera.zoom + Game.Camera.x
+    y: float = (mouse_pos[1] - 720 / 2) / Game.Camera.zoom + Game.Camera.y
 
+    # Constante gravitationnelle
+    G = 6.67430e-11
 
-
+    # Calcul de l'attraction gravitationnelle pour chaque corps
     for corps in Game.space:
         unit_vector: tuple[float, float] = Vectors.get_unit_vector((x, y), corps.pos)
-        attraction_norm = G * (corps.mass / (Vectors.get_distance((x, y), corps.pos) * 1000 / Game.Camera.zoom) ** 2)
-        attraction_vector = (unit_vector[0] * attraction_norm, unit_vector[1] * attraction_norm)
-        attraction_vector_sum = (attraction_vector_sum[0] + attraction_vector[0], attraction_vector_sum[1] + attraction_vector[1])
+        distance = Vectors.get_distance((x, y), corps.pos)
 
-    endX: float = (attraction_vector_sum[0] + Game.Camera.x / Game.Camera.zoom) * Game.Camera.zoom # je fais des tests pour voir si l'affichage fonctionne... pas encore a l'échelle
+        if distance > 0:  # Éviter la division par zéro
+            attraction_norm = G * (corps.mass / ((distance * 1000 / Game.Camera.zoom) ** 2))
+        else:
+            attraction_norm = 0
+
+        attraction_vector = (
+            unit_vector[0] * attraction_norm,
+            unit_vector[1] * attraction_norm
+        )
+
+        attraction_vector_sum = (
+            attraction_vector_sum[0] + attraction_vector[0],
+            attraction_vector_sum[1] + attraction_vector[1]
+        )
+
+    # Calcul des coordonnées de la fin du vecteur résultant (espace -> écran)
+    endX: float = (attraction_vector_sum[0] + Game.Camera.x / Game.Camera.zoom) * Game.Camera.zoom
     endY: float = (attraction_vector_sum[1] + Game.Camera.y / Game.Camera.zoom) * Game.Camera.zoom
-        
-    pg.draw.line(screen, (255, 255, 255), (mouse_pos[0], mouse_pos[1]), (endX, endY), 5)
-    
 
-   
+
+    pg.draw.line(screen, (255, 255, 255), mouse_pos, (endX, endY), 5)
+
+    
+    font = pg.font.Font(None, 24)
+    screen_width = screen.get_width()
+    screen_height = screen.get_height()
+
+    # Coordonnées fixes pour le bas et au centre
+    draw_text(screen, f"Pointeur écran : {mouse_pos}", (screen_width // 2 - 100, screen_height - 60), font)
+    draw_text(screen, f"Position espace : ({x:.2f}, {y:.2f})", (screen_width // 2 - 150, screen_height - 40), font)
+    draw_text(screen, 
+              f"Vecteur de norme : ({attraction_vector_sum[0]:.2e}, {attraction_vector_sum[1]:.2e})", 
+              (screen_width // 2 - 200, screen_height - 20), font)
+
 # endregion
 
 # region Converter
