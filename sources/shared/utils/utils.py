@@ -780,6 +780,43 @@ def draw_text(screen, text, position, font, color=(255, 255, 255)):
 
 font = pg.font.Font(None, 24)
 
+def draw_attraction_norm2(screen) -> None:
+    attractionVectorSum = mouseSpacePos = screenPosToSpacePos(pg.mouse.get_pos())
+
+    k: int = 1e9
+
+    for corps in Game.space:
+        attraction_norm: float = .0
+        unit_vector: tuple[float, float] = Vectors.get_unit_vector(mouseSpacePos, corps.pos)
+        distance = Vectors.get_distance(mouseSpacePos, corps.pos)
+
+        if distance > 0:  # Éviter la division par zéro
+            attraction_norm = G * (corps.mass / ((distance * 1000 / Game.Camera.zoom) ** 2))
+
+        attraction_vector = (
+            unit_vector[0] * attraction_norm,
+            unit_vector[1] * attraction_norm
+        )
+
+        attractionVectorSum = (
+            attractionVectorSum[0] + attraction_vector[0] * k,
+            attractionVectorSum[1] + attraction_vector[1] * k
+        )
+
+    pg.draw.line(screen, (255, 255, 255), spacePosToScreenPos(mouseSpacePos), spacePosToScreenPos(attractionVectorSum), 5)
+
+    AVS = spacePosToScreenPos(attractionVectorSum)
+    MSP = spacePosToScreenPos(mouseSpacePos)
+
+    longueur = (((AVS[0] - MSP[0]) ** 2 + (AVS[1] - MSP[1]) ** 2) ** .5)
+
+    screen_width, screen_height = screen.get_size()
+
+    # Coordonnées fixes pour le bas et au centre
+    draw_text(screen, f"Pointeur écran : {spacePosToScreenPos(mouseSpacePos)}", (screen_width // 2 - 100, screen_height - 60), font)
+    draw_text(screen, f"Position espace : ({mouseSpacePos[0]:.2f}, {mouseSpacePos[1]:.2f})", (screen_width // 2 - 150, screen_height - 40), font)
+    draw_text(screen, f"longueur de norme : {longueur}", (screen_width // 2 - 200, screen_height - 20), font)
+
 def draw_attraction_norm(screen) -> None:
 
     # Récupérer la position de la souris
@@ -832,13 +869,13 @@ def draw_attraction_norm(screen) -> None:
 # region Converter
 
 def screenPosToSpacePos(pos: tuple[float, float]) -> tuple[float, float]:
-    x: float = (Game.Camera.x + pos[0]) / Game.Camera.zoom
-    y: float = (Game.Camera.y + pos[1]) / Game.Camera.zoom
+    x: float = (pos[0] - Game.Camera.x) / Game.Camera.zoom
+    y: float = (pos[1] - Game.Camera.y) / Game.Camera.zoom
     return (x, y)
 
 def spacePosToScreenPos(pos: tuple[float, float]) -> tuple[float, float]:
-    x: float = (pos[0] + Game.Camera.x / Game.Camera.zoom) * Game.Camera.zoom
-    y: float = (pos[1] + Game.Camera.y / Game.Camera.zoom) * Game.Camera.zoom
+    x: float = (pos[0] * Game.Camera.zoom) + Game.Camera.x
+    y: float = (pos[1] * Game.Camera.zoom) + Game.Camera.y
     return (x, y)
 
 # endregion
