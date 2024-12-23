@@ -163,6 +163,14 @@ with proto("Game") as Game:
         pg.mixer.music.play()
         return
 
+    @Game
+    def getHeaviest(self):
+        c, m = self.space[0], self.space[0].mass
+        for corps in self.space:
+            if corps.mass > m:
+                c, m = corps, corps.mass
+        return c
+
 
 with proto("CameraHandler") as CameraHandler:
     @CameraHandler

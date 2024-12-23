@@ -16,13 +16,14 @@ from shared.utils.utils import (
     Button, SizeViewer, loadSpace,
     loadStars, draw_velocity_vector,
     draw_cinetic_energy_vector, draw_attraction_norm2, scientificNotation,
-    spacePosToScreenPos
+    spacePosToScreenPos, orbitalPeriod
 )
 from shared.components.Corps import Corps
 from shared.components.Captors import Captors
 from shared.components.Prediction import Prediction
 from shared.components.Spaceship import Space_ship
 from shared.components.Physics import G
+from shared.components.Vectors import Vectors
 
 dk = DataKeeper()
 dk.pause = False
@@ -213,6 +214,10 @@ def loader() -> None:
     venus.name = "Vénus"
     terre = Corps(5.9736e24, 6371.008, (149_597_887.5 , 0), (0, 0, 255), 0, -29.783 * C_EDUBANG)
     terre.name = "Terre"
+
+    # lune = Corps(7.3477e22, 1736, (149_597_887.5 + 384_399 , 0), (255, 255, 255), 0, (-29.783 - 1.022) * C_EDUBANG)
+    # lune.name = "Lune"
+
     mars = Corps(6.4185e23, 3389.5, (227_944_000, 0), (255, 50, 50), 0, -24.080 * C_EDUBANG)
     mars.name = "Mars"
     jupiter = Corps(1.8986e27, 69911, (778_340_000, 0), (255, 255, 230), 0, -13.0585 * C_EDUBANG)
@@ -232,6 +237,7 @@ def loader() -> None:
     Game.space.append(mercure)
     Game.space.append(venus)
     Game.space.append(terre)
+    # Game.space.append(lune)
     Game.space.append(mars)
     Game.space.append(jupiter)
     Game.space.append(saturne)
@@ -361,9 +367,15 @@ def stats(corps) -> None:
     text = subtitle.render("Caractéristiques orbitaux", False, (255, 255, 255))
     screen.blit(text, (width - 330, 210))
 
+    heaviest = Game.getHeaviest()
+    d = Vectors.get_distance(corps.pos, heaviest.pos)
+    days: float = round(orbitalPeriod(heaviest.mass, d), 2)
+    text = Game.font.render("Période de révolution : %s jours" % days, False, (255, 255, 255))
+    screen.blit(text, (width - 330, 240))
+
     velocity: float = round(((corps.velocity[0] / C_EDUBANG) ** 2 + (corps.velocity[1] / C_EDUBANG) ** 2) ** .5, 3)
     text = Game.font.render("Vitesse orbitale : %s km/s" % velocity, False, (255, 255, 255))
-    screen.blit(text, (width - 330, 240))
+    screen.blit(text, (width - 330, 270))
 
     text = subtitle.render("Caractéristiques physiques", False, (255, 255, 255))
     screen.blit(text, (width - 330, 500))

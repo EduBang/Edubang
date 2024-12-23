@@ -622,6 +622,16 @@ with proto("SizeViewer") as SizeViewer:
 
 # Fonction permettant de mettre à jour la postion entre 2 corps.
 def updateCorps(a, b) -> float:
+    """
+    Met à jour la position de 2 corps en fonction de leur masse et de leur distance.
+
+    Arguments : 
+        a (Corps): Premier corps
+        b (Corps): Deuxième corps
+    
+    Retourne :
+        float : Distance entre les 2 corps
+    """
     distance: float = Vectors.get_distance(a.pos, b.pos)
     attraction: float = Physics.get_attraction(a.mass, b.mass, distance)
     unitVectorA: tuple[float] = Vectors.get_unit_vector(a.pos, b.pos)
@@ -635,6 +645,16 @@ def updateCorps(a, b) -> float:
 
 # Fonction permettant de mélanger les couleurs de 2 corps selon la surface
 def mergeColor(a, b) -> tuple[int, int, int]:
+    """
+    Fusionne la couleur de 2 corps en fonction de leur surface.
+
+    Arguments : 
+        a (Corps): Premier corps
+        b (Corps): Deuxième corps
+    
+    Retourne :
+        tuple[int, int, int] : Couleur résultant de la fusion
+    """
     # C'est un calcul de moyenne pondérée
     surfaceA: float = pi * a.radius ** 2
     surfaceB: float = pi * b.radius ** 2
@@ -645,6 +665,16 @@ def mergeColor(a, b) -> tuple[int, int, int]:
 
 # Fonction permettant de fusionner le nom de 2 astres selon leur masse
 def mergeNames(d1: tuple[int, str], d2: tuple[int, str]) -> str:
+    """
+    Fusionne le nom de 2 corps en fonction de leur masse.
+
+    Arguments : 
+        d1 (tuple[int, str]): Métadonnée du premier corps
+        d2 (tuple[int, str]): Métadonnée du deuxième corps
+    
+    Retourne :
+        str : Nom résultant de la fusion
+    """
     m1, n1 = d1
     m2, n2 = d2
     mass: int = m1 + m2
@@ -660,6 +690,17 @@ def mergeNames(d1: tuple[int, str], d2: tuple[int, str]) -> str:
     return result
 
 def processMergingNames(a, b, c) -> None:
+    """
+    Procède la fusion des noms
+
+    Arguments : 
+        a (Corps): Premier corps
+        b (Corps): Deuxième corps
+        c (Corps): Corps résultant
+    
+    Retourne :
+        None
+    """
     aName = getattr(a, "name", None)
     bName = getattr(b, "name", None)
     c.name = aName or bName
@@ -668,9 +709,19 @@ def processMergingNames(a, b, c) -> None:
         x2 = b if x1 == a else a
         dominationIndex: float = x2.mass * 100 / x1.mass
         c.name = x1 if 10 < dominationIndex else mergeNames((x1.mass, x1.name), (x2.mass, x2.name))
-        return
+    return
 
 def mergeEnergy(d1: EnergyInfos, d2: EnergyInfos) -> tuple[float, float]:
+    """
+    Fusionne les énergies cinétiques de 2 corps.
+
+    Arguments : 
+        d1 (EnergyInfos): Informations énergétiques du premier corps
+        d2 (EnergyInfos): Informations énergétiques du deuxième corps
+    
+    Retourne :
+        tuple[float, float] : Energie cinétique résultante
+    """
     mass: int = d1[0] + d2[0]
 
     cineticEnergyCorps1: float = Physics.get_cinetic_energy(d1[0], Physics.get_velocity(d1[1], d1[2], Game.DT))
@@ -691,6 +742,16 @@ def mergeEnergy(d1: EnergyInfos, d2: EnergyInfos) -> tuple[float, float]:
     return (x, y)
 
 def process_collide(corps1, corps2):
+    """
+    Procède la fusion de 2 corps
+
+    Arguments : 
+        corps1 (Corps): Premier corps
+        corps2 (Corps): Deuxième corps
+    
+    Retourne :
+        Corps : Corps à supprimer de la simulation
+    """
     x, y = mergeEnergy((corps1.mass, corps1.pos, corps1.path[-1]), (corps2.mass, corps2.pos, corps2.path[-1]))
 
     mass: int = corps1.mass + corps2.mass
@@ -717,6 +778,15 @@ def process_collide(corps1, corps2):
 # region Fond espace
 
 def loadSpace(perlin) -> tuple[dict[tuple, tuple], int]:
+    """
+    Charge un espace selon un bruit de Perlin.
+
+    Arguments : 
+        perlin (Perlin): Bruit de Perlin
+    
+    Retourne :
+        tuple[dict[tuple, tuple], int] : Espace généré
+    """
     galaxy = {}
 
     # Code qui génère les amas de galaxies
@@ -731,6 +801,16 @@ def loadSpace(perlin) -> tuple[dict[tuple, tuple], int]:
     return (galaxy, perlin.size)
 
 def loadStars(n: int = 100, position: tuple[int, int] = (-1000, 1000)) -> list[tuple[int, int]]:
+    """
+    Charge les étoiles de l'espace.
+
+    Arguments : 
+        n (int): Nombre d'étoiles
+        position (tuple[int, int]): Plage de position possible de génération
+    
+    Retourne :
+        list[tuple[int, int]] : Etoiles générées
+    """
     stars = []
     for i in range(n):
         stars.append((randint(position[0], position[1]), randint(position[0], position[1])))
@@ -871,11 +951,29 @@ def draw_attraction_norm(screen) -> None:
 # region Converter
 
 def screenPosToSpacePos(pos: tuple[float, float]) -> tuple[float, float]:
+    """
+    Convertit une position écran en position espace.
+
+    Arguments : 
+        pos (tuple[float, float]): Position à convetir
+    
+    Retourne :
+        tuple[float, float] : Position convertie
+    """
     x: float = (pos[0] - Game.Camera.x) / Game.Camera.zoom
     y: float = (pos[1] - Game.Camera.y) / Game.Camera.zoom
     return (x, y)
 
 def spacePosToScreenPos(pos: tuple[float, float]) -> tuple[float, float]:
+    """
+    Convertit une position espace en position écran.
+
+    Arguments : 
+        pos (tuple[float, float]): Position à convetir
+    
+    Retourne :
+        tuple[float, float] : Position convertie
+    """
     x: float = (pos[0] * Game.Camera.zoom) + Game.Camera.x
     y: float = (pos[1] * Game.Camera.zoom) + Game.Camera.y
     return (x, y)
@@ -896,7 +994,18 @@ def updateSpaceship(a, b) -> float:
     b.update_position(accB, Game.deltaTime * Game.timeScale)
     return distance
 
-def scientificNotation(value, position, *, end: str | None = None) -> None:
+def scientificNotation(value: float | int, position: tuple[int, int], *, end: str | None = None) -> None:
+    """
+    Affiche une valeur en notation scientifique.
+
+    Arguments : 
+        value (float | int): Valeur à afficher en notation scientifique.
+        position (tuple[int, int]): Position de l'affichage.
+        end (str | None): Texte à afficher à la fin de la notation scientifique.
+    
+    Retourne :
+        None
+    """
     strMass: list[str, str] = value.__str__().split("e")
     mantisse: str = strMass[0]
     exponent: str = strMass[1][1:]
@@ -915,5 +1024,20 @@ def scientificNotation(value, position, *, end: str | None = None) -> None:
         text = Game.font.render(end, False, (255, 255, 255))
         Game.screen.blit(text, (position[0] + w1 + w2, position[1]))
     return
+
+def orbitalPeriod(mass: float | int, semimajorAxe: float | int) -> float:
+    """
+    Calcule la période orbitale d'un corps autour d'un autre.
+    Formule selon la troisième loi de Kepler.
+
+    Arguments : 
+        mass (float | int): Masse du corps principal en kg.
+        semimajorAxe (float | int): Demi-grand axe de l'orbite en km.
+    
+    Retourne :
+        float : La période orbitale en jours.
+    """
+    return (2 * pi * ((semimajorAxe * 1e3) ** 3 / (G * mass)) ** .5) / 86400
+
 
 # endregion
