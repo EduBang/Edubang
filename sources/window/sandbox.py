@@ -15,12 +15,13 @@ from shared.utils.utils import (
     Input, Text, CheckBox,
     Button, SizeViewer, loadSpace,
     loadStars, draw_velocity_vector,
-    draw_cinetic_energy_vector, draw_attraction_norm, scientificNotation
+    draw_cinetic_energy_vector, draw_attraction_norm2, scientificNotation
 )
 from shared.components.Corps import Corps
 from shared.components.Captors import Captors
 from shared.components.Prediction import Prediction
 from shared.components.Spaceship import Space_ship
+from shared.components.Physics import G
 
 dk = DataKeeper()
 dk.pause = False
@@ -359,7 +360,7 @@ def stats(corps) -> None:
     text = subtitle.render("Caractéristiques orbitaux", False, (255, 255, 255))
     screen.blit(text, (width - 330, 210))
 
-    velocity = round(((corps.velocity[0] / C_EDUBANG) ** 2 + (corps.velocity[1] / C_EDUBANG) ** 2) ** .5, 3)
+    velocity: float = round(((corps.velocity[0] / C_EDUBANG) ** 2 + (corps.velocity[1] / C_EDUBANG) ** 2) ** .5, 3)
     text = Game.font.render("Vitesse orbitale : %s km/s" % velocity, False, (255, 255, 255))
     screen.blit(text, (width - 330, 240))
 
@@ -371,8 +372,11 @@ def stats(corps) -> None:
 
     text = Game.font.render("Masse :", False, (255, 255, 255))
     screen.blit(text, (width - 330, 560))
-
     scientificNotation(corps.mass, (width - 267, 560), end="kg")
+
+    surfaceGravity: float = round((G * corps.mass) / ((corps.radius * 1e3) ** 2), 3)
+    text = Game.font.render("Gravité de surface : %s m/s²" % surfaceGravity, False, (255, 255, 255))
+    screen.blit(text, (width - 330, 590))
     return
 
 def draw(screen) -> None:
@@ -437,7 +441,7 @@ def draw(screen) -> None:
         # draw_cinetic_energy_vector(screen, corps)
 
     if showAttractionNorm:
-        draw_attraction_norm(screen)
+        draw_attraction_norm2(screen)
 
     if showPrediction:
         Prediction.predict(Game, 20)

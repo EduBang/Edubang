@@ -778,44 +778,46 @@ def draw_text(screen, text, position, font, color=(255, 255, 255)):
     screen.blit(rendered_text, position)
     return
 
-font = pg.font.Font(None, 24)
-
 def draw_attraction_norm2(screen) -> None:
-    attractionVectorSum = mouseSpacePos = screenPosToSpacePos(pg.mouse.get_pos())
-
-    k: int = 1e9
+    attractionVectorSum = mouseSpacePos = AVS = screenPosToSpacePos(pg.mouse.get_pos())
 
     for corps in Game.space:
         attraction_norm: float = .0
         unit_vector: tuple[float, float] = Vectors.get_unit_vector(mouseSpacePos, corps.pos)
-        distance = Vectors.get_distance(mouseSpacePos, corps.pos)
+        distance: float = Vectors.get_distance(mouseSpacePos, corps.pos)
 
-        if distance > 0:  # Éviter la division par zéro
-            attraction_norm = G * (corps.mass / ((distance * 1000 / Game.Camera.zoom) ** 2))
+        if distance > 0:
+            attraction_norm: float = (G * corps.mass) / ((distance * 1e3) ** 2)
 
-        attraction_vector = (
+        attraction_vector: tuple[float, float] = (
             unit_vector[0] * attraction_norm,
             unit_vector[1] * attraction_norm
         )
 
-        attractionVectorSum = (
-            attractionVectorSum[0] + attraction_vector[0] * k,
-            attractionVectorSum[1] + attraction_vector[1] * k
+        attractionVectorSum: tuple[float, float] = (
+            attractionVectorSum[0] + attraction_vector[0] * 1e3,
+            attractionVectorSum[1] + attraction_vector[1] * 1e3
         )
 
-    pg.draw.line(screen, (255, 255, 255), spacePosToScreenPos(mouseSpacePos), spacePosToScreenPos(attractionVectorSum), 5)
+        AVS: tuple[float, float] = (
+            AVS[0] + attraction_vector[0],
+            AVS[1] + attraction_vector[1]
+        )
 
-    AVS = spacePosToScreenPos(attractionVectorSum)
-    MSP = spacePosToScreenPos(mouseSpacePos)
+    MSP: tuple[float, float] = spacePosToScreenPos(mouseSpacePos)
 
-    longueur = (((AVS[0] - MSP[0]) ** 2 + (AVS[1] - MSP[1]) ** 2) ** .5)
+    pg.draw.line(screen, (255, 255, 255), MSP, spacePosToScreenPos(attractionVectorSum), 5)
 
-    screen_width, screen_height = screen.get_size()
+    valeur: float = round(((AVS[0] - mouseSpacePos[0]) ** 2 + (AVS[1] - mouseSpacePos[1]) ** 2) ** .5, 2)
 
-    # Coordonnées fixes pour le bas et au centre
-    draw_text(screen, f"Pointeur écran : {spacePosToScreenPos(mouseSpacePos)}", (screen_width // 2 - 100, screen_height - 60), font)
-    draw_text(screen, f"Position espace : ({mouseSpacePos[0]:.2f}, {mouseSpacePos[1]:.2f})", (screen_width // 2 - 150, screen_height - 40), font)
-    draw_text(screen, f"longueur de norme : {longueur}", (screen_width // 2 - 200, screen_height - 20), font)
+    x, y = MSP
+    pg.draw.line(screen, (255, 255, 255), (x + 4, y - 4), (x + 16, y - 16), 1)
+    surface = Game.font.render("%s m/s²" % valeur, False, (255, 255, 255))
+    screen.blit(surface, (x + 18, y - 30))
+
+    return
+
+font = pg.font.Font(None, 24)
 
 def draw_attraction_norm(screen) -> None:
 
