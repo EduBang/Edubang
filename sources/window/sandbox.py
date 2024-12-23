@@ -15,7 +15,8 @@ from shared.utils.utils import (
     Input, Text, CheckBox,
     Button, SizeViewer, loadSpace,
     loadStars, draw_velocity_vector,
-    draw_cinetic_energy_vector, draw_attraction_norm2, scientificNotation
+    draw_cinetic_energy_vector, draw_attraction_norm2, scientificNotation,
+    spacePosToScreenPos
 )
 from shared.components.Corps import Corps
 from shared.components.Captors import Captors
@@ -427,9 +428,7 @@ def draw(screen) -> None:
         corps.draw(screen, Game.Camera)
         if showNames:
             if hasattr(corps, "name") and pi * (corps.radius * Game.Camera.zoom) ** 2 < 10:
-                camera = Game.Camera
-                x = (corps.pos[0] + camera.x / camera.zoom) * camera.zoom
-                y = (corps.pos[1] + camera.y / camera.zoom) * camera.zoom
+                x, y = spacePosToScreenPos(corps.pos)
                 pg.draw.line(screen, (255, 255, 255), (x + 4, y - 4), (x + 16, y - 16), 1)
                 surface = Game.font.render(corps.name, False, (255, 255, 255))
                 screen.blit(surface, (x + 18, y - 30))

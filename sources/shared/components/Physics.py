@@ -1,6 +1,6 @@
 from proto import proto
 
-G: float = 6.67 * 10 ** -11
+G: float = 6.67e-11
 
 with proto("Physics") as Physics:
     @Physics
