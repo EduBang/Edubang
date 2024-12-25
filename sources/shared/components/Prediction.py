@@ -37,7 +37,7 @@ with proto("Prediction") as Prediction:
                     if b["corps"] in futureCollided or a == b: continue
  
                     distance: float = Vectors.get_distance(pos, b["pos"])
-                    attraction: float = Physics.get_attraction(mass, b["mass"], distance)
+                    attraction: float = Physics.get_attraction(mass, b["mass"], distance, velocity, b["velocity"])
                     unitVector: tuple[float, float] = Vectors.get_unit_vector(pos, b["pos"])
                     acc: tuple[float, float] = (unitVector[0] * attraction / mass, unitVector[1] * attraction / mass)
 

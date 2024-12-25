@@ -18,9 +18,9 @@ pg.init()
 pg.display.set_caption("EduBang")
 icon = pg.image.load("data/images/appicon.png")
 pg.display.set_icon(icon)
-MUSIC_END_EVENT = pg.USEREVENT + 1
-buttons = []
-resolution = (1280, 720)
+MUSIC_END_EVENT: int = pg.USEREVENT + 1
+buttons: list = []
+resolution: tuple[int, int] = (1280, 720)
 screen = pg.display.set_mode((resolution), pg.RESIZABLE)
 pg.key.set_repeat(500, 50)
 
@@ -318,5 +318,4 @@ def main() -> None:
     return
 
 main()
-
 Game.quit()

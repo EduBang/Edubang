@@ -14,7 +14,7 @@ type EnergyInfos = tuple[int, tuple[int, int], tuple[int, int]]
 
 # La constante d'EduBang
 # valeur de calibrage, origine à déterminer
-C_EDUBANG = 10750
+C_EDUBANG = 10750 # 10750
 
 exponentFont = getFont("Medium", 12)
 
@@ -213,12 +213,10 @@ with proto("MessageBox") as MessageBox:
 
 with proto("KeyBind") as KeyBind:
     def drawKeyBind(self):
-        color = FOCUS_COLOR if self.focus else (255, 255, 255)
+        color: tuple[int, int, int] = FOCUS_COLOR if self.focus else (255, 255, 255)
         pg.draw.rect(Game.screen, color, pg.Rect(self.position, self.size), 0, 4)
         surface = self.font.render(" + ".join(self.keyname), False, (0, 0, 0))
-        x = self.position[0] + 10
-        y = self.position[1] + 10
-        Game.screen.blit(surface, (x, y))
+        Game.screen.blit(surface, (self.position[0] + 10, self.position[1] + 10))
         return
     
     def mousemotionKB(self, event) -> None:
@@ -236,6 +234,8 @@ with proto("KeyBind") as KeyBind:
         if button != 1: return
         if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
             self.onPressed()
+        else:
+            self.focus = False
         return
     
     def mousebuttonupKB(self, event) -> None:
@@ -244,6 +244,8 @@ with proto("KeyBind") as KeyBind:
         if button != 1: return
         if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
             self.onReleased()
+        else:
+            self.focus = False
         return
     
     def mousewheelKB(self, event) -> None:
@@ -279,7 +281,7 @@ with proto("KeyBind") as KeyBind:
 
     @KeyBind
     def onPressed(self) -> None:
-        self.focus = True
+        self.focus = not self.focus
         return
 
     @KeyBind
@@ -633,7 +635,7 @@ def updateCorps(a, b) -> float:
         float : Distance entre les 2 corps
     """
     distance: float = Vectors.get_distance(a.pos, b.pos)
-    attraction: float = Physics.get_attraction(a.mass, b.mass, distance)
+    attraction: float = Physics.get_attraction(a.mass, b.mass, distance, a.velocity, b.velocity)
     unitVectorA: tuple[float] = Vectors.get_unit_vector(a.pos, b.pos)
     unitVectorB: tuple[float] = (-unitVectorA[0], -unitVectorA[1])
     accA: tuple[float, float] = (unitVectorA[0] * attraction / a.mass, unitVectorA[1] * attraction / a.mass)
@@ -708,7 +710,7 @@ def processMergingNames(a, b, c) -> None:
         x1 = a if a.mass < b.mass else b
         x2 = b if x1 == a else a
         dominationIndex: float = x2.mass * 100 / x1.mass
-        c.name = x1 if 10 < dominationIndex else mergeNames((x1.mass, x1.name), (x2.mass, x2.name))
+        c.name = x2.name if 10 < dominationIndex else mergeNames((x1.mass, x1.name), (x2.mass, x2.name))
     return
 
 def mergeEnergy(d1: EnergyInfos, d2: EnergyInfos) -> tuple[float, float]:
@@ -984,7 +986,7 @@ def spacePosToScreenPos(pos: tuple[float, float]) -> tuple[float, float]:
 
 def updateSpaceship(a, b) -> float:
     distance: float = Vectors.get_distance(a.pos, b.pos) # pixel
-    attraction: float = Physics.get_attraction(a.mass, b.mass, distance)
+    attraction: float = Physics.get_attraction(a.mass, b.mass, distance, a.velocity, b.velocity)
     unitVectorA: tuple[float, float] = Vectors.get_unit_vector(a.pos, b.pos)
     unitVectorB: tuple[float, float] = (-unitVectorA[0], -unitVectorA[1])
     accA: tuple[float, float] = [(unitVectorA[0] * attraction / a.mass) + unitVectorA[1] * attraction / a.mass]

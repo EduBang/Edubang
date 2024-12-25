@@ -1,13 +1,28 @@
+from math import exp
+
 from proto import proto
 
-G: float = 6.67e-11
+G: float = 6.6743e-11
+c: int = 299_792_458 # m/s
+UA: float = 149_597_870.7 # km, Selon l'Union Astronomique Internationale en 2012
+
+type Velocity = tuple[float, float]
 
 with proto("Physics") as Physics:
     @Physics
-    def get_attraction(self, mass1, mass2, d) -> float:
-        if d == 0:
-            return .0
-        return G * (mass1 * mass2) / (d ** 2)
+    def getRelativeVelocity(self, v1: Velocity, v2: Velocity) -> float:
+        v1: float = (v1[0] ** 2 + v1[1] ** 2) ** .5
+        v2: float = (v2[0] ** 2 + v2[1] ** 2) ** .5
+        return (v1 ** 2 + v2 ** 2) ** .5
+
+    @Physics
+    def get_attraction(self, mass1, mass2, d, v1, v2, cutDistance: float | int = 120 * UA) -> float:
+        if 0 < d < cutDistance:
+            attenuation: float = exp(-d / cutDistance)
+            relative: float = (1 + (self.getRelativeVelocity(v1, v2) ** 2) / (c ** 2))
+            force: float = G * (mass1 * mass2) / (d ** 2)
+            return force * relative * attenuation
+        return .0
     
     @Physics
     def get_velocity(self, pos_init, pos_final, dt) -> float | int:

@@ -151,12 +151,10 @@ def draw(screen) -> None:
 
 def update() -> None:
     for corps in Game.space:
+        corps.update_position([0, 0], Game.DT)
         for otherCorps in Game.space:
             if corps == otherCorps: continue
             distance: float = updateCorps(corps, otherCorps)
             if Captors.collide(corps, otherCorps, distance):
-                removedCorps = process_collide(corps, otherCorps)
-                Game.space.remove(removedCorps)
-        
-        corps.update_position([0, 0], Game.DT)
+                Game.space.remove(process_collide(corps, otherCorps))
     return
