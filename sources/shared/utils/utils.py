@@ -1,6 +1,6 @@
 from types import MethodType
 from random import randint
-from math import pi
+from math import pi, atan2, sin, cos
 
 import pygame as pg
 
@@ -39,6 +39,8 @@ C_UNICODES = UNICODES if Game.os == "Windows" else UNICODES_DARWIN
 fnKeys: tuple = (0x400000e2 if Game.os == "Windows" else 0x37, 0x400000e0 if Game.os == "Windows" else 0x3b)
 
 SCROLL_SPEED: int = 20
+
+radian: float = pi / 180
 
 with proto("Button") as Button:
     def drawButton(self) -> None:
@@ -887,7 +889,7 @@ def draw_attraction_norm2(screen) -> None:
 
     MSP: tuple[float, float] = spacePosToScreenPos(mouseSpacePos)
 
-    pg.draw.line(screen, (255, 255, 255), MSP, spacePosToScreenPos(attractionVectorSum), 5)
+    drawArrow(MSP, spacePosToScreenPos(attractionVectorSum), l = 5)
 
     valeur: float = round(((AVS[0] - mouseSpacePos[0]) ** 2 + (AVS[1] - mouseSpacePos[1]) ** 2) ** .5, 2)
 
@@ -1041,5 +1043,27 @@ def orbitalPeriod(mass: float | int, semimajorAxe: float | int) -> float:
     """
     return (2 * pi * ((semimajorAxe * 1e3) ** 3 / (G * mass)) ** .5) / 86400
 
+def drawArrow(startPos: tuple[int, int], endPos: tuple[int, int], *, color: tuple[int, int, int] = (255, 255, 255), l: int = 2, c: int = 8) -> None:
+    """
+    Dessine une flèche
+
+    Arguments:
+        startPos (tuple[int, int]): Position de départ
+        endPos (tuple[int, int]): Position de fin
+        color (tuple[int, int, int]): Couleur de la flèche
+        l (int): Largeur de la ligne
+        c (int): Longueur des cotés du triangle
+
+    Retourne:
+        None
+    """
+    pg.draw.line(Game.screen, color, startPos, endPos, l)
+    rotation: float = (atan2(startPos[1] - endPos[1], endPos[0] - startPos[0])) + pi/2
+    pg.draw.polygon(Game.screen, color, (
+        (endPos[0] + c * sin(rotation), endPos[1] + c * cos(rotation)),
+        (endPos[0] + c * sin(rotation - 120 * radian), endPos[1] + c * cos(rotation - 120 * radian)),
+        (endPos[0] + c * sin(rotation + 120 * radian), endPos[1] + c * cos(rotation + 120 * radian)),
+    ))
+    return
 
 # endregion
