@@ -8,7 +8,7 @@ from main import Game, getFont
 from proto import proto
 from eventListen import Events
 from shared.components.Vectors import Vectors
-from shared.components.Physics import Physics, G
+from shared.components.Physics import Physics, G, c
 
 type EnergyInfos = tuple[int, tuple[int, int], tuple[int, int]]
 
@@ -636,10 +636,9 @@ def updateCorps(a, b) -> float:
     """
     distance: float = Vectors.get_distance(a.pos, b.pos)
     attraction: float = Physics.get_attraction(a.mass, b.mass, distance, a.velocity, b.velocity)
-    unitVectorA: tuple[float] = Vectors.get_unit_vector(a.pos, b.pos)
-    unitVectorB: tuple[float] = (-unitVectorA[0], -unitVectorA[1])
-    accA: tuple[float, float] = (unitVectorA[0] * attraction / a.mass, unitVectorA[1] * attraction / a.mass)
-    accB: tuple[float, float] = (unitVectorB[0] * attraction / b.mass, unitVectorB[1] * attraction / b.mass)
+    unitVector: tuple[float] = Vectors.get_unit_vector(a.pos, b.pos)
+    accA: tuple[float, float] = (unitVector[0] * attraction / a.mass, unitVector[1] * attraction / a.mass)
+    accB: tuple[float, float] = (-unitVector[0] * attraction / b.mass, -unitVector[1] * attraction / b.mass)
 
     a.update_position(accA, Game.DT)
     b.update_position(accB, Game.DT)
@@ -1008,9 +1007,10 @@ def scientificNotation(value: float | int, position: tuple[int, int], *, end: st
     Retourne :
         None
     """
-    strMass: list[str, str] = value.__str__().split("e")
-    mantisse: str = strMass[0]
-    exponent: str = strMass[1][1:]
+    strValue: list[str, str] = value.__str__().split("e")
+    mantisse: str = strValue[0][:7]
+    e: str = strValue[1] if len(strValue) > 1 else "+0"
+    exponent: str = e[1:] if e[0] == "+" else e
 
     renderedMantisse: str = "%s x 10" % mantisse
 

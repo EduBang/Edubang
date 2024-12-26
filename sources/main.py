@@ -66,6 +66,7 @@ with proto("Game") as Game:
         self.window = ""
         self.windows = {}
         self.font = getFont("Medium")
+        self.italic = getFont("MediumItalic")
         self.keybinds = {}
         self.keys = {}
         self.invertedKeybinds = {}
@@ -74,6 +75,7 @@ with proto("Game") as Game:
         self.music = None
         self.screen = screen
         self.os = system()
+        self.dmusic = []
 
         ws = [w for w in listdir("sources/window") if path.isfile(path.join("sources/window", w))]
         for w in ws:
@@ -129,6 +131,16 @@ with proto("Game") as Game:
     @Game
     def draw(self) -> None:
         self.windows[self.window][1](screen)
+        if self.dmusic and self.settings["volume"] != 0:
+            Game.dmusic[1] -= (Game.deltaTime * 2.195)
+            width, height = screen.get_size()
+            text: str = "Playing %s" % Game.dmusic[0].split("\\")[1][:-4]
+            surface = Game.italic.render(text, False, (255, 255, 255))
+            surface.set_alpha(int(255 * Game.dmusic[1] / 5))
+            tW, tH = Game.italic.size(text)
+            screen.blit(surface, (width // 2 - tW // 2, height // 2 - tH // 2 + 200))
+            if Game.dmusic[1] <= 0:
+                Game.dmusic = None
         pg.display.update()
         return
 
@@ -161,6 +173,7 @@ with proto("Game") as Game:
     def playMusic(self) -> None:
         pg.mixer.music.load(self.music)
         pg.mixer.music.play()
+        self.dmusic = [self.music, 5]
         return
 
     @Game
@@ -312,7 +325,7 @@ def main() -> None:
         # Constante de calibrage du temps
         Game.deltaTime = clock.tick(60) / 2195 # (1000 * 2.195)
         Game.DT = Game.deltaTime * Game.timeScale
-        
+
         Game.draw()
         Game.update()
     return

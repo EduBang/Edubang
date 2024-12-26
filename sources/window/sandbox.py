@@ -24,6 +24,7 @@ from shared.components.Prediction import Prediction
 from shared.components.Spaceship import Space_ship
 from shared.components.Physics import G
 from shared.components.Vectors import Vectors
+from shared.components.Relative import totalEnergy, kineticEnergy, momentum
 
 dk = DataKeeper()
 dk.pause = False
@@ -134,7 +135,7 @@ def keydown(event) -> None:
                                     (57_909_050, -47.362),
                                     (108_209_500, -35.02571),
                                     (149_597_887.5, -29.783),
-                                    # (149_597_887.5 + 384_399, -29.783 - 1.022),
+                                    # (149_597_887.5 + 384_399, -29.783 - 0.95),
                                     (227_944_000, -24.080),
                                     (778_340_000, -13.0585),
                                     # (778_340_000.5 + 421_800, -13.0585 - 11.5),
@@ -225,7 +226,7 @@ def loader() -> None:
     terre = Corps(5.9736e24, 6371.008, (149_597_887.5 , 0), (0, 0, 255), 0, -29.783 * C_EDUBANG)
     terre.name = "Terre"
 
-    lune = Corps(7.3477e22, 1736, (149_597_887.5 + 384_399 , 0), (200, 200, 200), 0, (-29.783 - 1.022) * C_EDUBANG)
+    lune = Corps(7.3477e22, 1736, (149_597_887.5 + 384_399 , 0), (200, 200, 200), 0, (-29.783 - 0.95) * C_EDUBANG)
     lune.name = "Lune"
     lune.orbit = terre
 
@@ -426,6 +427,21 @@ def stats(corps) -> None:
     velocity: float = round(((corps.velocity[0] / C_EDUBANG) ** 2 + (corps.velocity[1] / C_EDUBANG) ** 2) ** .5, 3)
     text = Game.font.render("Vitesse orbitale : %s km/s" % velocity, False, (255, 255, 255))
     screen.blit(text, (width - 330, 270))
+
+    # moment: float = momentum(corps.mass, velocity)
+    # text = Game.font.render("Momentum :", False, (255, 255, 255))
+    # screen.blit(text, (width - 330, 300))
+    # scientificNotation(moment, (width - 227, 300), end="kg")
+
+    # kinetic: float = kineticEnergy(corps.mass, velocity)
+    # text = Game.font.render("Énergie cinétique :", False, (255, 255, 255))
+    # screen.blit(text, (width - 330, 330))
+    # scientificNotation(kinetic, (width - 187, 330), end="N")
+
+    # total: float = totalEnergy(corps.mass, velocity)
+    # text = Game.font.render("Énergie totale :", False, (255, 255, 255))
+    # screen.blit(text, (width - 330, 360))
+    # scientificNotation(total, (width - 210, 360), end="N")
 
     text = subtitle.render("Caractéristiques physiques", False, (255, 255, 255))
     screen.blit(text, (width - 330, 500))

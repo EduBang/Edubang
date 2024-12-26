@@ -4,6 +4,7 @@ from proto import proto
 import pygame as pg
 
 from ..utils.utils import spacePosToScreenPos
+from .Relative import lorentzFactor
 
 with proto("Corps") as Corps:
     @Corps
@@ -33,9 +34,11 @@ with proto("Corps") as Corps:
             self.path.pop(0)
         # Mise à jour de la vitesse (conserve l'inertie)
 
+        gamma: float = lorentzFactor((self.velocity[0] ** 2 + self.velocity[1] ** 2) ** .5)
+
         # selon prgm, acc en km/s
-        self.velocity[0] += acc[0] * dt
-        self.velocity[1] += acc[1] * dt
+        self.velocity[0] += acc[0] * dt / gamma
+        self.velocity[1] += acc[1] * dt / gamma
 
         # Mise à jour de la position en fonction de la nouvelle vitesse (avec inertie)
         self.pos = (
