@@ -170,9 +170,9 @@ def keydown(event) -> None:
     else:
         mb.active = False
         
-    if key == pg.K_KP_PLUS:
+    if key == pg.K_KP_PLUS and Game.Camera.zoom < Game.Camera.maxZoom:
         Game.Camera.zoom *= 1.05
-    elif key == pg.K_KP_MINUS:
+    elif key == pg.K_KP_MINUS and Game.Camera.zoom > Game.Camera.minZoom:
         Game.Camera.zoom /= 1.05
 
     return
@@ -474,10 +474,11 @@ def draw(screen) -> None:
 
     screen.blit(image, (Game.Camera.x / 10 - size[0] // 4, Game.Camera.y / 10 - size[1] // 4))
 
-    for star in dk.stars:
-        x = int(star[0] + Game.Camera.x / 7)
-        y = int(star[1] + Game.Camera.y / 7)
-        screen.set_at((x, y), (255, 255, 255))
+    if Game.Camera.zoom < 0.3:
+        for star in dk.stars:
+            x = int(star[0] + Game.Camera.x / 7)
+            y = int(star[1] + Game.Camera.y / 7)
+            screen.set_at((x, y), (255, 255, 255))
 
     for element in interface:
         if hasattr(element, "trajectoire"):

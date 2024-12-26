@@ -20,8 +20,7 @@ icon = pg.image.load("data/images/appicon.png")
 pg.display.set_icon(icon)
 MUSIC_END_EVENT: int = pg.USEREVENT + 1
 buttons: list = []
-resolution: tuple[int, int] = (1280, 720)
-screen = pg.display.set_mode((resolution), pg.RESIZABLE)
+screen = pg.display.set_mode((1280, 720), pg.RESIZABLE)
 pg.key.set_repeat(500, 50)
 
 pg.font.init()
@@ -29,23 +28,9 @@ pg.mixer.init()
 pg.mixer.music.set_endevent(MUSIC_END_EVENT)
 
 clock = pg.time.Clock()
-FONTS: dict[str, int] = {
-    "SemiBoldItalic": "data/fonts/Open_Sans/OpenSans-SemiBoldItalic.ttf",
-    "SemiBold": "data/fonts/Open_Sans/OpenSans-SemiBold.ttf",
-    "Regular": "data/fonts/Open_Sans/OpenSans-Regular.ttf",
-    "MediumItalic": "data/fonts/Open_Sans/OpenSans-MediumItalic.ttf",
-    "Medium": "data/fonts/Open_Sans/OpenSans-Medium.ttf",
-    "LightItalic": "data/fonts/Open_Sans/OpenSans-LightItalic.ttf",
-    "Light": "data/fonts/Open_Sans/OpenSans-Light.ttf",
-    "Italic": "data/fonts/Open_Sans/OpenSans-Italic.ttf",
-    "ExtraBoldItalic": "data/fonts/Open_Sans/OpenSans-ExtraBoldItalic.ttf",
-    "ExtraBold": "data/fonts/Open_Sans/OpenSans-ExtraBold.ttf",
-    "BoldItalic": "data/fonts/Open_Sans/OpenSans-BoldItalic.ttf",
-    "Bold": "data/fonts/Open_Sans/OpenSans-Bold.ttf",
-}
 
 def getFont(font, size: int = 16) -> pg.font.Font:
-    return pg.font.Font(FONTS[font], size)
+    return pg.font.Font("data/fonts/Open_Sans/OpenSans-%s.ttf" % font, size)
 
 with proto("Game") as Game:
     @Game
@@ -56,7 +41,6 @@ with proto("Game") as Game:
 
     @Game
     def load(self) -> None:
-
         self.timeScale = 1 # seconde
         self.deltaTime = 0 # seconde
         self.DT = self.deltaTime * self.timeScale
@@ -75,7 +59,7 @@ with proto("Game") as Game:
         self.music = None
         self.screen = screen
         self.os = system()
-        self.dmusic = []
+        self.tmusic = None
 
         ws = [w for w in listdir("sources/window") if path.isfile(path.join("sources/window", w))]
         for w in ws:
@@ -131,16 +115,16 @@ with proto("Game") as Game:
     @Game
     def draw(self) -> None:
         self.windows[self.window][1](screen)
-        if self.dmusic and self.settings["volume"] != 0:
-            Game.dmusic[1] -= (Game.deltaTime * 2.195)
+        if self.tmusic and self.settings["volume"] != 0:
+            Game.tmusic -= (Game.deltaTime * 2.195)
             width, height = screen.get_size()
-            text: str = "Playing %s" % Game.dmusic[0].split("\\")[1][:-4]
+            text: str = "Playing %s" % self.music.split("\\")[1][:-4]
             surface = Game.italic.render(text, False, (255, 255, 255))
-            surface.set_alpha(int(255 * Game.dmusic[1] / 5))
+            surface.set_alpha(int(255 * Game.tmusic / 5))
             tW, tH = Game.italic.size(text)
             screen.blit(surface, (width // 2 - tW // 2, height // 2 - tH // 2 + 200))
-            if Game.dmusic[1] <= 0:
-                Game.dmusic = None
+            if Game.tmusic <= 0:
+                Game.tmusic = None
         pg.display.update()
         return
 
@@ -173,7 +157,7 @@ with proto("Game") as Game:
     def playMusic(self) -> None:
         pg.mixer.music.load(self.music)
         pg.mixer.music.play()
-        self.dmusic = [self.music, 5]
+        self.tmusic = 5
         return
 
     @Game
@@ -193,7 +177,7 @@ with proto("CameraHandler") as CameraHandler:
         self.y = 0
         self.speed = 5
         self.zoom = 0.00_000_1
-        self.maxZoom = 10_000_000
+        self.maxZoom = 300 # 10_000_000; Voir Trello
         self.minZoom = 0.00_000_01
         self.focus = None
         return
@@ -205,7 +189,7 @@ with proto("CameraHandler") as CameraHandler:
         self.y = 0
         self.speed = 5
         self.zoom = 0.00_000_1
-        self.maxZoom = 10_000_000
+        self.maxZoom = 300 # 10_000_000; Voir Trello
         self.minZoom = 0.00_000_01
         self.focus = None
         return
