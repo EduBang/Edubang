@@ -43,12 +43,12 @@ def backFunction() -> None:
     return
 
 def load() -> None:
-    backButton = Button((100, 100), (180, 60))
+    backButton = Button((100, 200), (180, 60))
     backButton.text = "Retour"
     backButton.onPressed = backFunction
     interface.append(backButton)
 
-    keybindButton = Button((100, 200), (180, 60))
+    keybindButton = Button((100, 300), (180, 60))
     keybindButton.text = "Contrôles"
     keybindButton.onPressed = goKeybind
     interface.append(keybindButton)
@@ -58,16 +58,19 @@ def load() -> None:
         f.close()
 
     for i, setting in enumerate(dk.settings):
-        sb = SlideBar((250, 200 * (i + 1) + 125))
+        sb = SlideBar((250, 300 * (i + 1) + 125))
         sb.setting = setting
         sb.value = int(dk.settings[setting])
-        text = Text(setting, (100, 200 * (i + 1) + 110), color=(255, 255, 255))
+        text = Text(setting, (100, 300 * (i + 1) + 110), color=(255, 255, 255))
         interface.append(sb)
         interface.append(text)
     return
 
 def draw(screen) -> None:
     screen.fill((0, 0 ,0))
+    surface = Game.title.render("Paramètres", False, (255, 255, 255))
+    screen.blit(surface, (100, 100))
+
     for element in interface:
         element.draw()
     return

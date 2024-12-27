@@ -8,12 +8,12 @@ from .Relative import lorentzFactor
 
 with proto("Corps") as Corps:
     @Corps
-    def new(self, mass, radius, pos, color, v_initial_x, v_initial_y) -> None:
+    def new(self, mass: int | float, radius: int, pos: tuple[int, int], color: tuple[int, int, int], v_initial: tuple[float, float]) -> None:
         self.mass = mass # kilogramme
         self.radius = radius # kilomètre
         self.pos = pos
         self.color = color
-        self.velocity = [v_initial_x, v_initial_y]  # Vitesse initiale
+        self.velocity = list(v_initial)  # Vitesse initiale
         self.path = []
         return
     

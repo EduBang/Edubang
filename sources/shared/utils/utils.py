@@ -8,13 +8,13 @@ from main import Game, getFont
 from proto import proto
 from eventListen import Events
 from shared.components.Vectors import Vectors
-from shared.components.Physics import Physics, G, c
+from shared.components.Physics import Physics, G
 
 type EnergyInfos = tuple[int, tuple[int, int], tuple[int, int]]
 
 # La constante d'EduBang
 # valeur de calibrage, origine à déterminer
-C_EDUBANG = 10750 # 10750
+C_EDUBANG: int = 10750
 
 exponentFont = getFont("Medium", 12)
 
@@ -39,8 +39,6 @@ C_UNICODES = UNICODES if Game.os == "Windows" else UNICODES_DARWIN
 fnKeys: tuple = (0x400000e2 if Game.os == "Windows" else 0x37, 0x400000e0 if Game.os == "Windows" else 0x3b)
 
 SCROLL_SPEED: int = 20
-
-radian: float = pi / 180
 
 with proto("Button") as Button:
     def drawButton(self) -> None:
@@ -714,7 +712,7 @@ def processMergingNames(a, b, c) -> None:
         c.name = x2.name if 10 < dominationIndex else mergeNames((x1.mass, x1.name), (x2.mass, x2.name))
     return
 
-def mergeEnergy(d1: EnergyInfos, d2: EnergyInfos) -> tuple[float, float]:
+def mergeEnergy(d1: EnergyInfos, d2: EnergyInfos) -> list[float, float]:
     """
     Fusionne les énergies cinétiques de 2 corps.
 
@@ -742,7 +740,7 @@ def mergeEnergy(d1: EnergyInfos, d2: EnergyInfos) -> tuple[float, float]:
     x: float = (sumVectorCineticEnergyCorps1[0] + sumVectorCineticEnergyCorps2[0]) / mass
     y: float = (sumVectorCineticEnergyCorps1[1] + sumVectorCineticEnergyCorps2[1]) / mass
 
-    return (x, y)
+    return [x, y]
 
 def process_collide(corps1, corps2):
     """
@@ -986,7 +984,7 @@ def spacePosToScreenPos(pos: tuple[float, float]) -> tuple[float, float]:
 # region Autre
 
 def updateSpaceship(a, b) -> float:
-    distance: float = Vectors.get_distance(a.pos, b.pos) # pixel
+    distance: float = Vectors.get_distance(a.pos, b.pos)
     attraction: float = Physics.get_attraction(a.mass, b.mass, distance, a.velocity, b.velocity)
     unitVectorA: tuple[float, float] = Vectors.get_unit_vector(a.pos, b.pos)
     unitVectorB: tuple[float, float] = (-unitVectorA[0], -unitVectorA[1])
@@ -1009,7 +1007,7 @@ def scientificNotation(value: float | int, position: tuple[int, int], *, end: st
     Retourne :
         None
     """
-    strValue: list[str, str] = value.__str__().split("e")
+    strValue: list[str, str] = str(value).split("e")
     mantisse: str = strValue[0][:7]
     e: str = strValue[1] if len(strValue) > 1 else "+0"
     exponent: str = e[1:] if e[0] == "+" else e
@@ -1021,11 +1019,11 @@ def scientificNotation(value: float | int, position: tuple[int, int], *, end: st
     Game.screen.blit(text, (position[0], position[1]))
     
     text = exponentFont.render(exponent, False, (255, 255, 255))
-    w2, h2 = Game.font.size(exponent)
     Game.screen.blit(text, (position[0] + w1, position[1] - 3))
 
     if end:
         text = Game.font.render(end, False, (255, 255, 255))
+        w2, h2 = Game.font.size(exponent)
         Game.screen.blit(text, (position[0] + w1 + w2, position[1]))
     return
 
@@ -1057,13 +1055,32 @@ def drawArrow(startPos: tuple[int, int], endPos: tuple[int, int], *, color: tupl
     Retourne:
         None
     """
-    pg.draw.line(Game.screen, color, startPos, endPos, l)
     rotation: float = (atan2(startPos[1] - endPos[1], endPos[0] - startPos[0])) + pi/2
+    k: float = 2 * pi / 3
+    pg.draw.line(Game.screen, color, startPos, endPos, l)
     pg.draw.polygon(Game.screen, color, (
         (endPos[0] + c * sin(rotation), endPos[1] + c * cos(rotation)),
-        (endPos[0] + c * sin(rotation - 120 * radian), endPos[1] + c * cos(rotation - 120 * radian)),
-        (endPos[0] + c * sin(rotation + 120 * radian), endPos[1] + c * cos(rotation + 120 * radian)),
+        (endPos[0] + c * sin(rotation - k), endPos[1] + c * cos(rotation - k)),
+        (endPos[0] + c * sin(rotation + k), endPos[1] + c * cos(rotation + k)),
     ))
     return
+
+def getAttractor(corps):
+    """
+    Récupère l'astre qui attire le plus un astre.
+
+    Arguments:
+        corps (Corps): Astre cible
+
+    Retourne:
+        Corps: Astre attracteur
+    """
+    attractors: dict = {}
+    for c in Game.space:
+        if c == corps: continue
+        distance: float = Vectors.get_distance(c.pos, corps.pos)
+        attraction: float = Physics.get_attraction(c.mass, corps.mass, distance, c.velocity, corps.velocity)
+        attractors[attraction] = c
+    return attractors[max(attractors)]
 
 # endregion

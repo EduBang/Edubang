@@ -1,5 +1,5 @@
 from proto import proto
-from math import cos, sin, radians, pi
+from math import cos, sin, radians
 
 with proto("Angles") as Angles:
     @Angles

@@ -45,7 +45,7 @@ def backFunction() -> None:
     return
 
 def load() -> None:
-    backButton = Button((600, 100), (180, 60))
+    backButton = Button((100, 200), (180, 60))
     backButton.text = "Retour"
     backButton.onPressed = backFunction
     interface.append(backButton)
@@ -56,17 +56,17 @@ def load() -> None:
         with open(keybindFile, "r", encoding="utf-8") as f:
             keybinds = loadJson(f)
             f.close()
-        title = Text(keybindFile.split("\\")[1][:-5], (200, 100 * ((i * 8) + 1)), color=(255, 255, 255))
+        title = Text(keybindFile.split("\\")[1][:-5], (500, 100 * ((i * 8) + 1)), color=(255, 255, 255))
         title.font = getFont("Bold", 24)
         title.scrollable = True
         interface.append(title)
         for j, k in enumerate(keybinds):
             keybind = keybinds[k]
-            kb = KeyBind(keybind["code"], keybind["key"], (400, 100 * (j + (i * 8) + 1) + 60))
+            kb = KeyBind(keybind["code"], keybind["key"], (700, 100 * (j + (i * 8) + 1) + 60))
             kb.kb = (k, keybind)
             kb.file = keybindFile
             kb.scrollable = True
-            text = Text(keybind["name"], (100, 100 * (j + (i * 8) + 1) + 70), color=(255, 255, 255))
+            text = Text(keybind["name"], (400, 100 * (j + (i * 8) + 1) + 70), color=(255, 255, 255))
             text.scrollable = True
             interface.append(kb)
             interface.append(text)
@@ -74,6 +74,9 @@ def load() -> None:
 
 def draw(screen) -> None:
     screen.fill((0, 0 ,0))
+    surface = Game.title.render("Contrôles", False, (255, 255, 255))
+    screen.blit(surface, (100, 100))
+
     for element in interface:
         element.draw()
     return

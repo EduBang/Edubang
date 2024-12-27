@@ -1,0 +1,96 @@
+{
+    "title": "Solar System",
+    "description": "Our solar system.",
+    "space": [
+        {
+            "mass": 1.9885e30,
+            "radius": 696342,
+            "position": [0, 0],
+            "color": [255, 255, 0],
+            "velocity": [0, 0],
+            "meta": {
+                "name": "Sun"
+            }
+        },
+        {
+            "mass": 3.3011e23,
+            "radius": 2439.7,
+            "position": [57909050, 0],
+            "color": [127, 127, 127],
+            "velocity": [0, -509141.5],
+            "meta": {
+                "name": "Mercury"
+            }
+        },
+        {
+            "mass": 4.8675e24,
+            "radius": 6051.8,
+            "position": [108209500, 0],
+            "color": [255, 127, 127],
+            "velocity": [0, -376526.3825],
+            "meta": {
+                "name": "Venus"
+            }
+        },
+        {
+            "mass": 5.9736e24,
+            "radius": 6371.008,
+            "position": [149597887.5, 0],
+            "color": [0, 0, 255],
+            "velocity": [0, -320167.25],
+            "meta": {
+                "name": "Earth"
+            }
+        },
+        {
+            "mass": 6.4185e23,
+            "radius": 3389.5,
+            "position": [227944000.5, 0],
+            "color": [255, 50, 50],
+            "velocity": [0, -258860],
+            "meta": {
+                "name": "Mars"
+            }
+        },
+        {
+            "mass": 1.8986e27,
+            "radius": 69911,
+            "position": [778340000, 0],
+            "color": [252, 201, 129],
+            "velocity": [0, -140378.875],
+            "meta": {
+                "name": "Jupiter"
+            }
+        },
+        {
+            "mass": 5.6846e26,
+            "radius": 58232,
+            "position": [1426700000, 0],
+            "color": [230, 177, 124],
+            "velocity": [0, -103637.525],
+            "meta": {
+                "name": "Saturn"
+            }
+        },
+        {
+            "mass": 8.681e25,
+            "radius": 25362,
+            "position": [2870700000, 0],
+            "color": [100, 100, 200],
+            "velocity": [0, -73064.869],
+            "meta": {
+                "name": "Uranus"
+            }
+        },
+        {
+            "mass": 1.0243e26,
+            "radius": 24622,
+            "position": [4498400000, 0],
+            "color": [100, 100, 255],
+            "velocity": [0, -58399.16],
+            "meta": {
+                "name": "Neptune"
+            }
+        }
+    ]
+}

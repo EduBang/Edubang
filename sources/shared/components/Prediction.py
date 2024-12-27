@@ -66,7 +66,7 @@ with proto("Prediction") as Prediction:
                         pg.draw.circle(game.screen, (255, 255, 255), spacePosToScreenPos((x, y)), radius, 1)
                         futureCollided.append(i)
                         futureCollided.append(j)
-                        c = Corps(i.mass + j.mass, radius, (x, y), (0, 0, 0), *mergeEnergy((i.mass, i.pos, lastPosI), (j.mass, j.pos, lastPosJ)))
+                        c = Corps(i.mass + j.mass, radius, (x, y), (0, 0, 0), mergeEnergy((i.mass, i.pos, lastPosI), (j.mass, j.pos, lastPosJ)))
                         space.append(
                             {
                             "pos": c.pos,

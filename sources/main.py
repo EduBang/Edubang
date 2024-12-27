@@ -51,6 +51,7 @@ with proto("Game") as Game:
         self.windows = {}
         self.font = getFont("Medium")
         self.italic = getFont("MediumItalic")
+        self.title = getFont("Regular", 32)
         self.keybinds = {}
         self.keys = {}
         self.invertedKeybinds = {}
@@ -60,6 +61,7 @@ with proto("Game") as Game:
         self.screen = screen
         self.os = system()
         self.tmusic = None
+        self.pause = False
 
         ws = [w for w in listdir("sources/window") if path.isfile(path.join("sources/window", w))]
         for w in ws:
@@ -167,7 +169,6 @@ with proto("Game") as Game:
             if corps.mass > m:
                 c, m = corps, corps.mass
         return c
-
 
 with proto("CameraHandler") as CameraHandler:
     @CameraHandler
@@ -310,7 +311,18 @@ def main() -> None:
         Game.deltaTime = clock.tick(60) / 2195 # (1000 * 2.195)
         Game.DT = Game.deltaTime * Game.timeScale
 
+        if Game.Camera.active:
+            if Game.keys["cameraUp"]:
+                Game.Camera.y += Game.Camera.speed
+            if Game.keys["cameraLeft"]:
+                Game.Camera.x += Game.Camera.speed
+            if Game.keys["cameraDown"]:
+                Game.Camera.y -= Game.Camera.speed
+            if Game.keys["cameraRight"]:
+                Game.Camera.x -= Game.Camera.speed
+
         Game.draw()
+        if Game.pause: continue
         Game.update()
     return
 
