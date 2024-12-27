@@ -17,6 +17,7 @@ from shared.utils.utils import (
     loadStars, draw_velocity_vector,
     draw_cinetic_energy_vector, draw_attraction_norm2, scientificNotation,
     spacePosToScreenPos, orbitalPeriod, C_EDUBANG,
+    totalEnergy, kineticEnergy, momentum,
     getAttractor
 )
 from shared.components.Corps import Corps
@@ -25,7 +26,6 @@ from shared.components.Prediction import Prediction
 from shared.components.Spaceship import Space_ship
 from shared.components.Physics import G
 from shared.components.Vectors import Vectors
-from shared.components.Relative import totalEnergy, kineticEnergy, momentum
 
 dk = DataKeeper()
 dk.timeScale = None
@@ -37,6 +37,7 @@ dk.process = None
 dk.image = None
 dk.stars = []
 dk.perlin = PerlinNoise(768)
+dk.wait = True
 
 def stopFocusFn() -> None:
     Game.Camera.focus = None
@@ -88,6 +89,8 @@ def window(w) -> None:
 @Events.observe
 def keydown(event) -> None:
     if Game.window != "sandbox": return
+    if dk.wait: return
+
     keys = []
     
     mods = pg.key.get_mods()
@@ -119,27 +122,7 @@ def keydown(event) -> None:
     if Game.keys["pause"]:
         Game.pause = not Game.pause
     if Game.keys["resetSimulation"]:
-        for a, d in zip(Game.space, [
-                                    (0, 0),
-                                    (57_909_050, -47.362),
-                                    (108_209_500, -35.02571),
-                                    (149_597_887.5, -29.783),
-                                    # (149_597_887.5 + 384_399, -29.783 - 0.95),
-                                    (227_944_000, -24.080),
-                                    (778_340_000, -13.0585),
-                                    # (778_340_000.5 + 421_800, -13.0585 - 11.5),
-                                    # (778_340_000.5 - 671_100, -13.0585 + 10),
-                                    # (778_340_000.5 + 1_070_400, -13.0585 - 8),
-                                    # (778_340_000.5 - 1_882_700, -13.0585 + 6),
-                                    (1_426_700_000, -9.6407),
-                                    # (1_426_700_000.5 + 1_221_870, -9.6407 - 4.2),
-                                    (2_870_700_000, -6.796732),
-                                    (4_498_400_000, -5.43248),
-                                    # (4_498_400_000 + 354_759, -5.43248 - 3.3)
-                                    ]
-                        ):
-            a.pos = (d[0], 0)
-            a.velocity = [0, d[1] * C_EDUBANG]
+        Game.resetSpace()
     key = event.key
     if not dk.active: return
     if key == pg.K_ESCAPE:
@@ -191,6 +174,7 @@ def mousebuttondown(event) -> None:
     return
 
 def loader() -> None:
+    dk.wait = True
     Game.Camera.active = True
     Game.Camera.x = 1000
     Game.Camera.y = 500
@@ -204,92 +188,10 @@ def loader() -> None:
     dk.image = pg.image.fromstring(img.tobytes(), img.size, img.mode)
     
     dk.stars = loadStars(1500, (-3000, 3000))
-
-    soleil = Corps(1.9885e30, 696342, (0, 0), (255, 255, 0), (0, 0))
-    soleil.name = "Soleil"
-    mercure = Corps(3.3011e23, 2439.7, (57_909_050, 0), (127, 127, 127), (0, -47.362 * C_EDUBANG))
-    mercure.name = "Mercure"
-    venus = Corps(4.8675e24, 6051.8, (108_209_500, 0), (255, 127, 127), (0, -35.02571 * C_EDUBANG))
-    venus.name = "Vénus"
-    terre = Corps(5.9736e24, 6371.008, (149_597_887.5 , 0), (0, 0, 255), (0, -29.783 * C_EDUBANG))
-    terre.name = "Terre"
-
-    lune = Corps(7.3477e22, 1736, (149_597_887.5 + 384_399 , 0), (200, 200, 200), (0, (-29.783 - 1.022) * C_EDUBANG))
-    lune.name = "Lune"
-    lune.orbit = terre
-
-    mars = Corps(6.4185e23, 3389.5, (227_944_000, 0), (255, 50, 50), (0, -24.080 * C_EDUBANG))
-    mars.name = "Mars"
-
-    jupiter = Corps(1.8986e27, 69911, (778_340_000, 0), (252, 201, 129), (0, -13.0585 * C_EDUBANG))
-    jupiter.name = "Jupiter"
-
-    io = Corps(8.93e22, 1821.6, (778_340_000.5 + 421_800, 0), (240, 232, 84), (0, (-13.0585 - 11.5) * C_EDUBANG)) # 17.334
-    io.name = "IO"
-    io.orbit = jupiter
-
-    europe = Corps(4.8e22, 1560.8, (778_340_000.5 - 671_100, 0), (237, 228, 157), (0, (-13.0585 + 10) * C_EDUBANG)) # 13.74
-    europe.name = "Europe"
-    europe.orbit = jupiter
-
-    ganymede = Corps(1.4819e23, 2631.2, (778_340_000.5 + 1_070_400, 0), (186, 168, 138), (0, (-13.0585 - 8) * C_EDUBANG)) # 10.88
-    ganymede.name = "Ganymède"
-    ganymede.orbit = jupiter
-
-    callisto = Corps(1.075938e23, 2410.15, (778_340_000.5 - 1_882_700, 0), (64, 63, 57), (0, (-13.0585 + 6) * C_EDUBANG)) # 8.2
-    callisto.name = "Callisto"
-    callisto.orbit = jupiter
-
-    saturne = Corps(5.6846e26, 58232, (1_426_700_000, 0), (230, 177, 124), (0, -9.6407 * C_EDUBANG))
-    saturne.name = "Saturne"
-
-    titan = Corps(1.3452e23, 2575.5, (1_426_700_000.5 + 1_221_870, 0), (204, 157, 82), (0, (-9.6407 - 4.2) * C_EDUBANG)) # 5.57
-    titan.name = "Titan"
-    titan.orbit = saturne
-
-    uranus = Corps(8.681e25, 25362, (2_870_700_000, 0), (100, 100, 200), (0, -6.796732 * C_EDUBANG))
-    uranus.name = "Uranus"
-    neptune = Corps(1.0243e26, 24622, (4_498_400_000, 0), (100, 100, 255), (0, -5.43248 * C_EDUBANG))
-    neptune.name = "Neptune"
-
-    triton = Corps(2.140e22, 1353.4, (4_498_400_000 + 354_759, 0), (161, 237, 240), (0, (-5.43248 - 3.3) * C_EDUBANG)) # 4.39
-    triton.name = "Triton"
-    triton.orbit = neptune
     
     # ship = Space_ship.new((1000, 1000), 2000, 0, 0, 0)
     # ship.name = "Spaceship"
-    
     # Game.space.append(ship)
-    Game.space.append(soleil)
-    Game.space.append(mercure)
-    Game.space.append(venus)
-    Game.space.append(terre)
-
-    # Game.space.append(lune)
-
-    Game.space.append(mars)
-    Game.space.append(jupiter)
-
-    # Game.space.append(io)
-    # Game.space.append(europe)
-    # Game.space.append(ganymede)
-    # Game.space.append(callisto)
-
-    Game.space.append(saturne)
-
-    # Game.space.append(titan)
-
-    Game.space.append(uranus)
-    Game.space.append(neptune)
-
-    # Game.space.append(triton)
-
-    # km = Corps(10, 1, (0, 0), (255, 255, 255), 0, 0)
-    # km.name = "1 Kilometer"
-    # Game.space.append(km)
-    # km10 = Corps(100, 10, (100, 100), (255, 255, 255), 0, 0)
-    # km10.name = "10 Kilometer"
-    # Game.space.append(km10)
 
     textDT = Text("Échelle du temps : ", (20, 145), color=(255, 255, 255))
     interface.append(textDT)
@@ -361,7 +263,7 @@ def loader() -> None:
     dk.loadingFinished = True
     dk.loadingImages = []
     dk.loadingImageIndex = 0
-
+    dk.wait = False
     return
 
 def load(*args, **kwargs) -> None:
@@ -543,6 +445,7 @@ def update() -> None:
         if dk.loadingImageIndex > 59:
             dk.loadingImageIndex = 0
 
+    if dk.wait: return
     for corps in Game.space:
         corps.update_position([0, 0], Game.DT)
         for otherCorps in Game.space:

@@ -5,6 +5,7 @@ from sys import exit
 from math import pi
 from importlib import util
 from random import choice
+from copy import deepcopy
 
 environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
 
@@ -46,6 +47,7 @@ with proto("Game") as Game:
         self.DT = self.deltaTime * self.timeScale
         self.running = True
         self.space = []
+        self.originSpace = []
         self.Camera = CameraHandler()
         self.window = ""
         self.windows = {}
@@ -148,6 +150,12 @@ with proto("Game") as Game:
         self.Camera.reset()
         self.timeScale = 1
         self.space = []
+        self.pause = False
+        return
+    
+    @Game
+    def resetSpace(self) -> None:
+        self.space = deepcopy(self.originSpace)
         return
 
     @Game
@@ -201,7 +209,6 @@ Game.load()
 def window(w) -> None:
     for i in buttons:
         buttons.remove(i)
-    Game.space = []
     return
 
 @Events.observe

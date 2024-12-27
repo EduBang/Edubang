@@ -1,6 +1,7 @@
 from types import MethodType
 from random import randint
 from math import pi, atan2, sin, cos
+from copy import deepcopy
 
 import pygame as pg
 
@@ -8,7 +9,8 @@ from main import Game, getFont
 from proto import proto
 from eventListen import Events
 from shared.components.Vectors import Vectors
-from shared.components.Physics import Physics, G
+from shared.components.Physics import Physics, G, c
+from shared.components.Corps import Corps
 
 type EnergyInfos = tuple[int, tuple[int, int], tuple[int, int]]
 
@@ -17,6 +19,9 @@ type EnergyInfos = tuple[int, tuple[int, int], tuple[int, int]]
 C_EDUBANG: int = 10750
 
 exponentFont = getFont("Medium", 12)
+
+titleFont = getFont("Regular", 20)
+descriptionFont = getFont("Regular", 14)
 
 # region Prototypes
 
@@ -528,6 +533,68 @@ with proto("SlideBar") as SlideBar:
             })
         return
 
+with proto("System") as System:
+    def drawSystem(self) -> None:
+        pg.draw.rect(Game.screen, (255, 255, 255), pg.Rect(self.position, self.size), 1, 8)
+        surface = titleFont.render(self.system["title"], False, (255, 255, 255))
+        Game.screen.blit(surface, (self.position[0] + 10, self.position[1] + 10))
+        surface = descriptionFont.render(self.system["description"], False, (255, 255, 255))
+        Game.screen.blit(surface, (self.position[0] + 10, self.position[1] + 40))
+        return
+    
+    def mousemotionS(self, event) -> None:
+        x, y = event.pos
+        if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
+            self.onHover()
+            Events.trigger("hovering", self)
+        else:
+            Events.trigger("unhovering", self)
+        return
+    
+    def mousebuttonupS(self, event) -> None:
+        button = event.button
+        x, y = event.pos
+        if button != 1: return
+        if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
+            for corps in self.system["space"]:
+                c = Corps(corps["mass"], corps["radius"], corps["position"], corps["color"], corps["velocity"])
+                for meta in corps["meta"]:
+                    setattr(c, meta, corps["meta"][meta])
+                Game.space.append(c)
+            Game.originSpace = deepcopy(Game.space)
+            Game.select("sandbox")
+        return
+
+    def mousewheelS(self, event) -> None:
+        if not self.scrollable: return
+        self.offsetY = SCROLL_SPEED * event.y
+        self.position[1] += self.offsetY
+        return
+
+    def windowS(self, w) -> None:
+        Events.stopObserving(self)
+        return
+
+    def onHover() -> None:
+        pg.mouse.set_cursor(pg.SYSTEM_CURSOR_HAND)
+        return
+
+    @System
+    def new(self, system: dict, index: int) -> None:
+        self.system = system
+        self.position = [400, 100 + 50 * index]
+        self.size = (500, 100)
+        self.draw = MethodType(drawSystem, self)
+        self.onHover = onHover
+        self.scrollable = False
+        self.offsetY = 0
+        Events.group(self, {
+            "mousemotion": MethodType(mousemotionS, self),
+            "mousebuttonup": MethodType(mousebuttonupS, self),
+            "mousewheel": MethodType(mousewheelS, self),
+            "window": MethodType(windowS, self)
+            })
+
 # prototype pour garder des variables
 with proto("DataKeeper") as DataKeeper:
     @DataKeeper
@@ -978,6 +1045,64 @@ def spacePosToScreenPos(pos: tuple[float, float]) -> tuple[float, float]:
     x: float = (pos[0] * Game.Camera.zoom) + Game.Camera.x
     y: float = (pos[1] * Game.Camera.zoom) + Game.Camera.y
     return (x, y)
+
+# endregion
+
+# region Relative
+
+def lorentzFactor(v: float | int) -> float:
+    """
+    Calcule de facteur de Lorentz
+
+    Arguments:
+        v (float | int): La vitesse de l'objet
+    
+    Retourne:
+        float: Le facteur de Lorentz
+    """
+    return 1 / (1 - (v ** 2 / c ** 2)) ** .5
+
+def momentum(m: float | int, v: float | int) -> float:
+    """
+    Calcule le moment relativiste
+
+    Arguments:
+        m (float | int): La masse de l'objet
+        v (float | int): La vitesse de l'objet
+    
+    Retourne:
+        float: Le moment relativiste
+    """
+    gamma: float = lorentzFactor(v)
+    return gamma * m * v
+
+def totalEnergy(m: float | int, v: float | int) -> float:
+    """
+    Calcule l'énergie totale de l'objet
+    
+    Arguments:
+        m (float | int): La masse de l'objet
+        v (float | int): La vitesse de l'objet
+    
+    Retourne:
+        float: L'énergie totale de l'objet
+    """
+    gamma: float = lorentzFactor(v)
+    return gamma * m * c ** 2
+
+def kineticEnergy(m: float | int, v: float | int) -> float:
+    """
+    Calcule l'énérgie cinétique de l'objet
+
+    Arguments:
+        m (float | int): La masse de l'objet
+        v (float | int): La vitesse de l'objet
+    
+    Retourne:
+        float: L'énergie cinétique de l'objet
+    """
+    gamma: float = lorentzFactor(v)
+    return (gamma - 1) * m * c ** 2
 
 # endregion
 

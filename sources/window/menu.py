@@ -45,6 +45,7 @@ v = [100, 1]
 
 @Events.observe
 def window(w) -> None:
+    if w != "menu": return
     interface.clear()
     return
 
@@ -140,7 +141,7 @@ def load(*args, **kwargs) -> None:
 
     discover = Button((100, 300), (180, 60))
     discover.text = "Découvrir"
-    discover.onPressed = goSandbox
+    discover.onPressed = goDiscover
     interface.append(discover)
 
     editor = Button((100, 400), (180, 60))
