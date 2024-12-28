@@ -98,14 +98,14 @@ def loadSolarSystem() -> None:
     Game.Camera.zoom = 0.00_000_4
     Game.Camera.x = 600
     Game.Camera.y = 500
-    v[0] = 20
-    v[1] = 20
+    v[0] = 10
+    v[1] = 40
     return
 
 def loadTest1() -> None:
     Game.Camera.zoom = 1
     a = Corps(6e15, 10, (100, 500), (255, 0, 0), (0, 0))
-    b = Corps(6e17, 100, (600, 500), (0, 0, 255), (0, 0))
+    b = Corps(6e17, 100, (900, 500), (0, 0, 255), (0, 0))
     Game.space.append(a)
     Game.space.append(b)
     v[0] = 100
@@ -115,7 +115,7 @@ def loadTest1() -> None:
 def loadTest2() -> None:
     Game.Camera.zoom = 1
     terre = Corps(6e17, 50, (100, 500), (255, 0, 0), (0, 50))
-    mars = Corps(6e17, 50, (600, 500), (0, 0, 255), (0, 0))
+    mars = Corps(6e17, 50, (900, 500), (0, 0, 255), (0, 0))
     Game.space.append(terre)
     Game.space.append(mars)
     v[0] = 100

@@ -1,6 +1,6 @@
 from types import MethodType
 from random import randint
-from math import pi, atan2, sin, cos
+from math import pi, atan2, sin, cos, log10, floor
 from copy import deepcopy
 
 import pygame as pg
@@ -19,7 +19,6 @@ type EnergyInfos = tuple[int, tuple[int, int], tuple[int, int]]
 C_EDUBANG: int = 10750
 
 exponentFont = getFont("Medium", 12)
-
 titleFont = getFont("Regular", 20)
 descriptionFont = getFont("Regular", 14)
 
@@ -44,6 +43,10 @@ C_UNICODES = UNICODES if Game.os == "Windows" else UNICODES_DARWIN
 fnKeys: tuple = (0x400000e2 if Game.os == "Windows" else 0x37, 0x400000e0 if Game.os == "Windows" else 0x3b)
 
 SCROLL_SPEED: int = 20
+
+def onHover() -> None:
+    pg.mouse.set_cursor(pg.SYSTEM_CURSOR_HAND)
+    return
 
 with proto("Button") as Button:
     def drawButton(self) -> None:
@@ -93,10 +96,6 @@ with proto("Button") as Button:
 
     def windowBTN(self, w) -> None:
         Events.stopObserving(self)
-        return
-
-    def onHover() -> None:
-        pg.mouse.set_cursor(pg.SYSTEM_CURSOR_HAND)
         return
 
     @Button
@@ -165,10 +164,6 @@ with proto("CheckBox") as CheckBox:
 
     def windowCB(self, w) -> None:
         Events.stopObserving(self)
-        return
-
-    def onHover() -> None:
-        pg.mouse.set_cursor(pg.SYSTEM_CURSOR_HAND)
         return
 
     @CheckBox
@@ -278,10 +273,6 @@ with proto("KeyBind") as KeyBind:
                 self.keyname.append("espace" if event.key in C_UNICODES else event.unicode if event.key > 0x110000 else chr(event.key))
                 self.keys.append(event.key)
                 self.focus = False
-        return
-
-    def onHover() -> None:
-        pg.mouse.set_cursor(pg.SYSTEM_CURSOR_HAND)
         return
 
     @KeyBind
@@ -408,10 +399,6 @@ with proto("Input") as Input:
                 self.text += event.unicode
         return
 
-    def onHover() -> None:
-        pg.mouse.set_cursor(pg.SYSTEM_CURSOR_HAND)
-        return
-
     @Input
     def onPressed(self) -> None:
         if not self.active: return
@@ -499,10 +486,6 @@ with proto("SlideBar") as SlideBar:
         Events.stopObserving(self)
         return
 
-    def onHover() -> None:
-        pg.mouse.set_cursor(pg.SYSTEM_CURSOR_HAND)
-        return
-
     @SlideBar
     def onPressed(self) -> None:
         self.active = True
@@ -575,10 +558,6 @@ with proto("System") as System:
         Events.stopObserving(self)
         return
 
-    def onHover() -> None:
-        pg.mouse.set_cursor(pg.SYSTEM_CURSOR_HAND)
-        return
-
     @System
     def new(self, system: dict, index: int) -> None:
         self.system = system
@@ -616,33 +595,19 @@ with proto("SizeViewer") as SizeViewer:
         x, y = self.position
         pg.draw.rect(Game.screen, (255, 255, 255), pg.Rect((x, y), (width, 2)))
         pg.draw.rect(Game.screen, (255, 255, 255), pg.Rect((x, y - 8), (2, 10)))
-        pg.draw.rect(Game.screen, (255, 255, 255), pg.Rect((x + 100, y - 8), (2, 10)))
+        pg.draw.rect(Game.screen, (255, 255, 255), pg.Rect((x + width, y - 8), (2, 10)))
         surface = Game.font.render(text, False, (255, 255, 255))
         Game.screen.blit(surface, (x, y + 10))
         w, h = Game.font.size(text)
         self.size = (w if w > 100 else 100, h + 60)
         return
 
-    def getSize() -> tuple[int, str]:
-        unit = "km"
-        distance = round(100 / Game.Camera.zoom, 3)
-        if Game.Camera.zoom < 0.1:
-            unit = "x10³ km"
-            distance = round(100 / Game.Camera.zoom / 1000, 3)
-            if distance > 1000:
-                unit = "x10⁶ km"
-                distance = round(100 / Game.Camera.zoom / 1000000, 3)
-        elif Game.Camera.zoom > 100:
-            unit = "m"
-            distance = round((100 / Game.Camera.zoom) * 1000, 3)
-
-        return (100, f"{distance} {unit}")
-
     def mousemotionSV(self, event) -> None:
         x, y = event.pos
         if self.focus:
             self.position = [x - self.size[0] // 2, y]
         if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
+            self.onHover()
             Events.trigger("hovering", self)
         else:
             Events.trigger("unhovering", self)
@@ -662,13 +627,9 @@ with proto("SizeViewer") as SizeViewer:
         if button != 1: return
         self.focus = False
         return
-    
+
     def windowSV(self, w) -> None:
         Events.stopObserving(self)
-        return
-
-    def onHover() -> None:
-        pg.mouse.set_cursor(pg.SYSTEM_CURSOR_HAND)
         return
 
     @SizeViewer
@@ -676,6 +637,7 @@ with proto("SizeViewer") as SizeViewer:
         self.position = list(position)
         self.draw = MethodType(drawSizeViewer, self)
         self.size = (0, 0)
+        self.onHover = onHover
         self.focus = False
         Events.group(self, {
             "mousemotion": MethodType(mousemotionSV, self),
@@ -1207,5 +1169,26 @@ def getAttractor(corps):
         attraction: float = Physics.get_attraction(c.mass, corps.mass, distance, c.velocity, corps.velocity)
         attractors[attraction] = c
     return attractors[max(attractors)]
+
+def closeTo(n: float | int) -> int:
+    k: int = 10 ** floor(log10(n))
+    closest: list = sorted((k, 2 * k, 5 * k, 10 * k), key=lambda x: (abs(n - x), x))
+    return closest[0]
+
+def getSize() -> tuple[int, str]:
+    d: float = round(100 * 1e3 / Game.Camera.zoom, 3)
+    unit: str = "m"
+    if d > 1e3:
+        unit = "km"
+        d = round(100 / Game.Camera.zoom, 3)
+    if d > 1e3:
+        unit = "x10³ km"
+        d = round(100 / Game.Camera.zoom / 1e3, 3)
+    if d > 1e3:
+        unit = "x10⁶ km"
+        d = round(100 / Game.Camera.zoom / 1e6, 3)
+    distance = closeTo(d)
+    width: float = distance * 100 / d
+    return (width, "%s %s" % (distance, unit))
 
 # endregion

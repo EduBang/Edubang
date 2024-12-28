@@ -20,7 +20,6 @@ from shared.utils.utils import (
     totalEnergy, kineticEnergy, momentum,
     getAttractor
 )
-from shared.components.Corps import Corps
 from shared.components.Captors import Captors
 from shared.components.Prediction import Prediction
 from shared.components.Spaceship import Space_ship

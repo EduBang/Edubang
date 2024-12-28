@@ -20,7 +20,7 @@ pg.display.set_caption("EduBang")
 icon = pg.image.load("data/images/appicon.png")
 pg.display.set_icon(icon)
 MUSIC_END_EVENT: int = pg.USEREVENT + 1
-buttons: list = []
+hoverable: list = []
 screen = pg.display.set_mode((1280, 720), pg.RESIZABLE)
 pg.key.set_repeat(500, 50)
 
@@ -186,7 +186,7 @@ with proto("CameraHandler") as CameraHandler:
         self.y = 0
         self.speed = 5
         self.zoom = 0.00_000_1
-        self.maxZoom = 300 # 10_000_000; Voir Trello
+        self.maxZoom = 200 # 10_000_000; Voir Trello
         self.minZoom = 0.00_000_01
         self.focus = None
         return
@@ -198,7 +198,7 @@ with proto("CameraHandler") as CameraHandler:
         self.y = 0
         self.speed = 5
         self.zoom = 0.00_000_1
-        self.maxZoom = 300 # 10_000_000; Voir Trello
+        self.maxZoom = 200 # 10_000_000; Voir Trello
         self.minZoom = 0.00_000_01
         self.focus = None
         return
@@ -207,20 +207,19 @@ Game.load()
 
 @Events.observe
 def window(w) -> None:
-    for i in buttons:
-        buttons.remove(i)
+    hoverable.clear()
     return
 
 @Events.observe
-def hovering(button) -> None:
-    if not button in buttons:
-        buttons.append(button)
+def hovering(element) -> None:
+    if not element in hoverable:
+        hoverable.append(element)
     return
 
 @Events.observe
-def unhovering(button) -> None:
-    if button in buttons:
-        buttons.remove(button)
+def unhovering(element) -> None:
+    if element in hoverable:
+        hoverable.remove(element)
     return
 
 @Events.observe
@@ -311,7 +310,7 @@ def main() -> None:
                 Game.changeMusic()
                 Game.playMusic()
 
-        if len(buttons) == 0:
+        if len(hoverable) == 0:
             pg.mouse.set_cursor(pg.SYSTEM_CURSOR_ARROW)
 
         # Constante de calibrage du temps

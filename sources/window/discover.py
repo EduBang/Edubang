@@ -3,7 +3,7 @@ from os import listdir, path
 
 from eventListen import Events
 
-from main import Game, getFont
+from main import Game
 from shared.utils.utils import DataKeeper, System, Button
 
 dk = DataKeeper()
