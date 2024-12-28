@@ -591,7 +591,8 @@ with proto("Path") as Path:
 
 with proto("SizeViewer") as SizeViewer:
     def drawSizeViewer(self):
-        width, text = getSize()
+        width, distance, unit = getSize()
+        text: str = "%s %s" % (distance, unit)
         x, y = self.position
         pg.draw.rect(Game.screen, (255, 255, 255), pg.Rect((x, y), (width, 2)))
         pg.draw.rect(Game.screen, (255, 255, 255), pg.Rect((x, y - 8), (2, 10)))
@@ -1175,7 +1176,7 @@ def closeTo(n: float | int) -> int:
     closest: list = sorted((k, 2 * k, 5 * k, 10 * k), key=lambda x: (abs(n - x), x))
     return closest[0]
 
-def getSize() -> tuple[int, str]:
+def getSize() -> tuple[int, int, str]:
     d: float = round(100 * 1e3 / Game.Camera.zoom, 3)
     unit: str = "m"
     if d > 1e3:
@@ -1189,6 +1190,6 @@ def getSize() -> tuple[int, str]:
         d = round(100 / Game.Camera.zoom / 1e6, 3)
     distance = closeTo(d)
     width: float = distance * 100 / d
-    return (width, "%s %s" % (distance, unit))
+    return (width, distance, unit)
 
 # endregion
