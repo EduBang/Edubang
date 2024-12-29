@@ -50,26 +50,30 @@ def load() -> None:
     backButton.onPressed = backFunction
     interface.append(backButton)
 
+    h: int = 100
     keybindsFiles = [path.join("data/settings", f) for f in listdir("data/settings") if path.isfile(path.join("data/settings", f))]
     for i, keybindFile in enumerate(keybindsFiles):
         keybinds = {}
         with open(keybindFile, "r", encoding="utf-8") as f:
             keybinds = loadJson(f)
             f.close()
-        title = Text(keybindFile.split("\\")[1][:-5], (500, 100 * ((i * 8) + 1)), color=(255, 255, 255))
+        title = Text(keybindFile.split("\\")[1][:-5], (500, h), color=(255, 255, 255))
         title.font = getFont("Bold", 24)
         title.scrollable = True
         interface.append(title)
+        h += 70
         for j, k in enumerate(keybinds):
             keybind = keybinds[k]
-            kb = KeyBind(keybind["code"], keybind["key"], (700, 100 * (j + (i * 8) + 1) + 60))
+            kb = KeyBind(keybind["code"], keybind["key"], (700, h))
             kb.kb = (k, keybind)
             kb.file = keybindFile
             kb.scrollable = True
-            text = Text(keybind["name"], (400, 100 * (j + (i * 8) + 1) + 70), color=(255, 255, 255))
+            text = Text(keybind["name"], (400, h + 10), color=(255, 255, 255))
             text.scrollable = True
             interface.append(kb)
             interface.append(text)
+            h += 70
+        h += 50
     return
 
 def draw(screen) -> None:
