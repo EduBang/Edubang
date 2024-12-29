@@ -1,3 +1,4 @@
+from ctypes import pythonapi, c_long, py_object
 from json import load as loadJson
 from os import listdir, path, environ
 from platform import system
@@ -36,6 +37,14 @@ def getFont(font, size: int = 16) -> pg.font.Font:
 with proto("Game") as Game:
     @Game
     def quit(self) -> None:
+        isAlive = getattr(self.subprocess, "is_alive", False)
+        if isAlive:
+            threadId = self.subprocess.ident
+            if not threadId: return
+            pointer = pythonapi.PyThreadState_SetAsyncExc(c_long(threadId), py_object(SystemExit))
+            if pointer > 1:
+                pythonapi.PyThreadState_SetAsyncExc(threadId, 0)
+            self.subprocess = None
         pg.quit()
         exit(0)
         return
@@ -64,6 +73,7 @@ with proto("Game") as Game:
         self.os = system()
         self.tmusic = None
         self.pause = False
+        self.subprocess = None
 
         ws = [w for w in listdir("sources/window") if path.isfile(path.join("sources/window", w))]
         for w in ws:
@@ -268,8 +278,6 @@ def mousewheel(event) -> None:
 def mousebuttondown(event) -> None:
     button = event.button
     x, y = event.pos
-    if button in [4, 5]: # les scrolls bas et haut sont considérés comme des cliques de souris
-        return
     if button == 1: # clique gauche
         if not Game.Camera.active: return
         for corps in Game.space:

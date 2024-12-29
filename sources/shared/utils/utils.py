@@ -27,12 +27,14 @@ descriptionFont = getFont("Regular", 14)
 FOCUS_COLOR: tuple[int, int, int] = (13, 178, 190)
 
 UNICODES: dict[int, str] = {
+    0x9: "tab",
     0x20: "espace",
     0x400000e2: "alt",
     0x400000e0: "ctrl"
 }
 
 UNICODES_DARWIN: dict[int, str] = {
+    0x30: "tab",
     0x31: "espace",
     0x37: "alt",
     0x3b: "cmd"
@@ -270,7 +272,7 @@ with proto("KeyBind") as KeyBind:
                 self.keyname.append("alt")
                 self.keys.append(fnKeys[0])
             if event.key not in fnKeys:
-                self.keyname.append("espace" if event.key in C_UNICODES else event.unicode if event.key > 0x110000 else chr(event.key))
+                self.keyname.append(C_UNICODES[event.key] if event.key in C_UNICODES else event.unicode if event.key > 0x110000 else chr(event.key))
                 self.keys.append(event.key)
                 self.focus = False
         return
@@ -1188,6 +1190,9 @@ def getSize() -> tuple[int, int, str]:
     if d > 1e3:
         unit = "x10⁶ km"
         d = round(100 / Game.Camera.zoom / 1e6, 3)
+    if d > 1e3:
+        unit = "x10⁹ km"
+        d = round(100 / Game.Camera.zoom / 1e9, 3)
     distance = closeTo(d)
     width: float = distance * 100 / d
     return (width, distance, unit)

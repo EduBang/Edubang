@@ -1,4 +1,3 @@
-from ctypes import pythonapi, c_long, py_object
 from threading import Thread
 from os import path
 from math import pi
@@ -32,7 +31,6 @@ dk.active = False
 dk.loadingFinished = False
 dk.loadingImages = []
 dk.loadingImageIndex = 0
-dk.process = None
 dk.image = None
 dk.stars = []
 dk.perlin = PerlinNoise(768)
@@ -67,22 +65,10 @@ showSV: bool = False
 showNames: bool = True
 showPrediction: bool = False
 
-def kill(thread: Thread) -> None:
-    threadId = thread.ident
-    if not threadId: return
-    pointer = pythonapi.PyThreadState_SetAsyncExc(c_long(threadId), py_object(SystemExit))
-    if pointer > 1:
-        pythonapi.PyThreadState_SetAsyncExc(threadId, 0)
-    return
-
 @Events.observe
 def window(w) -> None:
     if w != "sandbox": return
     interface.clear()
-    isAlive = getattr(dk.process, "is_alive", False)
-    if isAlive:
-        kill(dk.process)
-        dk.process = None
     return
 
 @Events.observe
@@ -250,7 +236,6 @@ def loader() -> None:
     w, h = Game.screen.get_size()
 
     sizeViewer = SizeViewer((w - 200, h - 50))
-    sizeViewer.measure = None
     interface.append(sizeViewer)
 
     stopFocus = Button((w - 340, h - 60), (330, 50))
@@ -272,9 +257,9 @@ def load(*args, **kwargs) -> None:
         img = pg.transform.scale(img, (108, 108))
         dk.loadingImages.append(img)
     dk.loadingFinished = False
-    process = Thread(target=loader)
-    process.start()
-    dk.process = process
+    subprocess = Thread(target=loader)
+    subprocess.start()
+    Game.subprocess = subprocess
     return
 
 def menu(screen) -> None:

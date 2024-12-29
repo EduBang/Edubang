@@ -7,6 +7,8 @@ from eventListen import Events
 from main import Game, getFont
 from shared.utils.utils import DataKeeper, Button, spacePosToScreenPos, getSize
 
+interface: list = []
+
 unitFont = getFont("Regular", 12)
 
 def drawGrid() -> None:
