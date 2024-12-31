@@ -108,6 +108,11 @@ def keydown(event) -> None:
         Game.pause = not Game.pause
     if Game.keys["resetSimulation"]:
         Game.resetSpace()
+        f = Game.Camera.focus
+        if f:
+            for e in Game.space:
+                if e.mass == f.mass and e.radius == f.radius and e.color == f.color:
+                    Game.Camera.focus = e
     key = event.key
     if not dk.active: return
     if key == pg.K_ESCAPE:
@@ -132,22 +137,6 @@ def keydown(event) -> None:
     elif key == pg.K_KP_MINUS and Game.Camera.zoom > Game.Camera.minZoom:
         Game.Camera.zoom /= 1.05
 
-    return
-
-@Events.observe
-def keydown(event) -> None:
-    keys = []
-    
-    mods = pg.key.get_mods()
-    if mods & pg.KMOD_LCTRL:
-        keys.append(0x400000e0)
-    if mods & pg.KMOD_LALT:
-        keys.append(0x400000e2)
-    keys.append(event.key)
-
-    key = Game.getKeyFromCode(keys)
-    if key:
-        Game.keys[key] = True
     return
 
 @Events.observe
@@ -236,6 +225,7 @@ def loader() -> None:
     w, h = Game.screen.get_size()
 
     sizeViewer = SizeViewer((w - 200, h - 50))
+    sizeViewer.measure = None
     interface.append(sizeViewer)
 
     stopFocus = Button((w - 340, h - 60), (330, 50))
