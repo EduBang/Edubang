@@ -1,6 +1,6 @@
 from threading import Thread
 from os import path
-from math import pi
+from math import pi, sqrt
 
 import pygame as pg
 from PIL import Image, ImageFilter, ImageOps, ImageEnhance
@@ -299,7 +299,7 @@ def stats(corps) -> None:
     text = Game.font.render("Période de révolution : %s jours" % days, False, (255, 255, 255))
     screen.blit(text, (width - 330, 240))
 
-    velocity: float = round(((corps.velocity[0] / C_EDUBANG) ** 2 + (corps.velocity[1] / C_EDUBANG) ** 2) ** .5, 3)
+    velocity: float = round(sqrt((corps.velocity[0] / C_EDUBANG) ** 2 + (corps.velocity[1] / C_EDUBANG) ** 2), 3)
     text = Game.font.render("Vitesse orbitale : %s km/s" % velocity, False, (255, 255, 255))
     screen.blit(text, (width - 330, 270))
 

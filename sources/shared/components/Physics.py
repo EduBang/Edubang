@@ -1,4 +1,4 @@
-from math import exp
+from math import exp, sqrt
 
 from proto import proto
 
@@ -11,9 +11,9 @@ type Velocity = tuple[float, float]
 with proto("Physics") as Physics:
     @Physics
     def getRelativeVelocity(self, v1: Velocity, v2: Velocity) -> float:
-        v1: float = (v1[0] ** 2 + v1[1] ** 2) ** .5
-        v2: float = (v2[0] ** 2 + v2[1] ** 2) ** .5
-        return (v1 ** 2 + v2 ** 2) ** .5
+        v1: float = sqrt(v1[0] ** 2 + v1[1] ** 2)
+        v2: float = sqrt(v2[0] ** 2 + v2[1] ** 2)
+        return sqrt(v1 ** 2 + v2 ** 2)
 
     @Physics
     def get_attraction(self, mass1, mass2, d, v1, v2, cutDistance: float | int = 120 * UA) -> float:
@@ -29,7 +29,7 @@ with proto("Physics") as Physics:
         velocity: float | int = 0
         if dt != 0:
             velocity_vector = (pos_final[0] - pos_init[0], pos_final[1] - pos_init[1])
-            norm_velocity_vector = (velocity_vector[0] ** 2 + velocity_vector[1] ** 2) ** .5
+            norm_velocity_vector = sqrt(velocity_vector[0] ** 2 + velocity_vector[1] ** 2)
             velocity = norm_velocity_vector / dt
         return velocity
         

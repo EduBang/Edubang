@@ -1,6 +1,8 @@
+from json import load as loadJson
+from os import listdir, path
 from types import MethodType
 from random import randint
-from math import pi, atan2, sin, cos, log10, floor
+from math import pi, sqrt, atan2, sin, cos, log10, floor
 from copy import deepcopy
 
 import pygame as pg
@@ -118,7 +120,7 @@ with proto("Button") as Button:
             "mousebuttonup": MethodType(mousebuttonupBTN, self),
             "mousewheel": MethodType(mousewheelBTN, self),
             "window": MethodType(windowBTN, self)
-            })
+        })
         return
 
 with proto("CheckBox") as CheckBox:
@@ -189,7 +191,7 @@ with proto("CheckBox") as CheckBox:
             "mousebuttonup": MethodType(mousebuttonupCB, self),
             "mousewheel": MethodType(mousewheelCB, self),
             "window": MethodType(windowCB, self)
-            })
+        })
         return
 
 with proto("MessageBox") as MessageBox:
@@ -302,7 +304,7 @@ with proto("KeyBind") as KeyBind:
             "mousewheel": MethodType(mousewheelKB, self),
             "window": MethodType(windowKB, self),
             "keydown": MethodType(keydownKB, self)
-            })
+        })
         return
 
 with proto("Text") as Text:
@@ -430,7 +432,7 @@ with proto("Input") as Input:
             "mousewheel": MethodType(mousewheelI, self),
             "window": MethodType(windowI, self),
             "keydown": MethodType(keydownI, self)
-            })
+        })
         return
 
 with proto("SlideBar") as SlideBar:
@@ -515,7 +517,7 @@ with proto("SlideBar") as SlideBar:
             "mousebuttonup": MethodType(mousebuttonupSB, self),
             "mousewheel": MethodType(mousewheelSB, self),
             "window": MethodType(windowSB, self)
-            })
+        })
         return
 
 with proto("System") as System:
@@ -574,7 +576,88 @@ with proto("System") as System:
             "mousebuttonup": MethodType(mousebuttonupS, self),
             "mousewheel": MethodType(mousewheelS, self),
             "window": MethodType(windowS, self)
-            })
+        })
+
+with proto("Inventory") as Inventory:
+    def drawInventory(self):
+        if self.active:
+            bodies = self.bodies.copy()
+            width, height = Game.screen.get_size()
+            x = width / 100
+            y = height / 100
+            pg.draw.rect(Game.screen, (10, 9, 9), pg.Rect((10 * x, 10 * y), (80 * x, 80 * y)), 0, 8)
+            pg.draw.rect(Game.screen, (255, 255, 255), pg.Rect((10 * x, 10 * y), (80 * x, 80 * y)), 1, 8)
+            w, h = 180, 100
+            r: bool = True
+            k: int = floor((80 * x) / (w + 12))
+            i: int = 0
+            dy = (10 * y + 10)
+            while r and k > 0:
+                dx = (10 * x + 10)
+                for j in range(k):
+                    body = bodies[i]
+                    pg.draw.rect(Game.screen, (255, 255, 255), pg.Rect((dx, dy), (w, h)), 1, 8)
+                    surface = Game.font.render(body["meta"]["name"], False, (255, 255, 255))
+                    Game.screen.blit(surface, (dx + 10, dy + 10))
+                    pg.draw.circle(Game.screen, body["color"], (dx + 130, dy + 50), 10)
+                    self.clickableZones[body["file"]] = ((dx, dy), (dx + 180, dy + 100))
+                    dx += 190
+                    i += 1
+                    if len(bodies) <= i:
+                        r = False
+                        break
+                dy += 110
+        return
+    
+    def mousemotionIn(self, event) -> None:
+        x, y = event.pos
+        for cz in self.clickableZones.values():
+            if x > cz[0][0] and x < cz[1][0] and y > cz[0][1] and y < cz[1][1]:
+                self.onHover()
+                Events.trigger("hovering", self)
+                break
+        else:
+            Events.trigger("unhovering", self)
+        return
+    
+    def mousebuttonupIn(self, event) -> None:
+        button = event.button
+        x, y = event.pos
+        if button != 1: return
+        for file, cz in self.clickableZones.items():
+            if x > cz[0][0] and x < cz[1][0] and y > cz[0][1] and y < cz[1][1]:
+                for body in self.bodies:
+                    if body["file"] != file:
+                        continue
+                    Events.trigger("inventory", body)
+                    self.active = False
+                    return
+
+    def windowIn(self, w) -> None:
+        Events.stopObserving(self)
+        return
+
+    @Inventory
+    def new(self):
+        self.active = False
+        self.bodies = []
+        self.clickableZones = {}
+        bodyFiles = [path.join("data/bodies", f) for f in listdir("data/bodies") if path.isfile(path.join("data/bodies", f))]
+        for i, bodyFile in enumerate(bodyFiles):
+            body = {}
+            with open(bodyFile, "r", encoding="utf-8") as f:
+                body = loadJson(f)
+                body["file"] = bodyFile
+                f.close()
+            self.bodies.append(body)
+        self.draw = MethodType(drawInventory, self)
+        self.onHover = onHover
+        Events.group(self, {
+            "mousemotion": MethodType(mousemotionIn, self),
+            "mousebuttonup": MethodType(mousebuttonupIn, self),
+            "window": MethodType(windowIn, self)
+        })
+        return
 
 # prototype pour garder des variables
 with proto("DataKeeper") as DataKeeper:
@@ -647,7 +730,7 @@ with proto("SizeViewer") as SizeViewer:
             "mousebuttondown": MethodType(mousebuttondownSV, self),
             "mousebuttonup": MethodType(mousebuttonupSV, self),
             "window": MethodType(windowSV, self)
-            })
+        })
         return
 
 # endregion
@@ -785,10 +868,8 @@ def process_collide(corps1, corps2):
     Retourne :
         Corps : Corps à supprimer de la simulation
     """
-    x, y = mergeEnergy((corps1.mass, corps1.pos, corps1.path[-1]), (corps2.mass, corps2.pos, corps2.path[-1]))
-
     mass: int = corps1.mass + corps2.mass
-    radius: float = (((pi * corps1.radius ** 2) + (pi * corps2.radius ** 2)) / pi) ** .5
+    radius: float = sqrt(((pi * corps1.radius ** 2) + (pi * corps2.radius ** 2)) / pi)
     color: tuple[float, float, float] = mergeColor(corps1, corps2)
 
     corps = corps1
@@ -799,7 +880,7 @@ def process_collide(corps1, corps2):
     corps.mass = mass
     corps.radius = radius
     corps.color = color
-    corps.velocity = [x, y]
+    corps.velocity = mergeEnergy((corps1.mass, corps1.pos, corps1.path[-1]), (corps2.mass, corps2.pos, corps2.path[-1]))
     corps.path = []
     processMergingNames(corps1, corps2, corps)
     if Game.Camera.focus in [corps1, corps2]:
@@ -921,7 +1002,7 @@ def draw_attraction_norm2(screen) -> None:
 
     drawArrow(MSP, spacePosToScreenPos(attractionVectorSum), l = 5)
 
-    valeur: float = round(((AVS[0] - mouseSpacePos[0]) ** 2 + (AVS[1] - mouseSpacePos[1]) ** 2) ** .5, 2)
+    valeur: float = round(sqrt((AVS[0] - mouseSpacePos[0]) ** 2 + (AVS[1] - mouseSpacePos[1]) ** 2), 2)
 
     x, y = MSP
     pg.draw.line(screen, (255, 255, 255), (x + 4, y - 4), (x + 16, y - 16), 1)
@@ -1025,7 +1106,7 @@ def lorentzFactor(v: float | int) -> float:
     Retourne:
         float: Le facteur de Lorentz
     """
-    return 1 / (1 - (v ** 2 / c ** 2)) ** .5
+    return 1 / sqrt(1 - (v ** 2 / c ** 2))
 
 def momentum(m: float | int, v: float | int) -> float:
     """
@@ -1129,7 +1210,7 @@ def orbitalPeriod(mass: float | int, semimajorAxe: float | int) -> float:
     Retourne :
         float : La période orbitale en jours.
     """
-    return (2 * pi * ((semimajorAxe * 1e3) ** 3 / (G * mass)) ** .5) / 86400
+    return (2 * pi * sqrt((semimajorAxe * 1e3) ** 3 / (G * mass))) / 86400
 
 def drawArrow(startPos: tuple[int, int], endPos: tuple[int, int], *, color: tuple[int, int, int] = (255, 255, 255), l: int = 2, c: int = 8) -> None:
     """
@@ -1145,13 +1226,13 @@ def drawArrow(startPos: tuple[int, int], endPos: tuple[int, int], *, color: tupl
     Retourne:
         None
     """
-    rotation: float = (atan2(startPos[1] - endPos[1], endPos[0] - startPos[0])) + pi/2
+    orientation: float = (atan2(startPos[1] - endPos[1], endPos[0] - startPos[0])) + pi/2
     k: float = 2 * pi / 3
     pg.draw.line(Game.screen, color, startPos, endPos, l)
     pg.draw.polygon(Game.screen, color, (
-        (endPos[0] + c * sin(rotation), endPos[1] + c * cos(rotation)),
-        (endPos[0] + c * sin(rotation - k), endPos[1] + c * cos(rotation - k)),
-        (endPos[0] + c * sin(rotation + k), endPos[1] + c * cos(rotation + k)),
+        (endPos[0] + c * sin(orientation), endPos[1] + c * cos(orientation)),
+        (endPos[0] + c * sin(orientation - k), endPos[1] + c * cos(orientation - k)),
+        (endPos[0] + c * sin(orientation + k), endPos[1] + c * cos(orientation + k)),
     ))
     return
 

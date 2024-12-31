@@ -124,20 +124,33 @@ def loadTest2() -> None:
     Game.Camera.y = 0
     return
 
+def loadTest3() -> None:
+    Game.Camera.zoom = 1
+    a = Corps(6e17, 50, (100, 100), (255, 0, 0), (-100, 100))
+    b = Corps(6e17, 50, (100, 900), (0, 0, 255), (-100, -100))
+    Game.space.append(a)
+    Game.space.append(b)
+    v[0] = 100
+    v[1] = 1
+    Game.Camera.x = 1000
+    Game.Camera.y = 0
+    return
+
 cases = {
     0: loadRandomSpace,
     1: loadSolarSystem,
     2: loadTest1,
-    3: loadTest2
+    3: loadTest2,
+    4: loadTest3
 }
 
 def reset() -> None:
     Game.reset()
-    cases[randint(0, 3)]()
+    cases[randint(0, 4)]()
     return
 
 def load(*args, **kwargs) -> None:
-    cases[randint(0, 3)]()
+    cases[randint(0, 4)]()
 
     discover = Button((100, 300), (180, 60))
     discover.text = "Découvrir"

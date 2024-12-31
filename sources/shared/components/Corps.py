@@ -1,10 +1,10 @@
-from math import pi
+from math import pi, sqrt
 
 from proto import proto
 import pygame as pg
 
 def lorentzFactor(v: float | int) -> float:
-    return 1 / (1 - (v ** 2 / 0x11DE784A ** 2)) ** .5
+    return 1 / sqrt(1 - (v ** 2 / 0x13F4D4EACDD7564))
 
 with proto("Corps") as Corps:
     @Corps
@@ -35,7 +35,8 @@ with proto("Corps") as Corps:
             self.path.pop(0)
         # Mise à jour de la vitesse (conserve l'inertie)
 
-        gamma: float = lorentzFactor((self.velocity[0] ** 2 + self.velocity[1] ** 2) ** .5)
+        # print(self.velocity)
+        gamma: float = lorentzFactor(sqrt(self.velocity[0] ** 2 + self.velocity[1] ** 2))
 
         # selon prgm, acc en km/s
         self.velocity[0] += acc[0] * dt / gamma

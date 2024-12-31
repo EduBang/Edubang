@@ -3,7 +3,7 @@ from json import load as loadJson
 from os import listdir, path, environ
 from platform import system
 from sys import exit
-from math import pi
+from math import pi, sqrt
 from importlib import util
 from random import choice
 from copy import deepcopy
@@ -266,8 +266,8 @@ def keyup(event) -> None:
 
 @Events.observe
 def mousewheel(event) -> None:
-    x, y = event.x, event.y
     if not Game.Camera.active: return
+    x, y = event.x, event.y
     if y == 1 and Game.Camera.zoom < Game.Camera.maxZoom: # scroll vers le haut: zoom
         Game.Camera.zoom *= 1.05
     if y == -1 and Game.Camera.zoom > Game.Camera.minZoom: # scroll vers le bas: dézoom
@@ -276,6 +276,7 @@ def mousewheel(event) -> None:
 
 @Events.observe
 def mousebuttondown(event) -> None:
+    if Game.window != "sandbox": return
     button = event.button
     x, y = event.pos
     if button == 1: # clique gauche
@@ -286,11 +287,11 @@ def mousebuttondown(event) -> None:
             sqx = (x - xC) ** 2
             sqy = (y - yC) ** 2
             if pi * (corps.radius * Game.Camera.zoom) ** 2 < 10:
-                if (sqx + sqy) ** .5 < 10:
+                if sqrt(sqx + sqy) < 10:
                     Game.Camera.focus = corps
                     Game.Camera.zoom = 1 / corps.radius * 51
                     break
-            if (sqx + sqy) ** .5 < corps.radius * Game.Camera.zoom:
+            if sqrt(sqx + sqy) < corps.radius * Game.Camera.zoom:
                 Game.Camera.focus = corps
                 Game.Camera.zoom = 1 / corps.radius * 51
                 break

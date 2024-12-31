@@ -1,5 +1,4 @@
-from copy import deepcopy
-from math import pi
+from math import pi, sqrt
 
 from proto import proto
 import pygame as pg
@@ -62,7 +61,7 @@ with proto("Prediction") as Prediction:
                     d: float = Vectors.get_distance(lastPosI, lastPosJ)
                     if Captors.collide(i, j, d):
                         x, y = lastPosI if i.mass > j.mass else lastPosJ
-                        radius: float = (((pi * i.radius ** 2) + (pi * j.radius ** 2)) / pi) ** .5
+                        radius: float = sqrt(((pi * i.radius ** 2) + (pi * j.radius ** 2)) / pi)
                         pg.draw.circle(game.screen, (255, 255, 255), spacePosToScreenPos((x, y)), radius, 1)
                         futureCollided.append(i)
                         futureCollided.append(j)
