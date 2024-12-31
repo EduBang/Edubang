@@ -55,12 +55,19 @@ def onHover() -> None:
 with proto("Button") as Button:
     def drawButton(self) -> None:
         if not self.active: return 
-        pg.draw.rect(Game.screen, (255, 255, 255), pg.Rect(self.position, self.size), 0, 8)
-        surface = Game.font.render(self.text, False, (0, 0, 0))
-        width, height = Game.font.size(self.text)
+        offset: int = 0
+        pg.draw.rect(Game.screen, self.color, pg.Rect(self.position, self.size), 0, 8)
+        if self.icon:
+            Game.screen.blit(self.icon, (
+                self.position[0] + 10,
+                self.position[1] + 5
+            ))
+            offset = self.icon.get_size()[0]
+        surface = self.font.render(self.text, False, self.textColor)
+        width, height = self.font.size(self.text)
         x = self.position[0] + (self.size[0] - width) / 2
         y = self.position[1] + (self.size[1] - height) / 2
-        Game.screen.blit(surface, (x, y))
+        Game.screen.blit(surface, (x + offset / 2, y))
         return
     
     def mousemotionBTN(self, event) -> None:
@@ -103,10 +110,14 @@ with proto("Button") as Button:
         return
 
     @Button
-    def new(self, position: tuple[int, int], size: tuple[int, int]) -> None:
+    def new(self, position: tuple[int, int], size: tuple[int, int], *, color: tuple[int, int, int] = (255, 255, 255)) -> None:
         self.text = "Button"
         self.position = list(position)
         self.size = size
+        self.color = color
+        self.font = Game.font
+        self.textColor = (0, 0, 0)
+        self.icon = None
         self.draw = MethodType(drawButton, self)
         self.onPressed = lambda: None
         self.onReleased = lambda: None

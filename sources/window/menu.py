@@ -2,18 +2,30 @@ from random import randint
 from math import pi
 
 import pygame as pg
+from PIL import Image
 from eventListen import Events
+from nsi25perlin import PerlinNoise
 
-from main import Game
-from shared.utils.utils import updateCorps, process_collide, Button, C_EDUBANG, spacePosToScreenPos, DataKeeper
+
+from main import Game, getFont
+from shared.utils.utils import updateCorps, process_collide, Button, C_EDUBANG, spacePosToScreenPos, DataKeeper, loadSpace
 from shared.components.Corps import Corps
 from shared.components.Captors import Captors
 from shared.components.Prediction import Prediction
 
 dk = DataKeeper()
 
+space, size = loadSpace(PerlinNoise())
+img = Image.new("RGB", (size, size))
+for pos in space:
+    img.putpixel(pos, (space[pos]))
+img = img.resize((8 * size, 6 * size), Image.Resampling.LANCZOS)
+
+dk.image = pg.image.fromstring(img.tobytes(), img.size, img.mode)
 dk.brand = None
 dk.time = 15
+
+semibold = getFont("SemiBold", 20)
 
 def goSandbox() -> None:
     Game.reset()
@@ -152,23 +164,37 @@ def reset() -> None:
 def load(*args, **kwargs) -> None:
     cases[randint(0, 4)]()
 
-    discover = Button((100, 300), (180, 60))
-    discover.text = "Découvrir"
-    discover.onPressed = goDiscover
-    interface.append(discover)
+    icons: list = [pg.transform.scale(pg.image.load("./data/images/%s.png" % i), (38, 50)) for i in ("play", "pencil", "settings", "power")]
 
-    editor = Button((100, 400), (180, 60))
-    editor.text = "Éditer"
-    editor.onPressed = goEditor
-    interface.append(editor)
+    discoverButton = Button((100, 300), (170, 60), color=(13, 178, 190))
+    discoverButton.text = "Démarrer"
+    discoverButton.font = semibold
+    discoverButton.textColor = (255, 255, 255)
+    discoverButton.icon = icons[0]
+    discoverButton.onPressed = goDiscover
+    interface.append(discoverButton)
 
-    settingsButton = Button((100, 500), (180, 60))
+    editorButton = Button((100, 400), (265, 60), color=(13, 178, 190))
+    editorButton.text = "Éditeur de système"
+    editorButton.font = semibold
+    editorButton.textColor = (255, 255, 255)
+    editorButton.icon = icons[1]
+    editorButton.onPressed = goEditor
+    interface.append(editorButton)
+
+    settingsButton = Button((100, 500), (190, 60), color=(13, 178, 190))
     settingsButton.text = "Paramètres"
+    settingsButton.font = semibold
+    settingsButton.textColor = (255, 255, 255)
+    settingsButton.icon = icons[2]
     settingsButton.onPressed = goSettings
     interface.append(settingsButton)
 
-    quitButton = Button((100, 600), (180, 60))
-    quitButton.text = "Quitter"
+    quitButton = Button((100, 600), (240, 60), color=(13, 178, 190))
+    quitButton.text = "Quitter Edubang"
+    quitButton.font = semibold
+    quitButton.textColor = (255, 255, 255)
+    quitButton.icon = icons[3]
     quitButton.onPressed = quitFunction
     interface.append(quitButton)
 
@@ -176,7 +202,9 @@ def load(*args, **kwargs) -> None:
     return
 
 def draw(screen) -> None:
-    screen.fill((0, 0 ,0))
+    screen.fill((0, 0, 0))
+
+    screen.blit(dk.image, (0, 0))
 
     for corps in Game.space:
         corps.draw(screen, Game.Camera)
@@ -204,6 +232,10 @@ def draw(screen) -> None:
 
     for element in interface:
         element.draw()
+
+    w, h = screen.get_size()
+    surface = semibold.render("NE PAS DIFFUSER - CONFIDENTIEL", False, (128, 128, 128))
+    screen.blit(surface, (w - 450, h - 100))
 
     return
 

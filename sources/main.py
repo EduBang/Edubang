@@ -132,7 +132,7 @@ with proto("Game") as Game:
         if self.tmusic and self.settings["volume"] != 0:
             Game.tmusic -= (Game.deltaTime * 2.195)
             width, height = screen.get_size()
-            text: str = "Playing %s" % self.music[12:][:-4]
+            text: str = "Playing %s" % self.music[12:-4]
             surface = Game.italic.render(text, False, (255, 255, 255))
             surface.set_alpha(int(255 * Game.tmusic / 5))
             tW, tH = Game.italic.size(text)
