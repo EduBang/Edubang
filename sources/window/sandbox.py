@@ -17,7 +17,7 @@ from shared.utils.utils import (
     draw_cinetic_energy_vector, draw_attraction_norm2, scientificNotation,
     spacePosToScreenPos, orbitalPeriod, C_EDUBANG,
     totalEnergy, kineticEnergy, momentum,
-    getAttractor
+    getAttractor, barycentre, toDate
 )
 from shared.components.Captors import Captors
 from shared.components.Prediction import Prediction
@@ -35,6 +35,7 @@ dk.image = None
 dk.stars = []
 dk.perlin = PerlinNoise(768)
 dk.wait = True
+dk.timer = 0
 
 def stopFocusFn() -> None:
     Game.Camera.focus = None
@@ -64,6 +65,7 @@ showAttractionNorm: bool = False
 showSV: bool = False
 showNames: bool = True
 showPrediction: bool = False
+showBarycentre: bool = False
 
 @Events.observe
 def window(w) -> None:
@@ -108,6 +110,7 @@ def keydown(event) -> None:
         Game.pause = not Game.pause
     if Game.keys["resetSimulation"]:
         Game.resetSpace()
+        dk.timer = 0
         f = Game.Camera.focus
         if f:
             for e in Game.space:
@@ -213,6 +216,13 @@ def loader() -> None:
     showPrediction = CheckBox((280, 391), False)
     showPrediction.prediction = None
     interface.append(showPrediction)
+
+    textShowBarycentre = Text("Afficher le barycentre", (20, 445), color=(255, 255, 255))
+    interface.append(textShowBarycentre)
+
+    showBarycentre = CheckBox((280, 441), False)
+    showBarycentre.barycentre = None
+    interface.append(showBarycentre)
 
     textShowSV = Text("Règle de mesure", (20, 555), color=(255, 255, 255))
     interface.append(textShowSV)
@@ -323,6 +333,28 @@ def stats(corps) -> None:
     screen.blit(text, (width - 330, 590))
     return
 
+def sAfterOne(n: int) -> str:
+    return "s" if n > 1 else ""
+
+def showTime(screen) -> None:
+    date = toDate(dk.timer)
+    text: str = "Temps écoulé : "
+    if date[0] > 0:
+        text += "%s an%s, " % (date[0], sAfterOne(date[0]))
+    if date[1] > 0:
+        text += "%s mois, " % date[1]
+    if date[2] > 0:
+        text += "%s semaine%s, " % (date[2], sAfterOne(date[2]))
+    if date[3] > 0:
+        text += "%s jour%s, " % (date[3], sAfterOne(date[3]))
+    if date[4] > 0:
+        text += "%s heure%s" % (date[4], sAfterOne(date[4]))
+    
+    w, h = screen.get_size()
+    surface = Game.font.render(text, False, (255, 255, 255))
+    screen.blit(surface, (380, h - 50))
+    return
+
 def draw(screen) -> None:
     screen.fill((0, 0, 0))
     width, height = screen.get_size()
@@ -356,6 +388,8 @@ def draw(screen) -> None:
             showNames = element.checked
         if hasattr(element, "prediction"):
             showPrediction = element.checked
+        if hasattr(element, "barycentre"):
+            showBarycentre = element.checked
 
     if Game.Camera.focus:
         dk.stopFocus.active = True
@@ -389,6 +423,13 @@ def draw(screen) -> None:
     if showPrediction:
         Prediction.predict(Game, 20)
 
+    if showBarycentre:
+        bX, bY = spacePosToScreenPos(barycentre(Game.space))
+        pg.draw.line(screen, (0, 255, 0), (bX - 8, bY), (bX + 8, bY), 2)
+        pg.draw.line(screen, (0, 255, 0), (bX, bY - 8), (bX, bY + 8), 2)
+
+    showTime(screen)
+
     menu(screen)
 
     if Game.Camera.focus:
@@ -421,6 +462,7 @@ def update() -> None:
             dk.loadingImageIndex = 0
 
     if dk.wait: return
+    dk.timer += Game.timeScale * (Game.deltaTime * 2.195)
     for corps in Game.space:
         corps.update_position([0, 0], Game.DT)
         for otherCorps in Game.space:

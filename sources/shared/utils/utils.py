@@ -681,9 +681,8 @@ with proto("Path") as Path:
     @Path
     def draw_corps_path(self, screen, path, color):
         for pos in path:
-            x = float((pos[0] + Game.Camera.x / Game.Camera.zoom) * Game.Camera.zoom)
-            y = float((pos[1] + Game.Camera.y / Game.Camera.zoom) * Game.Camera.zoom)
-            pg.draw.circle(screen, color, (x, y), 1)
+            pg.draw.circle(screen, color, spacePosToScreenPos(pos), 1)
+        return
 
 with proto("SizeViewer") as SizeViewer:
     def drawSizeViewer(self):
@@ -1223,6 +1222,18 @@ def orbitalPeriod(mass: float | int, semimajorAxe: float | int) -> float:
     """
     return (2 * pi * sqrt((semimajorAxe * 1e3) ** 3 / (G * mass))) / 86400
 
+def barycentre(space: list) -> tuple[int, int]:
+    mX, mY, mass = 0, 0, 0
+    for corps in space:
+        m: float | int = corps.mass
+        x, y = corps.pos
+        mX += m * x
+        mY += m * y
+        mass += m
+    if mass == 0:
+        return (0, 0)
+    return (mX / mass, mY / mass)
+
 def drawArrow(startPos: tuple[int, int], endPos: tuple[int, int], *, color: tuple[int, int, int] = (255, 255, 255), l: int = 2, c: int = 8) -> None:
     """
     Dessine une flèche
@@ -1288,5 +1299,22 @@ def getSize() -> tuple[int, int, str]:
     distance = closeTo(d)
     width: float = distance * 100 / d
     return (width, distance, unit)
+
+def toDate(secondsSinceStarting: float) -> tuple[int, int, int, int, int]:
+    """
+    Convertit des secondes en date.
+
+    Arguments:
+        secondsSinceStarting (float): Secondes écoulées depuis le début
+
+    Retourne:
+        tuple[int, int, int, int, int]: Date formatée (années, mois, semaines, jours, heures)
+    """
+    years: int = floor(secondsSinceStarting // 365)
+    months: int = floor((secondsSinceStarting - years * 365) // 30)
+    weeks: int = floor((secondsSinceStarting - years * 365 - months * 30) // 7)
+    days: int = floor(secondsSinceStarting - years * 365 - months * 30 - weeks * 7)
+    hours: int = floor((secondsSinceStarting - years * 365 - months * 30 - weeks * 7 - days) * 24)
+    return (years, months, weeks, days, hours)
 
 # endregion

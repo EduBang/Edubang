@@ -30,12 +30,7 @@ with proto("Corps") as Corps:
     
     @Corps
     def update_position(self, acc, dt) -> None:
-        self.path.append(self.pos) # Laisser ce code ira consommer environ 4Mo de RAM par seconde pour 10 corps.
-        if len(self.path) > 499: # On limite alors la liste du chemin à 500. C'est ajustable.
-            self.path.pop(0)
         # Mise à jour de la vitesse (conserve l'inertie)
-
-        # print(self.velocity)
         gamma: float = lorentzFactor(sqrt(self.velocity[0] ** 2 + self.velocity[1] ** 2))
 
         # selon prgm, acc en km/s
@@ -47,4 +42,8 @@ with proto("Corps") as Corps:
             self.pos[0] + self.velocity[0] * dt,
             self.pos[1] + self.velocity[1] * dt
         )
+
+        self.path.append(self.pos) # Laisser ce code ira consommer environ 4Mo de RAM par seconde pour 10 corps.
+        if len(self.path) > 499: # On limite alors la liste du chemin à 500. C'est ajustable.
+            self.path.pop(0)
         return
