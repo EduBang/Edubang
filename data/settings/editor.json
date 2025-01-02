@@ -1,1 +1,1 @@
-{"openInventory": {"name": "Ouvrir l'inventaire", "code": [9], "key": ["tab"]}}
+{"inventory": {"name": "Ouvrir l'inventaire", "code": [9], "key": ["tab"]}, "delete": {"name": "Supprimer un corps", "code": [102], "key": ["f"]}}

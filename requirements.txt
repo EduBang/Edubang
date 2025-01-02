@@ -2,4 +2,4 @@ pygame
 pillow
 proto-obj
 nsi25Perlin
-eventListen
+eventListen==0.0.5

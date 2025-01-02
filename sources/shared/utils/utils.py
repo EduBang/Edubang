@@ -31,6 +31,7 @@ FOCUS_COLOR: tuple[int, int, int] = (13, 178, 190)
 UNICODES: dict[int, str] = {
     0x9: "tab",
     0x20: "espace",
+    0x7F: "del",
     0x400000e2: "alt",
     0x400000e0: "ctrl"
 }
@@ -591,36 +592,37 @@ with proto("System") as System:
 
 with proto("Inventory") as Inventory:
     def drawInventory(self):
-        if self.active:
-            bodies = self.bodies.copy()
-            width, height = Game.screen.get_size()
-            x = width / 100
-            y = height / 100
-            pg.draw.rect(Game.screen, (10, 9, 9), pg.Rect((10 * x, 10 * y), (80 * x, 80 * y)), 0, 8)
-            pg.draw.rect(Game.screen, (255, 255, 255), pg.Rect((10 * x, 10 * y), (80 * x, 80 * y)), 1, 8)
-            w, h = 180, 100
-            r: bool = True
-            k: int = floor((80 * x) / (w + 12))
-            i: int = 0
-            dy = (10 * y + 10)
-            while r and k > 0:
-                dx = (10 * x + 10)
-                for j in range(k):
-                    body = bodies[i]
-                    pg.draw.rect(Game.screen, (255, 255, 255), pg.Rect((dx, dy), (w, h)), 1, 8)
-                    surface = Game.font.render(body["meta"]["name"], False, (255, 255, 255))
-                    Game.screen.blit(surface, (dx + 10, dy + 10))
-                    pg.draw.circle(Game.screen, body["color"], (dx + 130, dy + 50), 10)
-                    self.clickableZones[body["file"]] = ((dx, dy), (dx + 180, dy + 100))
-                    dx += 190
-                    i += 1
-                    if len(bodies) <= i:
-                        r = False
-                        break
-                dy += 110
+        if not self.active: return
+        bodies = self.bodies.copy()
+        width, height = Game.screen.get_size()
+        x = width / 100
+        y = height / 100
+        pg.draw.rect(Game.screen, (10, 9, 9), pg.Rect((10 * x, 10 * y), (80 * x, 80 * y)), 0, 8)
+        pg.draw.rect(Game.screen, (255, 255, 255), pg.Rect((10 * x, 10 * y), (80 * x, 80 * y)), 1, 8)
+        w, h = 180, 100
+        r: bool = True
+        k: int = floor((80 * x) / (w + 12))
+        i: int = 0
+        dy = (10 * y + 10)
+        while r and k > 0:
+            dx = (10 * x + 10)
+            for j in range(k):
+                body = bodies[i]
+                pg.draw.rect(Game.screen, (255, 255, 255), pg.Rect((dx, dy), (w, h)), 1, 8)
+                surface = Game.font.render(body["meta"]["name"], False, (255, 255, 255))
+                Game.screen.blit(surface, (dx + 10, dy + 10))
+                pg.draw.circle(Game.screen, body["color"], (dx + 130, dy + 50), 10)
+                self.clickableZones[body["file"]] = ((dx, dy), (dx + 180, dy + 100))
+                dx += 190
+                i += 1
+                if len(bodies) <= i:
+                    r = False
+                    break
+            dy += 110
         return
     
     def mousemotionIn(self, event) -> None:
+        if not self.active: return
         x, y = event.pos
         for cz in self.clickableZones.values():
             if x > cz[0][0] and x < cz[1][0] and y > cz[0][1] and y < cz[1][1]:
@@ -632,6 +634,7 @@ with proto("Inventory") as Inventory:
         return
     
     def mousebuttonupIn(self, event) -> None:
+        if not self.active: return
         button = event.button
         x, y = event.pos
         if button != 1: return

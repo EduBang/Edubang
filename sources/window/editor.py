@@ -1,20 +1,33 @@
 from json import load as loadJson
 from os import listdir, path
+from math import pi, sqrt
 
 import pygame as pg
 from eventListen import Events
 
 from main import Game, getFont
 from shared.components.Corps import Corps
-from shared.utils.utils import DataKeeper, Button, spacePosToScreenPos, getSize, Inventory, screenPosToSpacePos
+from shared.utils.utils import DataKeeper, Button, spacePosToScreenPos, getSize, Inventory, screenPosToSpacePos, Input
 
 dk = DataKeeper()
 dk.body = None
 dk.inventory = None
+dk.mouseselection = None
+dk.selected = []
 
 interface: list = []
 
 unitFont = getFont("Regular", 12)
+
+def minimum(startPos, endPos) -> tuple:
+    x1, y1 = startPos
+    x2, y2 = endPos
+    return (min(x1, x2), min(y1, y2))
+
+def maximum(startPos, endPos) -> tuple:
+    x1, y1 = startPos
+    x2, y2 = endPos
+    return (max(x1, x2), max(y1, y2))
 
 @Events.observe
 def keydown(event) -> None:
@@ -31,8 +44,12 @@ def keydown(event) -> None:
     key = Game.getKeyFromCode(keys)
     if key:
         Game.keys[key] = True
-    if Game.keys["openInventory"]:
+    if Game.keys["inventory"]:
         dk.inventory.active = not dk.inventory.active
+    if Game.keys["delete"]:
+        for corps in dk.selected:
+            Game.space.remove(corps)
+        dk.selected.clear()
 
     key = event.key
     
@@ -61,6 +78,30 @@ def mousebuttondown(event) -> None:
         corps = Corps(body["mass"], body["radius"], screenPosToSpacePos(pos), body["color"], (0, 0))
         Game.space.append(corps)
         dk.body = None
+    else:
+        for corps in Game.space:
+            x, y = spacePosToScreenPos(corps.pos)
+            sqx, sqy = (pos[0] - x) ** 2, (pos[1] - y) ** 2
+            if pi * (corps.radius * Game.Camera.zoom) ** 2 < 10:
+                if sqrt(sqx + sqy) < 10:
+                    Game.Camera.focus = corps
+                    break
+            if sqrt(sqx + sqy) < corps.radius * Game.Camera.zoom:
+                Game.Camera.focus = corps
+                break
+        else:
+            Game.Camera.focus = None
+            dk.selected.clear()
+            dk.mouseselection = screenPosToSpacePos(pos)
+    return
+
+@Events.observe
+def mousebuttonup(event) -> None:
+    if Game.window != "editor": return
+    button = event.button
+    if button != 1: return
+    if dk.mouseselection:
+        dk.mouseselection = None
     return
 
 def drawGrid() -> None:
@@ -79,6 +120,23 @@ def drawGrid() -> None:
         screen.blit(surface, spacePosToScreenPos((0, s)))
     return
 
+def drawMouseSelection() -> None:
+    if dk.mouseselection:
+        startPos = spacePosToScreenPos(dk.mouseselection)
+        endPos = pg.mouse.get_pos()
+        pos = minimum(startPos, endPos)
+        w, h = abs(endPos[0] - startPos[0]), abs(endPos[1] - startPos[1])
+        surface = pg.Surface((w, h))
+        surface.set_alpha(100)
+        surface.fill((54, 156, 235))
+        Game.screen.blit(surface, pos)
+    return
+
+def drawSelected() -> None:
+    for selected in dk.selected:
+        x, y = spacePosToScreenPos(selected.pos)
+        pg.draw.circle(Game.screen, (255, 255, 255), (x, y), selected.radius * Game.Camera.zoom, 1)
+
 def load() -> None:
     Game.Camera.active = True
     Game.Camera.zoom = 1
@@ -91,22 +149,51 @@ def load() -> None:
     interface.append(inventory)
     return
 
+def stats(corps) -> None:
+    screen = Game.screen
+    width, height = screen.get_size()
+
+    pg.draw.rect(screen, (10, 9, 9), (width - 350, 0, 350, height))
+    return
+
 def draw(screen) -> None:
     screen.fill((0, 0, 0))
+    width, height = screen.get_size()
 
     drawGrid()
 
     for corps in Game.space:
         corps.draw(screen, Game.Camera)
 
+    drawSelected()
+    drawMouseSelection()
+
     if dk.body:
         pos = pg.mouse.get_pos()
         radius: float | int = dk.body["radius"]
         pg.draw.circle(screen, (255, 255, 255), pos, radius * Game.Camera.zoom, 1)
     
+    pg.draw.rect(screen, (10, 9, 9), (0, 0, width, 100))
+    pg.draw.line(screen, (255, 255, 255), (0, 100), (width, 100))
+
+    if Game.Camera.focus:
+        stats(Game.Camera.focus)
+
+
     for element in interface:
         element.draw()
     return
 
 def update() -> None:
+    if dk.mouseselection:
+        pos = screenPosToSpacePos(pg.mouse.get_pos())
+        mini = minimum(dk.mouseselection, pos)
+        maxi = maximum(dk.mouseselection, pos)
+        for corps in Game.space:
+            if mini[0] < corps.pos[0] < maxi[0] and mini[1] < corps.pos[1] < maxi[1]:
+                if corps not in dk.selected:
+                    dk.selected.append(corps)
+            else:
+                if corps in dk.selected:
+                    dk.selected.remove(corps)
     return

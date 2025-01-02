@@ -462,7 +462,7 @@ def update() -> None:
             dk.loadingImageIndex = 0
 
     if dk.wait: return
-    dk.timer += Game.timeScale * (Game.deltaTime * 2.195)
+    dk.timer += Game.DT * 2.195
     for corps in Game.space:
         corps.update_position([0, 0], Game.DT)
         for otherCorps in Game.space:

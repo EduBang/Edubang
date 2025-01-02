@@ -3,7 +3,7 @@ from math import pi, sqrt
 from proto import proto
 import pygame as pg
 
-from ..utils.utils import spacePosToScreenPos, mergeEnergy
+from ..utils.utils import spacePosToScreenPos, mergeEnergy, lorentzFactor
 from .Vectors import Vectors
 from .Physics import Physics
 from .Captors import Captors
@@ -40,8 +40,10 @@ with proto("Prediction") as Prediction:
                     unitVector: tuple[float, float] = Vectors.get_unit_vector(pos, b["pos"])
                     acc: tuple[float, float] = (unitVector[0] * attraction / mass, unitVector[1] * attraction / mass)
 
-                    velocity[0] += acc[0] * k
-                    velocity[1] += acc[1] * k
+                    gamma: float = lorentzFactor(sqrt(velocity[0] ** 2 + velocity[1] ** 2))
+
+                    velocity[0] += acc[0] * k / gamma
+                    velocity[1] += acc[1] * k / gamma
                     
                     x += velocity[0] * k
                     y += velocity[1] * k
