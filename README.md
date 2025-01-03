@@ -190,3 +190,4 @@ Il nous sert aussi Ã  exporter des fonctions physiques, des fonctions relatifs Ã
 # **License**
 
 [GPLv3](https://opensource.org/licenses/)
+
