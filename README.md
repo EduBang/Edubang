@@ -2,50 +2,63 @@
 
 # EduBang
 
+EduBang est un logiciel développé en Python dans le cadre des [Trophées NSI](https://trophees-nsi.fr/), permettant de **simuler des interactions spatiales** entre astres selon la [loi universelle de la gravitation de Newton](https://fr.wikipedia.org/wiki/Loi_universelle_de_la_gravitation). Ce logiciel offre une représentation réaliste des trajectoires et forces gravitationnelles dans l’espace.
 
-Edubang est un projet développé en Python dans le cadre des Trophées NSI, permettant de simuler des interactions spatiales entre astres selon la loi universelle de la gravitation de Newton. Ce logiciel offre une représentation réaliste des trajectoires et forces gravitationnelles dans l’espace.
+Il permet de **créer des systèmes stellaires** personnalisés en ajoutant des astres tels que des étoiles, des planètes ou des lunes avec des paramètres définis comme la masse, la position ou la vitesse. Cette personnalisation offre une grande liberté créative pour explorer différents scénarios.
 
-Il permet de créer des systèmes stellaires personnalisés en ajoutant des astres (étoiles, planètes, lunes) avec des paramètres définis comme la masse, la position ou la vitesse. Cette personnalisation offre une grande liberté créative pour explorer différents scénarios.
+EduBang propose aussi **un espace d’expérimentation** où les utilisateurs peuvent modifier les caractéristiques physiques des astres et observer les conséquences sur le système, renforçant ainsi la compréhension des lois de la gravité par la pratique.
 
-Edubang propose aussi un espace d’expérimentation où les utilisateurs peuvent modifier les caractéristiques physiques des astres et observer les conséquences sur le système, renforçant ainsi la compréhension des lois de la gravité par la pratique.
-
-Conçu pour être intuitif et captivant, Edubang s’adresse aux élèves, enseignants et passionnés d’astronomie, combinant apprentissage scientifique et plaisir de la découverte.
+Conçu pour être intuitif et captivant, EduBang s’adresse aux élèves, enseignants et passionnés d’astronomie, combinant apprentissage scientifique et plaisir de la découverte.
 
 # **Documentation technique d'EduBang**
 
-Ce fichier décrit le mode d'utilisation d'Edubang ainsi que son fonctionnement.
+Cette partie décrit le mode d'utilisation d'Edubang ainsi que son fonctionnement.
 
 - [Mode d'utilisation](#mode-dutilisation)
 - [Code source](#code-source)
 
-## Mode d'utilisation
+# Mode d'utilisation
 
-1. Démarrer EduBang en exécutant le fichier [main.py](/sources/main.py) avec Python, le menu doit s'afficher après l'exécution du fichier.
-2. Utiliser le menu pour naviguer dans le logiciel. Aidez-vous du [plan du logiciel](#plan-du-logiciel)
+## Première installation
+
+### Windows 10 et plus
+
+1. Installer Python [3.12.5](https://www.python.org/downloads/release/python-3125/) ou plus.
+2. Démarrer EduBang en exécutant le fichier [start.bat](/start.bat), ce fichier installera toutes les dépendances puis exécutera EduBang.
+
+### macOS
+
+1. Installer Python [3.12.5](https://www.python.org/downloads/release/python-3125/) ou plus.
+2. Installer toutes les dépendances qui se trouvent dans le fichier [requirements.txt](/requirements.txt) avec pip.
+3. Démarrer EduBang en exécutant le fichier [main.py](/sources/main.py)
+
+---
+
+Utiliser le menu pour naviguer dans le logiciel. Aidez-vous du [plan du logiciel](#plan-du-logiciel)
 
 - [Découvrir](#découvrir)
-- [Éditeur de système]()
-- [Paramètres]()
-- [Quitter]()
+- [Éditeur de système](#éditeur-de-système)
+- [Paramètres](#paramètres)
+- [Quitter](#quitter)
 
-### Découvrir
+## Découvrir
 
 Ce menu vous permet de choisir un système à visualiser. <br/>
 Pour choisir un système, **Effectuer un clique gauche sur le système désiré**.
 
 Le logiciel vous redirigera par la suite dans le [Bac à sable](#bac-à-sable).
 
-### Éditeur de système
+## Éditeur de système
 
 À RÉDIGER
 
-### Paramètres
+## Paramètres
 
 Ce menu vous propose de modifier le volume de la musique.
 
 - [Contrôles](#contrôles)
 
-### Quitter
+## Quitter
 
 Ce bouton ferme EduBang.
 
@@ -80,7 +93,7 @@ puis **Presser la touche désirée**.
 Vous pouvez faire une association de touche en les combinants.
 > Exemple: Ctrl + S, Alt + Del, Ctrl + Alt + Espace, etc.
 
-*Pour MacOS*, les touches **Commande** (Cmd), **Alternative** (Alt), **Tabulation** (Tab), **Espace** sont aussi supportées.
+*Pour macOS*, les touches **Commande** (Cmd), **Alternative** (Alt), **Tabulation** (Tab), **Espace** sont aussi supportées.
 
 ## Plan du logiciel
 ```
@@ -113,7 +126,7 @@ Il est donc important d'avoir une configuration correcte pour pouvoir profiter e
 
 |                        | Configuration minimale | Configuration optimale           |
 |------------------------|------------------------|----------------------------------|
-| Système d'exploitation | Windows 10, MacOS      | Windows 10, MacOS                |
+| Système d'exploitation | Windows 10, macOS      | Windows 10, macOS                |
 | Processeur             | Dual Core 2.7 GHz      | Intel Core i5 ou Ryzen 5 ou plus |
 | Matériel               | Clavier                | Clavier, Pavé numérique, Souris  |
 
@@ -124,9 +137,9 @@ Le fichier [main.py](/sources/main.py) est le fichier principal, c'est lui qui g
 
 ---
 
-### Répertoire _window_
+### Répertoire _/window_
 
-Le répertoire _window_ sert à classer les écrans (ou pages) que comporte Edubang.
+Le répertoire _/window_ sert à classer les écrans (ou pages) que comporte Edubang.
 > Exemple: le menu, les paramètres, le bac à sable, etc.
 
 Les fichiers qu'il contient sont les écrans.
@@ -154,13 +167,13 @@ C'est une routine qui dépend de screen, un argument qui a pour valeur l'écran 
 
 ### Répertoire _/shared_
 
-Le répertoire _shared_ est le répertoire qui contient les composants d'Edubang.
+Le répertoire _/shared_ est le répertoire qui contient les composants d'Edubang.
 
-#### Components
+#### Répertoire _/components_
 
 C'est le répertoire qui contient les fichiers relatifs à la physique de la simulation.
 
-#### Utils
+#### Répertoire _/utils_
 
 C'est un répertoire qui contient le fichier utils.py.
 Ce fichier est le fichier qui nous sert à créer les éléments d'interface.
@@ -168,8 +181,7 @@ Ce fichier est le fichier qui nous sert à créer les éléments d'interface.
 
 Il nous sert aussi à exporter des fonctions physiques, des fonctions relatifs à la génération de l'espace, des constantes, etc.
 
-
-## Auteurs
+# **Auteurs**
 
 - [Anaël Chevillard](https://github.com/anaelchevillard)
 - [Sacha Freguin](https://github.com/AS-Pic)
@@ -178,4 +190,3 @@ Il nous sert aussi à exporter des fonctions physiques, des fonctions relatifs �
 # **License**
 
 [GPLv3](https://opensource.org/licenses/)
-
