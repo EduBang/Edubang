@@ -7,13 +7,27 @@ Ce fichier décrit le mode d'utilisation d'Edubang ainsi que son fonctionnement.
 
 # Mode d'utilisation
 
-1. Démarrer EduBang en exécutant le fichier [main.py](/sources/main.py) avec Python, le menu doit s'afficher après l'exécution du fichier.
-2. Utiliser le menu pour naviguer dans le logiciel. Aidez-vous du [plan du logiciel](#plan-du-logiciel)
+## Première installation
+
+### Windows 10 et plus
+
+1. Installer Python [3.12.5](https://www.python.org/downloads/release/python-3125/) ou plus.
+2. Démarrer EduBang en exécutant le fichier [start.bat](/start.bat), ce fichier installera toutes les dépendances puis exécutera EduBang.
+
+### MacOS
+
+1. Installer Python [3.12.5](https://www.python.org/downloads/release/python-3125/) ou plus.
+2. Installer toutes les dépendances qui se trouvent dans le fichier [requirements.txt](/requirements.txt) avec pip.
+3. Démarrer EduBang en exécutant le fichier [main.py](/sources/main.py)
+
+---
+
+Utiliser le menu pour naviguer dans le logiciel. Aidez-vous du [plan du logiciel](#plan-du-logiciel)
 
 - [Découvrir](#découvrir)
-- [Éditeur de système]()
-- [Paramètres]()
-- [Quitter]()
+- [Éditeur de système](#éditeur-de-système)
+- [Paramètres](#paramètres)
+- [Quitter](#quitter)
 
 ## Découvrir
 

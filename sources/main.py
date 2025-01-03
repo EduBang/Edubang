@@ -74,6 +74,7 @@ with proto("Game") as Game:
         self.tmusic = None
         self.pause = False
         self.subprocess = None
+        self.screenSize = screen.get_size()
 
         ws = [w for w in listdir("sources/window") if path.isfile(path.join("sources/window", w))]
         for w in ws:
@@ -336,10 +337,13 @@ def main() -> None:
             if Game.keys["cameraRight"]:
                 Game.Camera.x -= Game.Camera.speed
 
+        Game.screenSize = screen.get_size()
+
         Game.draw()
         if Game.pause: continue
         Game.update()
+    
+    Game.quit()
     return
 
 main()
-Game.quit()

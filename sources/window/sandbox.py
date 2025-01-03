@@ -20,7 +20,7 @@ from shared.utils.utils import (
     getAttractor, barycentre, toDate
 )
 from shared.components.Captors import Captors
-from shared.components.Prediction import Prediction
+from shared.components.Prediction import predict
 from shared.components.Spaceship import Space_ship
 from shared.components.Physics import G
 from shared.components.Vectors import Vectors
@@ -153,7 +153,7 @@ def mousebuttondown(event) -> None:
 def loader() -> None:
     dk.wait = True
     Game.Camera.active = True
-    w, h = Game.screen.get_size()
+    w, h = Game.screenSize
     Game.Camera.x = w // 2
     Game.Camera.y = h // 2
     dk.active = True
@@ -232,8 +232,6 @@ def loader() -> None:
     showSV.sv = None
     interface.append(showSV)
 
-    w, h = Game.screen.get_size()
-
     sizeViewer = SizeViewer((w - 200, h - 50))
     sizeViewer.measure = None
     interface.append(sizeViewer)
@@ -263,7 +261,7 @@ def load(*args, **kwargs) -> None:
     return
 
 def menu(screen) -> None:
-    width, height = screen.get_size()
+    width, height = Game.screenSize
     pg.draw.rect(screen, (10, 9, 9), (0, 0, 350, height))
 
     screen.blit(brand, (20, 20))
@@ -283,7 +281,7 @@ def menu(screen) -> None:
 
 def stats(corps) -> None:
     screen = Game.screen
-    width, height = screen.get_size()
+    width, height = Game.screenSize
 
     pg.draw.rect(screen, (10, 9, 9), (width - 350, 0, 350, height))
     pg.draw.rect(screen, (0, 0, 0), (width - 340, 10, 330, 150))
@@ -337,27 +335,29 @@ def sAfterOne(n: int) -> str:
     return "s" if n > 1 else ""
 
 def showTime(screen) -> None:
-    date = toDate(dk.timer)
-    text: str = "Temps écoulé : "
-    if date[0] > 0:
-        text += "%s an%s, " % (date[0], sAfterOne(date[0]))
-    if date[1] > 0:
-        text += "%s mois, " % date[1]
-    if date[2] > 0:
-        text += "%s semaine%s, " % (date[2], sAfterOne(date[2]))
-    if date[3] > 0:
-        text += "%s jour%s, " % (date[3], sAfterOne(date[3]))
-    if date[4] > 0:
-        text += "%s heure%s" % (date[4], sAfterOne(date[4]))
+    text: str = "Temps écoulé : 0 heure"
+    if dk.timer > 0:
+        date = toDate(dk.timer)
+        text: str = "Temps écoulé : "
+        if date[0] > 0:
+            text += "%s an%s, " % (date[0], sAfterOne(date[0]))
+        if date[1] > 0:
+            text += "%s mois, " % date[1]
+        if date[2] > 0:
+            text += "%s semaine%s, " % (date[2], sAfterOne(date[2]))
+        if date[3] > 0:
+            text += "%s jour%s, " % (date[3], sAfterOne(date[3]))
+        if date[4] > 0:
+            text += "%s heure%s" % (date[4], sAfterOne(date[4]))
     
-    w, h = screen.get_size()
+    w, h = Game.screenSize
     surface = Game.font.render(text, False, (255, 255, 255))
     screen.blit(surface, (380, h - 50))
     return
 
 def draw(screen) -> None:
     screen.fill((0, 0, 0))
-    width, height = screen.get_size()
+    width, height = Game.screenSize
     if not dk.loadingFinished:
         text = Game.font.render("Chargement...", False, (255, 255, 255))
         tW, tH = Game.font.size("Chargement...")
@@ -421,7 +421,7 @@ def draw(screen) -> None:
         draw_attraction_norm2(screen)
 
     if showPrediction:
-        Prediction.predict(Game, 20)
+        predict(Game, 20)
 
     if showBarycentre:
         bX, bY = spacePosToScreenPos(barycentre(Game.space))
@@ -447,7 +447,6 @@ def draw(screen) -> None:
                 element.focus = False
 
     if Game.pause:
-        width, height = screen.get_size()
         text = Game.font.render("Simulation en pause", False, (255, 255, 255))
         tW, tH = Game.font.size("Simulation en pause")
         screen.blit(text, (width // 2 - tW // 2, height // 2 - tH // 2 - 200))

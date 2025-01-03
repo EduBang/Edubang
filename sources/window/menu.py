@@ -10,7 +10,7 @@ from main import Game, getFont
 from shared.utils.utils import updateCorps, process_collide, Button, C_EDUBANG, spacePosToScreenPos, DataKeeper, loadSpace
 from shared.components.Corps import Corps
 from shared.components.Captors import Captors
-from shared.components.Prediction import Prediction
+from shared.components.Prediction import predict
 
 dk = DataKeeper()
 
@@ -191,6 +191,8 @@ def load() -> None:
 def draw(screen) -> None:
     screen.fill((0, 0, 0))
 
+    w, h = Game.screenSize
+
     screen.blit(dk.image, (0, 0))
 
     for corps in Game.space:
@@ -201,17 +203,17 @@ def draw(screen) -> None:
             surface = Game.font.render(corps.name, False, (255, 255, 255))
             screen.blit(surface, (x + 18, y - 30))
 
-    Prediction.predict(Game, v[0], v[1])
+    predict(Game, v[0], v[1])
     
     if dk.time <= 5:
         k: float = 255 - (255 * dk.time / 5)
-        surface = pg.Surface(screen.get_size(), pg.SRCALPHA)
+        surface = pg.Surface((w, h), pg.SRCALPHA)
         surface.fill((0, 0, 0, k))
         screen.blit(surface, (0, 0))
     
     if dk.time >= 10:
         k: float = 255 - (255 * (15 - dk.time) / 5)
-        surface = pg.Surface(screen.get_size(), pg.SRCALPHA)
+        surface = pg.Surface((w, h), pg.SRCALPHA)
         surface.fill((0, 0, 0, k))
         screen.blit(surface, (0, 0))
     
@@ -220,7 +222,6 @@ def draw(screen) -> None:
     for element in interface:
         element.draw()
 
-    w, h = screen.get_size()
     surface = semibold.render("NE PAS DIFFUSER - CONFIDENTIEL", False, (128, 128, 128))
     screen.blit(surface, (w - 450, h - 100))
 

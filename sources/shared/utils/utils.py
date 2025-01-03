@@ -210,7 +210,7 @@ with proto("MessageBox") as MessageBox:
     @MessageBox
     def draw(self) -> None:
         if not self.active: return
-        widthScreen, heightScreen = pg.display.get_surface().get_size()
+        widthScreen, heightScreen = Game.screenSize
         surface = Game.font.render(self.text, False, (0, 0, 0))
         width, height = Game.font.size(self.text)
         x = widthScreen // 2
@@ -594,7 +594,7 @@ with proto("Inventory") as Inventory:
     def drawInventory(self):
         if not self.active: return
         bodies = self.bodies.copy()
-        width, height = Game.screen.get_size()
+        width, height = Game.screenSize
         x = width / 100
         y = height / 100
         pg.draw.rect(Game.screen, (10, 9, 9), pg.Rect((10 * x, 10 * y), (80 * x, 80 * y)), 0, 8)
@@ -1064,7 +1064,7 @@ def draw_attraction_norm(screen) -> None:
 
     pg.draw.line(screen, (255, 255, 255), mouse_pos, spacePosToScreenPos(attraction_vector_sum), 5)
 
-    screen_width, screen_height = screen.get_size()
+    screen_width, screen_height = Game.screenSize
 
     # Coordonnées fixes pour le bas et au centre
     draw_text(screen, f"Pointeur écran : {mouse_pos}", (screen_width // 2 - 100, screen_height - 60), font)

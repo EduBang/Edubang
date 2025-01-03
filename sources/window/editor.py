@@ -7,6 +7,7 @@ from eventListen import Events
 
 from main import Game, getFont
 from shared.components.Corps import Corps
+from shared.components.Prediction import predict
 from shared.utils.utils import DataKeeper, Button, spacePosToScreenPos, getSize, Inventory, screenPosToSpacePos, Input
 
 dk = DataKeeper()
@@ -107,7 +108,7 @@ def mousebuttonup(event) -> None:
 def drawGrid() -> None:
     w, distance, unit = getSize()
     screen = Game.screen
-    width, height = screen.get_size()
+    width, height = Game.screenSize
     k: int = int(width // w)
     for i in range(-5 * k, 5 * k):
         color: tuple[int, int, int] = (100, 100, 100) if i != 0 else (255, 255, 255)
@@ -140,7 +141,7 @@ def drawSelected() -> None:
 def load() -> None:
     Game.Camera.active = True
     Game.Camera.zoom = 1
-    w, h = Game.screen.get_size()
+    w, h = Game.screenSize
     Game.Camera.x = w // 2
     Game.Camera.y = h // 2
 
@@ -149,16 +150,15 @@ def load() -> None:
     interface.append(inventory)
     return
 
-def stats(corps) -> None:
+def stats(corps, width, height) -> None:
     screen = Game.screen
-    width, height = screen.get_size()
 
     pg.draw.rect(screen, (10, 9, 9), (width - 350, 0, 350, height))
     return
 
 def draw(screen) -> None:
     screen.fill((0, 0, 0))
-    width, height = screen.get_size()
+    width, height = Game.screenSize
 
     drawGrid()
 
@@ -172,13 +172,12 @@ def draw(screen) -> None:
         pos = pg.mouse.get_pos()
         radius: float | int = dk.body["radius"]
         pg.draw.circle(screen, (255, 255, 255), pos, radius * Game.Camera.zoom, 1)
-    
-    pg.draw.rect(screen, (10, 9, 9), (0, 0, width, 100))
-    pg.draw.line(screen, (255, 255, 255), (0, 100), (width, 100))
 
     if Game.Camera.focus:
-        stats(Game.Camera.focus)
+        stats(Game.Camera.focus, width, height)
 
+    pg.draw.rect(screen, (10, 9, 9), (0, 0, width, 100))
+    pg.draw.line(screen, (255, 255, 255), (0, 100), (width, 100))
 
     for element in interface:
         element.draw()
