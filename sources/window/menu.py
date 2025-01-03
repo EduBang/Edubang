@@ -6,7 +6,6 @@ from PIL import Image
 from eventListen import Events
 from nsi25perlin import PerlinNoise
 
-
 from main import Game, getFont
 from shared.utils.utils import updateCorps, process_collide, Button, C_EDUBANG, spacePosToScreenPos, DataKeeper, loadSpace
 from shared.components.Corps import Corps
@@ -27,16 +26,6 @@ dk.time = 15
 
 semibold = getFont("SemiBold", 20)
 
-def goSandbox() -> None:
-    Game.reset()
-    Game.select("sandbox")
-    return
-
-def goSettings() -> None:
-    Game.reset()
-    Game.select("settings")
-    return
-
 def goDiscover() -> None:
     Game.reset()
     Game.select("discover")
@@ -47,13 +36,17 @@ def goEditor() -> None:
     Game.select("editor")
     return
 
+def goSettings() -> None:
+    Game.reset()
+    Game.select("settings")
+    return
 
 def quitFunction() -> None:
     Game.running = False
     return
 
-interface = []
-v = [100, 1]
+interface: list = []
+v: list[int, int] = [100, 1]
 
 @Events.observe
 def window(w) -> None:
@@ -63,7 +56,7 @@ def window(w) -> None:
 
 def loadRandomSpace() -> None:
     Game.Camera.zoom = 1
-    x = 10
+    x: int = 10
     for i in range(x):
         a = Corps(randint(5 * 10 ** 14, 20 * 10 ** 14),
                 randint(10, 50),
@@ -72,8 +65,6 @@ def loadRandomSpace() -> None:
                 (randint(-100, 100) / 1000, randint(-100, 100) / 1000)
             )
         Game.space.append(a)
-    v[0] = 100
-    v[1] = 1
     return
 
 def loadSolarSystem() -> None:
@@ -120,8 +111,6 @@ def loadTest1() -> None:
     b = Corps(6e17, 100, (900, 500), (0, 0, 255), (0, 0))
     Game.space.append(a)
     Game.space.append(b)
-    v[0] = 100
-    v[1] = 1
     return
 
 def loadTest2() -> None:
@@ -130,8 +119,6 @@ def loadTest2() -> None:
     mars = Corps(6e17, 50, (900, 500), (0, 0, 255), (0, 0))
     Game.space.append(terre)
     Game.space.append(mars)
-    v[0] = 100
-    v[1] = 1
     Game.Camera.x = 600
     Game.Camera.y = 0
     return
@@ -142,8 +129,6 @@ def loadTest3() -> None:
     b = Corps(6e17, 50, (100, 900), (0, 0, 255), (-100, -100))
     Game.space.append(a)
     Game.space.append(b)
-    v[0] = 100
-    v[1] = 1
     Game.Camera.x = 1000
     Game.Camera.y = 0
     return
@@ -158,16 +143,18 @@ cases = {
 
 def reset() -> None:
     Game.reset()
+    v[0] = 100
+    v[1] = 1
     cases[randint(0, 4)]()
     return
 
-def load(*args, **kwargs) -> None:
+def load() -> None:
     cases[randint(0, 4)]()
 
     icons: list = [pg.transform.scale(pg.image.load("./data/images/%s.png" % i), (38, 50)) for i in ("play", "pencil", "settings", "power")]
 
     discoverButton = Button((100, 300), (170, 60), color=(13, 178, 190))
-    discoverButton.text = "Démarrer"
+    discoverButton.text = "Découvrir"
     discoverButton.font = semibold
     discoverButton.textColor = (255, 255, 255)
     discoverButton.icon = icons[0]
@@ -191,7 +178,7 @@ def load(*args, **kwargs) -> None:
     interface.append(settingsButton)
 
     quitButton = Button((100, 600), (240, 60), color=(13, 178, 190))
-    quitButton.text = "Quitter Edubang"
+    quitButton.text = "Quitter EduBang"
     quitButton.font = semibold
     quitButton.textColor = (255, 255, 255)
     quitButton.icon = icons[3]

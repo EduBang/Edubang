@@ -134,8 +134,8 @@ def drawMouseSelection() -> None:
 
 def drawSelected() -> None:
     for selected in dk.selected:
-        x, y = spacePosToScreenPos(selected.pos)
-        pg.draw.circle(Game.screen, (255, 255, 255), (x, y), selected.radius * Game.Camera.zoom, 1)
+        pg.draw.circle(Game.screen, (255, 255, 255), spacePosToScreenPos(selected.pos), selected.radius * Game.Camera.zoom, 1)
+    return
 
 def load() -> None:
     Game.Camera.active = True

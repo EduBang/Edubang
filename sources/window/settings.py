@@ -67,7 +67,7 @@ def load() -> None:
     return
 
 def draw(screen) -> None:
-    screen.fill((0, 0 ,0))
+    screen.fill((0, 0, 0))
     surface = Game.title.render("Paramètres", False, (255, 255, 255))
     screen.blit(surface, (100, 100))
 

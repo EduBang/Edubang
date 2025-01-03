@@ -24,8 +24,6 @@ exponentFont = getFont("Medium", 12)
 titleFont = getFont("Regular", 20)
 descriptionFont = getFont("Regular", 14)
 
-# region Prototypes
-
 FOCUS_COLOR: tuple[int, int, int] = (13, 178, 190)
 
 UNICODES: dict[int, str] = {
@@ -48,6 +46,8 @@ C_UNICODES = UNICODES if Game.os == "Windows" else UNICODES_DARWIN
 fnKeys: tuple = (0x400000e2 if Game.os == "Windows" else 0x37, 0x400000e0 if Game.os == "Windows" else 0x3b)
 
 SCROLL_SPEED: int = 20
+
+# region Prototypes
 
 def onHover() -> None:
     pg.mouse.set_cursor(pg.SYSTEM_CURSOR_HAND)
@@ -644,6 +644,7 @@ with proto("Inventory") as Inventory:
                     if body["file"] != file:
                         continue
                     Events.trigger("inventory", body)
+                    Events.trigger("unhovering", self)
                     self.active = False
                     return
 
@@ -673,7 +674,6 @@ with proto("Inventory") as Inventory:
         })
         return
 
-# prototype pour garder des variables
 with proto("DataKeeper") as DataKeeper:
     @DataKeeper
     def new(self):
@@ -1226,6 +1226,15 @@ def orbitalPeriod(mass: float | int, semimajorAxe: float | int) -> float:
     return (2 * pi * sqrt((semimajorAxe * 1e3) ** 3 / (G * mass))) / 86400
 
 def barycentre(space: list) -> tuple[int, int]:
+    """
+    Calcule les coordonnées du barycentre d'un système
+
+    Arguments:
+        space (list): Liste des astres du système
+    
+    Retourne:
+        tuple[int, int]: Coordonnées du barycentre
+    """
     mX, mY, mass = 0, 0, 0
     for corps in space:
         m: float | int = corps.mass
@@ -1280,6 +1289,15 @@ def getAttractor(corps):
     return attractors[max(attractors)]
 
 def closeTo(n: float | int) -> int:
+    """
+    Donne le numbre le plus de n entre 1 * k, 2 * k, 5 * k et 10 * k, k étant la puissante de 10 de n
+
+    Arguments:
+        n (float | int): Nombre cible
+
+    Retourne:
+        int: Le nombre le plus proche de n
+    """
     k: int = 10 ** floor(log10(n))
     closest: list = sorted((k, 2 * k, 5 * k, 10 * k), key=lambda x: (abs(n - x), x))
     return closest[0]
