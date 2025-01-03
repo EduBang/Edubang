@@ -154,7 +154,7 @@ C'est une routine qui dépend de screen, un argument qui a pour valeur l'écran 
 
 ---
 
-### Répertoire _shared_
+### Répertoire _/shared_
 
 Le répertoire _shared_ est le répertoire qui contient les composants d'Edubang.
 
