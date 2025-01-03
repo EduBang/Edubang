@@ -171,7 +171,7 @@ Ce fichier est le fichier qui nous sert à créer les éléments d'interface.
 Il nous sert aussi à exporter des fonctions physiques, des fonctions relatifs à la génération de l'espace, des constantes, etc.
 
 
-## Authors
+## Auteurs
 
 - [Anaël Chevillard](https://github.com/anaelchevillard)
 - [Sacha Freguin](https://github.com/AS-Pic)
