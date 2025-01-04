@@ -5,21 +5,29 @@ import pygame as pg
 from ..utils.utils import spacePosToScreenPos, mergeEnergy, lorentzFactor
 from .Vectors import Vectors
 from .Physics import Physics
-from .Captors import Captors
+from .Captors import isColliding
 from .Corps import Corps
 
 def predict(game, n: int = 0, k: int = 100) -> None:
+    """
+    Prédit les trajectoire des astres
+
+    Arguments:
+        game (Game): Le prototype de Game
+        n (int): Le nombre d'itération
+        k (int): le pas de temps
+
+    Retourne:
+        None
+    """
     if game.timeScale == 0: return
 
     space: list = [{"pos": tuple(i.pos), "velocity": list(i.velocity), "mass": int(i.mass), "corps": i} for i in game.space]
 
     k *= (5e-2 if game.timeScale > 0 else -5e-2)
 
-    poses: dict = {}
+    poses: dict = {item["corps"]: [] for item in space}
     futureCollided: list = []
-
-    for i in space:
-        poses[i["corps"]] = []
 
     for i in range(n):
         cache = []
@@ -57,7 +65,7 @@ def predict(game, n: int = 0, k: int = 100) -> None:
                 if j in futureCollided or i == j: continue
                 lastPosJ: tuple[float, float] = poses[j][-1]
                 d: float = Vectors.get_distance(lastPosI, lastPosJ)
-                if Captors.collide(i, j, d):
+                if isColliding(i, j, d):
                     x, y = lastPosI if i.mass > j.mass else lastPosJ
                     radius: float = sqrt(((pi * i.radius ** 2) + (pi * j.radius ** 2)) / pi)
                     pg.draw.circle(game.screen, (255, 255, 255), spacePosToScreenPos((x, y)), radius, 1)

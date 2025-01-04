@@ -1,1 +1,1 @@
-{"inventory": {"name": "Ouvrir l'inventaire", "code": [9], "key": ["tab"]}, "delete": {"name": "Supprimer un corps", "code": [102], "key": ["f"]}}
+{"inventory": {"name": "Ouvrir l'inventaire", "code": [9], "key": ["tab"]}, "delete": {"name": "Supprimer un corps", "code": [102], "key": ["f"]}, "selectAll": {"name": "Tout s\u00e9lectionner", "code": [1073742048, 97], "key": ["ctrl", "a"]}, "save": {"name": "Sauvegarder", "code": [1073742048, 115], "key": ["ctrl", "s"]}}

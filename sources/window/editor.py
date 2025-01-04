@@ -1,4 +1,5 @@
 from json import load as loadJson
+from json import dumps
 from os import listdir, path
 from math import pi, sqrt
 
@@ -8,17 +9,34 @@ from eventListen import Events
 from main import Game, getFont
 from shared.components.Corps import Corps
 from shared.components.Prediction import predict
-from shared.utils.utils import DataKeeper, Button, spacePosToScreenPos, getSize, Inventory, screenPosToSpacePos, Input
+from shared.utils.utils import DataKeeper, Button, spacePosToScreenPos, getSize, Inventory, screenPosToSpacePos, Input, barycentre
 
 dk = DataKeeper()
 dk.body = None
 dk.inventory = None
 dk.mouseselection = None
 dk.selected = []
+dk.specialKeys = []
+dk.saving = False
+dk.saveTarget = []
+dk.saveCanva = {}
+dk.standBy = False
+dk.tsave = None
+
+semibold = getFont("SemiBold", 16)
 
 interface: list = []
 
 unitFont = getFont("Regular", 12)
+
+def pause() -> None:
+    dk.standBy = True
+    Game.Camera.active = False
+    return
+
+def resume() -> None:
+    dk.standBy = False
+    Game.Camera.active = True
 
 def minimum(startPos, endPos) -> tuple:
     x1, y1 = startPos
@@ -30,9 +48,88 @@ def maximum(startPos, endPos) -> tuple:
     x2, y2 = endPos
     return (max(x1, x2), max(y1, y2))
 
+def resetSaveCanva() -> None:
+    saveButton, inputName, inputDescription = [dk.saveCanva[i] for i in ("save", "name", "description")]
+    dk.saving = False
+    dk.saveTarget.clear()
+    saveButton.active = False
+    inputName.active = False
+    inputName.visible = False
+    inputName.text = ""
+    inputDescription.active = False
+    inputDescription.visible = False
+    inputDescription.text = ""
+    dk.standBy = False
+    Game.Camera.active = True
+    return
+
+def doSave() -> None:
+    name: str = dk.saveCanva["name"].text
+    if not name:
+        astreSysteme: str = "astre" if len(dk.saveTarget) == 1 else "système"
+        dk.tsave = [5, "Nommez votre %s." % astreSysteme, (255, 0, 0)]
+        return
+    description: str = dk.saveCanva["description"].text
+    fileName: str = name.replace(" ", "_").lower()
+
+    if len(dk.saveTarget) == 1:
+        with open("data/bodies/%s.json" % fileName, "w+", encoding="utf-8") as f:
+            f.write(dumps({
+                "mass": dk.saveTarget[0].mass,
+                "radius": dk.saveTarget[0].radius,
+                "color": dk.saveTarget[0].color,
+                "meta": {
+                    "name": name,
+                    "description": description,
+                }
+            }))
+            f.close()
+    else:
+        with open("data/systems/%s.json" % fileName, "w+", encoding="utf-8") as f:
+            space: list = []
+            for corps in dk.saveTarget:
+                meta = {}
+                if hasattr(corps, "name"):
+                    meta["name"] = corps.name
+                if hasattr(corps, "description"):
+                    meta["description"] = corps.description
+                space.append({
+                    "mass": corps.mass,
+                    "radius": corps.radius,
+                    "position": corps.pos,
+                    "color": corps.color,
+                    "velocity": corps.velocity,
+                    "meta": meta
+                })
+            data: dict = {}
+            data["title"] = name
+            data["description"] = description
+            data["space"] = space
+
+            f.write(dumps(data))
+
+            f.close()
+    resetSaveCanva()
+    dk.tsave = [5, "%s sauvegardé" % name, (0, 255, 0)]
+    dk.inventory.update()
+    return
+
 @Events.observe
 def keydown(event) -> None:
     if Game.window != "editor": return
+    key = event.key
+
+    if key == pg.K_ESCAPE:
+        if dk.saving: resetSaveCanva()
+        if dk.body: dk.body = None
+
+    if dk.standBy: return
+    
+    if key == pg.K_KP_PLUS and Game.Camera.zoom < Game.Camera.maxZoom:
+        Game.Camera.zoom *= 1.05
+    elif key == pg.K_KP_MINUS and Game.Camera.zoom > Game.Camera.minZoom:
+        Game.Camera.zoom /= 1.05
+
     keys = []
     
     mods = pg.key.get_mods()
@@ -45,19 +142,45 @@ def keydown(event) -> None:
     key = Game.getKeyFromCode(keys)
     if key:
         Game.keys[key] = True
+
     if Game.keys["inventory"]:
         dk.inventory.active = not dk.inventory.active
     if Game.keys["delete"]:
         for corps in dk.selected:
             Game.space.remove(corps)
         dk.selected.clear()
+    if Game.keys["selectAll"]:
+        dk.selected = Game.space.copy()
+    if Game.keys["save"] and len(dk.selected) > 0:
+        dk.saving = True
+        dk.saveTarget = dk.selected.copy()
+        Game.keys[key] = False
+    return
 
-    key = event.key
+@Events.observe
+def keyup(event) -> None:
+    if Game.window != "editor": return
+    if dk.standBy: return
+    keys = []
     
-    if key == pg.K_KP_PLUS and Game.Camera.zoom < Game.Camera.maxZoom:
-        Game.Camera.zoom *= 1.05
-    elif key == pg.K_KP_MINUS and Game.Camera.zoom > Game.Camera.minZoom:
-        Game.Camera.zoom /= 1.05
+    mods = pg.key.get_mods()
+    if mods & pg.KMOD_LCTRL:
+        dk.specialKeys.append(0x400000e0)
+    if mods & pg.KMOD_LALT:
+        dk.specialKeys.append(0x400000e2)
+    if event.key not in dk.specialKeys:
+        keys.append(event.key)
+    
+    if len(keys) > 0:
+        key = Game.getKeyFromCode(keys)
+        if key:
+            Game.keys[key] = False
+        if len(dk.specialKeys) > 0:
+            keys = dk.specialKeys + keys
+            dk.specialKeys.clear()
+        key = Game.getKeyFromCode(keys)
+        if key:
+            Game.keys[key] = False
     return
 
 @Events.observe
@@ -77,6 +200,8 @@ def mousebuttondown(event) -> None:
     if body:
         pos = event.pos
         corps = Corps(body["mass"], body["radius"], screenPosToSpacePos(pos), body["color"], (0, 0))
+        for meta in body["meta"]:
+            setattr(corps, meta, body["meta"][meta])
         Game.space.append(corps)
         dk.body = None
     else:
@@ -134,8 +259,49 @@ def drawMouseSelection() -> None:
     return
 
 def drawSelected() -> None:
+    if len(dk.selected) < 1: return
+    c = dk.selected[0]
+    pos: tuple[float, float] = spacePosToScreenPos(c.pos)
+    x1 = pos[0] - c.radius * Game.Camera.zoom
+    y1 = pos[1] - c.radius * Game.Camera.zoom
+    x2 = pos[0] + c.radius * Game.Camera.zoom
+    y2 = pos[1] + c.radius * Game.Camera.zoom
     for selected in dk.selected:
-        pg.draw.circle(Game.screen, (255, 255, 255), spacePosToScreenPos(selected.pos), selected.radius * Game.Camera.zoom, 1)
+        x, y = spacePosToScreenPos(selected.pos)
+        pg.draw.circle(Game.screen, (255, 255, 255), (x, y), selected.radius * Game.Camera.zoom, 1)
+        dx1, dy1 = x - selected.radius * Game.Camera.zoom, y - selected.radius * Game.Camera.zoom
+        dx2, dy2 = x + selected.radius * Game.Camera.zoom, y + selected.radius * Game.Camera.zoom
+        if dx1 < x1:
+            x1 = dx1
+        if dy1 < y1:
+            y1 = dy1
+        if dx2 > x2:
+            x2 = dx2
+        if dy2 > y2:
+            y2 = dy2
+    pg.draw.rect(Game.screen, (255, 255, 255), (x1, y1, x2 - x1, y2 - y1), 1)
+
+    bX, bY = spacePosToScreenPos(barycentre(dk.selected))
+    pg.draw.line(Game.screen, (0, 255, 0), (bX - 8, bY), (bX + 8, bY), 2)
+    pg.draw.line(Game.screen, (0, 255, 0), (bX, bY - 8), (bX, bY + 8), 2)
+    return
+
+def drawSaving(width, height) -> None:
+    if not dk.saving: return
+    x, y = (width - 900) // 2, (height - 450) // 2
+    pg.draw.rect(Game.screen, (10, 9, 9), (x, y, 900, 450))
+    pg.draw.rect(Game.screen, (255, 255, 255), (x, y, 900, 450), 1)
+
+    saveButton, inputName, inputDescription = [dk.saveCanva[i] for i in ("save", "name", "description")]
+    inputName.position = (x + 10, y + 10)
+    inputDescription.position = (x + 10, y + 80)
+    saveButton.position = (x + 10, y + 380)
+    if not saveButton.active:
+        saveButton.active = True
+        inputName.active = True
+        inputName.visible = True
+        inputDescription.active = True
+        inputDescription.visible = True
     return
 
 def load() -> None:
@@ -148,6 +314,35 @@ def load() -> None:
     inventory = Inventory()
     dk.inventory = inventory
     interface.append(inventory)
+
+    saveButton = Button((0, 0), (180, 60))
+    saveButton.text = "Sauvegarder"
+    saveButton.font = semibold
+    saveButton.onPressed = doSave
+    saveButton.active = False
+    interface.append(saveButton)
+    dk.saveCanva["save"] = saveButton
+
+    inputName = Input("", (0, 0), (180, 60))
+    inputName.name = None
+    inputName.placeholder = "Nom"
+    inputName.active = False
+    inputName.visible = False
+    inputName.onPressed = pause
+    inputName.afterInput = resume
+    interface.append(inputName)
+    dk.saveCanva["name"] = inputName
+
+    inputDescription = Input("", (0, 0), (180, 60))
+    inputDescription.description = None
+    inputDescription.placeholder = "Description"
+    inputDescription.active = False
+    inputDescription.visible = False
+    inputDescription.onPressed = pause
+    inputDescription.afterInput = resume
+    interface.append(inputDescription)
+    dk.saveCanva["description"] = inputDescription
+
     return
 
 def stats(corps, width, height) -> None:
@@ -179,8 +374,21 @@ def draw(screen) -> None:
     pg.draw.rect(screen, (10, 9, 9), (0, 0, width, 100))
     pg.draw.line(screen, (255, 255, 255), (0, 100), (width, 100))
 
+    drawSaving(width, height)
+
     for element in interface:
         element.draw()
+
+    if dk.tsave:
+        dk.tsave[0] -= (Game.deltaTime * 2.195)
+        width, height = Game.screenSize
+        text: str = dk.tsave[1]
+        surface = Game.italic.render(text, False, dk.tsave[2])
+        surface.set_alpha(int(255 * dk.tsave[0] / 5))
+        tW, tH = Game.italic.size(text)
+        screen.blit(surface, (width // 2 - tW // 2, height // 2 - tH // 2 + 300))
+        if dk.tsave[0] <= 0:
+            dk.tsave = None
     return
 
 def update() -> None:

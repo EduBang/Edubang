@@ -1,8 +1,1 @@
-{
-    "mass": 5.9736e24,
-    "radius": 6371.008,
-    "color": [0, 0, 255],
-    "meta": {
-        "name": "Earth"
-    }
-}
+{"mass": 5.9736e+24, "radius": 6371.008, "color": [0, 0, 255], "meta": { "name": "Earth", "description": "Our home planet."}}

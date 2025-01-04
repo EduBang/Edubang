@@ -132,7 +132,7 @@ with proto("Game") as Game:
         self.windows[self.window][1](screen)
         if self.tmusic and self.settings["volume"] != 0:
             Game.tmusic -= (Game.deltaTime * 2.195)
-            width, height = screen.get_size()
+            width, height = self.screenSize
             text: str = "Playing %s" % self.music[12:-4]
             surface = Game.italic.render(text, False, (255, 255, 255))
             surface.set_alpha(int(255 * Game.tmusic / 5))
@@ -231,38 +231,6 @@ def hovering(element) -> None:
 def unhovering(element) -> None:
     if element in hoverable:
         hoverable.remove(element)
-    return
-
-@Events.observe
-def keydown(event) -> None:
-    keys = []
-    
-    mods = pg.key.get_mods()
-    if mods & pg.KMOD_LCTRL:
-        keys.append(0x400000e0)
-    if mods & pg.KMOD_LALT:
-        keys.append(0x400000e2)
-    keys.append(event.key)
-
-    key = Game.getKeyFromCode(keys)
-    if key:
-        Game.keys[key] = True
-    return
-
-@Events.observe
-def keyup(event) -> None:
-    keys = []
-
-    mods = pg.key.get_mods()
-    if mods & pg.KMOD_LCTRL:
-        keys.append(0x400000e0)
-    if mods & pg.KMOD_LALT:
-        keys.append(0x400000e2)
-    keys.append(event.key)
-
-    key = Game.getKeyFromCode(keys)
-    if key:
-        Game.keys[key] = False
     return
 
 @Events.observe

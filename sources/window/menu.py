@@ -9,7 +9,7 @@ from nsi25perlin import PerlinNoise
 from main import Game, getFont
 from shared.utils.utils import updateCorps, process_collide, Button, C_EDUBANG, spacePosToScreenPos, DataKeeper, loadSpace
 from shared.components.Corps import Corps
-from shared.components.Captors import Captors
+from shared.components.Captors import isColliding
 from shared.components.Prediction import predict
 
 dk = DataKeeper()
@@ -238,6 +238,6 @@ def update() -> None:
         for otherCorps in Game.space:
             if corps == otherCorps: continue
             distance: float = updateCorps(corps, otherCorps)
-            if Captors.collide(corps, otherCorps, distance):
+            if isColliding(corps, otherCorps, distance):
                 Game.space.remove(process_collide(corps, otherCorps))
     return

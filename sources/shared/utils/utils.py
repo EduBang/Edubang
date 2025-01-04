@@ -47,6 +47,8 @@ fnKeys: tuple = (0x400000e2 if Game.os == "Windows" else 0x37, 0x400000e0 if Gam
 
 SCROLL_SPEED: int = 20
 
+RAD: float = 2 * pi / 3
+
 # region Prototypes
 
 def onHover() -> None:
@@ -347,16 +349,20 @@ with proto("Text") as Text:
 
 with proto("Input") as Input:
     def drawInput(self) -> None:
-        color = FOCUS_COLOR if self.focus and self.active else (255, 255, 255)
+        if not self.visible: return
+        color: tuple[int, int, int] = FOCUS_COLOR if self.focus and self.active else (255, 255, 255)
+        fontColor: tuple[int, int, int] = (150, 150, 150) if self.placeholder and not self.text else (0, 0, 0)
         pg.draw.rect(Game.screen, color, pg.Rect(self.position, self.size), 0, 4)
-        surface = self.font.render(self.text, False, (0, 0, 0))
-        dim = self.font.size(self.text)
+        text: str = self.placeholder if self.placeholder and not self.text else self.text
+        surface = self.font.render(text, False, fontColor)
+        dim = self.font.size(text)
         x = self.position[0] + 5
         y = self.position[1] + self.size[1] // 2 - dim[1] // 2
         Game.screen.blit(surface, (x, y))
         return
     
     def mousemotionI(self, event) -> None:
+        if not self.active: return
         x, y = event.pos
         if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
             self.onHover()
@@ -366,10 +372,10 @@ with proto("Input") as Input:
         return
 
     def mousebuttondownI(self, event) -> None:
+        if not self.active: return
         button = event.button
         x, y = event.pos
         if button != 1: return
-        if not self.active: return
         if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
             self.focus = not self.focus
             if self.focus:
@@ -380,10 +386,10 @@ with proto("Input") as Input:
         return
     
     def mousebuttonupI(self, event) -> None:
+        if not self.active: return
         button = event.button
         x, y = event.pos
         if button != 1: return
-        if not self.active: return
         if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
             self.focus = not self.focus
             if self.focus: self.onReleased()
@@ -392,6 +398,7 @@ with proto("Input") as Input:
         return
     
     def mousewheelI(self, event) -> None:
+        if not self.active: return
         if not self.scrollable: return
         self.offsetY = SCROLL_SPEED * event.y
         self.position[1] += self.offsetY
@@ -416,19 +423,16 @@ with proto("Input") as Input:
         return
 
     @Input
-    def onPressed(self) -> None:
-        if not self.active: return
-        self.focus = True
-        return
-
-    @Input
     def new(self, text: str, position: tuple[int, int], size: tuple[int, int]) -> None:
         self.active = True
+        self.visible = True
         self.focus = False
         self.text = text
+        self.placeholder = None
         self.position = position
         self.size  = size
         self.draw = MethodType(drawInput, self)
+        self.onPressed = lambda: None
         self.onReleased = lambda: None
         self.afterInput = lambda: None
         self.onHover = onHover
@@ -577,7 +581,7 @@ with proto("System") as System:
     @System
     def new(self, system: dict, index: int) -> None:
         self.system = system
-        self.position = [400, 100 + 50 * index]
+        self.position = [400, 100 + 120 * index]
         self.size = (500, 100)
         self.draw = MethodType(drawSystem, self)
         self.onHover = onHover
@@ -651,12 +655,10 @@ with proto("Inventory") as Inventory:
     def windowIn(self, w) -> None:
         Events.stopObserving(self)
         return
-
+    
     @Inventory
-    def new(self):
-        self.active = False
+    def update(self) -> None:
         self.bodies = []
-        self.clickableZones = {}
         bodyFiles = [path.join("data/bodies", f) for f in listdir("data/bodies") if path.isfile(path.join("data/bodies", f))]
         for i, bodyFile in enumerate(bodyFiles):
             body = {}
@@ -665,6 +667,12 @@ with proto("Inventory") as Inventory:
                 body["file"] = bodyFile
                 f.close()
             self.bodies.append(body)
+
+    @Inventory
+    def new(self):
+        self.active = False
+        self.clickableZones = {}
+        self.update()
         self.draw = MethodType(drawInventory, self)
         self.onHover = onHover
         Events.group(self, {
@@ -1261,12 +1269,11 @@ def drawArrow(startPos: tuple[int, int], endPos: tuple[int, int], *, color: tupl
         None
     """
     orientation: float = (atan2(startPos[1] - endPos[1], endPos[0] - startPos[0])) + pi/2
-    k: float = 2 * pi / 3
     pg.draw.line(Game.screen, color, startPos, endPos, l)
     pg.draw.polygon(Game.screen, color, (
         (endPos[0] + c * sin(orientation), endPos[1] + c * cos(orientation)),
-        (endPos[0] + c * sin(orientation - k), endPos[1] + c * cos(orientation - k)),
-        (endPos[0] + c * sin(orientation + k), endPos[1] + c * cos(orientation + k)),
+        (endPos[0] + c * sin(orientation - RAD), endPos[1] + c * cos(orientation - RAD)),
+        (endPos[0] + c * sin(orientation + RAD), endPos[1] + c * cos(orientation + RAD)),
     ))
     return
 
@@ -1278,7 +1285,7 @@ def getAttractor(corps):
         corps (Corps): Astre cible
 
     Retourne:
-        Corps: Astre attracteur
+        Corps | None: Astre attracteur ou Rien
     """
     attractors: dict = {}
     for c in Game.space:
@@ -1286,7 +1293,7 @@ def getAttractor(corps):
         distance: float = Vectors.get_distance(c.pos, corps.pos)
         attraction: float = Physics.get_attraction(c.mass, corps.mass, distance, c.velocity, corps.velocity)
         attractors[attraction] = c
-    return attractors[max(attractors)]
+    return attractors[max(attractors)] if len(attractors) > 1 else None
 
 def closeTo(n: float | int) -> int:
     """

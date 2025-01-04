@@ -19,7 +19,7 @@ from shared.utils.utils import (
     totalEnergy, kineticEnergy, momentum,
     getAttractor, barycentre, toDate
 )
-from shared.components.Captors import Captors
+from shared.components.Captors import isColliding
 from shared.components.Prediction import predict
 from shared.components.Spaceship import Space_ship
 from shared.components.Physics import G
@@ -36,6 +36,7 @@ dk.stars = []
 dk.perlin = PerlinNoise(768)
 dk.wait = True
 dk.timer = 0
+dk.specialKeys = []
 
 def stopFocusFn() -> None:
     Game.Camera.focus = None
@@ -43,6 +44,8 @@ def stopFocusFn() -> None:
     return
 
 dk.stopFocus = None
+
+description = getFont("Regular", 14)
 
 interface: list = []
 
@@ -140,6 +143,31 @@ def keydown(event) -> None:
     elif key == pg.K_KP_MINUS and Game.Camera.zoom > Game.Camera.minZoom:
         Game.Camera.zoom /= 1.05
 
+    return
+
+@Events.observe
+def keyup(event) -> None:
+    if Game.window != "sandbox": return
+    keys = []
+    
+    mods = pg.key.get_mods()
+    if mods & pg.KMOD_LCTRL:
+        dk.specialKeys.append(0x400000e0)
+    if mods & pg.KMOD_LALT:
+        dk.specialKeys.append(0x400000e2)
+    if event.key not in dk.specialKeys:
+        keys.append(event.key)
+    
+    if len(keys) > 0:
+        key = Game.getKeyFromCode(keys)
+        if key:
+            Game.keys[key] = False
+        if len(dk.specialKeys) > 0:
+            keys = dk.specialKeys + keys
+            dk.specialKeys.clear()
+        key = Game.getKeyFromCode(keys)
+        if key:
+            Game.keys[key] = False
     return
 
 @Events.observe
@@ -279,56 +307,66 @@ def menu(screen) -> None:
     screen.blit(text, (20, 500))
     pg.draw.line(screen, (102, 102, 102), (20, 530), (100, 530))
 
+def displayMultilineText(text: str, font, position: tuple[int, int], width: int) -> int:
+    text: list = text.split(" ")
+    lines: list = []
+    h: int = font.size(" ")[1]
+
+    while len(text) > 0:
+        line: str = ""
+        while len(text) > 0 and font.size(line + text[0])[0] < width:
+            line += text.pop(0) + " "
+        lines.append(line)
+    
+    for i, line in enumerate(lines):
+        surface = font.render(line, False, (255, 255, 255))
+        Game.screen.blit(surface, (position[0], position[1] + h * i))
+
+    return h * len(lines)
+
 def stats(corps) -> None:
     screen = Game.screen
     width, height = Game.screenSize
+    offset = 0
 
     pg.draw.rect(screen, (10, 9, 9), (width - 350, 0, 350, height))
     pg.draw.rect(screen, (0, 0, 0), (width - 340, 10, 330, 150))
     pg.draw.circle(screen, corps.color, (width - 165, 75), 20)
+
     if hasattr(corps, "name"):
-        text = Game.font.render(corps.name, False, (255, 255, 255))
+        text = subtitle.render(corps.name, False, (255, 255, 255))
         screen.blit(text, (width - 330, 170))
+        offset += 20
+    
+    if hasattr(corps, "description"):
+        h: int = displayMultilineText(corps.description, description, (width - 330, 200), 330)
+        offset += h + 30
+    
     text = subtitle.render("Caractéristiques orbitaux", False, (255, 255, 255))
-    screen.blit(text, (width - 330, 210))
+    screen.blit(text, (width - 330, 170 + offset))
 
     attractor = getattr(corps, "orbit", None) or getAttractor(corps)
-    days: float = round(orbitalPeriod(attractor.mass, Vectors.get_distance(corps.pos, attractor.pos)), 2)
-    text = Game.font.render("Période de révolution : %s jours" % days, False, (255, 255, 255))
-    screen.blit(text, (width - 330, 240))
+    days: str = "%s jours" % round(orbitalPeriod(attractor.mass, Vectors.get_distance(corps.pos, attractor.pos)), 2) if attractor else "Inconnu"
+    text = Game.font.render("Période de révolution : %s" % days, False, (255, 255, 255))
+    screen.blit(text, (width - 330, 200 + offset))
 
     velocity: float = round(sqrt((corps.velocity[0] / C_EDUBANG) ** 2 + (corps.velocity[1] / C_EDUBANG) ** 2), 3)
     text = Game.font.render("Vitesse orbitale : %s km/s" % velocity, False, (255, 255, 255))
-    screen.blit(text, (width - 330, 270))
-
-    # moment: float = momentum(corps.mass, velocity)
-    # text = Game.font.render("Momentum :", False, (255, 255, 255))
-    # screen.blit(text, (width - 330, 300))
-    # scientificNotation(moment, (width - 227, 300), end="kg")
-
-    # kinetic: float = kineticEnergy(corps.mass, velocity)
-    # text = Game.font.render("Énergie cinétique :", False, (255, 255, 255))
-    # screen.blit(text, (width - 330, 330))
-    # scientificNotation(kinetic, (width - 187, 330), end="N")
-
-    # total: float = totalEnergy(corps.mass, velocity)
-    # text = Game.font.render("Énergie totale :", False, (255, 255, 255))
-    # screen.blit(text, (width - 330, 360))
-    # scientificNotation(total, (width - 210, 360), end="N")
+    screen.blit(text, (width - 330, 230 + offset))
 
     text = subtitle.render("Caractéristiques physiques", False, (255, 255, 255))
-    screen.blit(text, (width - 330, 500))
+    screen.blit(text, (width - 330, 460 + offset))
 
     text = Game.font.render("Rayon : %s km" % int(corps.radius), False, (255, 255, 255))
-    screen.blit(text, (width - 330, 530))
+    screen.blit(text, (width - 330, 490 + offset))
 
     text = Game.font.render("Masse :", False, (255, 255, 255))
-    screen.blit(text, (width - 330, 560))
-    scientificNotation(corps.mass, (width - 267, 560), end="kg")
+    screen.blit(text, (width - 330, 520 + offset))
+    scientificNotation(corps.mass, (width - 267, 520 + offset), end="kg")
 
     surfaceGravity: float = round((G * corps.mass) / ((corps.radius * 1e3) ** 2), 3)
     text = Game.font.render("Gravité de surface : %s m/s²" % surfaceGravity, False, (255, 255, 255))
-    screen.blit(text, (width - 330, 590))
+    screen.blit(text, (width - 330, 550 + offset))
     return
 
 def sAfterOne(n: int) -> str:
@@ -467,6 +505,6 @@ def update() -> None:
         for otherCorps in Game.space:
             if corps == otherCorps: continue
             distance: float = updateCorps(corps, otherCorps)
-            if Captors.collide(corps, otherCorps, distance):
+            if isColliding(corps, otherCorps, distance):
                 Game.space.remove(process_collide(corps, otherCorps))
     return

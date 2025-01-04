@@ -1,8 +1,1 @@
-{
-    "mass": 4.8675e24,
-    "radius": 6051.8,
-    "color": [255, 127, 127],
-    "meta": {
-        "name": "Venus"
-    }
-}
+{"mass": 4.8675e+24, "radius": 6051.8, "color": [255, 127, 127], "meta": { "name": "Venus", "description": "The hottest planet in our solar system."}}

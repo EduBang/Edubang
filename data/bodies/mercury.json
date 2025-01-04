@@ -1,8 +1,1 @@
-{
-    "mass": 3.3011e23,
-    "radius": 2439.7,
-    "color": [127, 127, 127],
-    "meta": {
-        "name": "Mercury"
-    }
-}
+{"mass": 3.3011e+23, "radius": 2439.7, "color": [127, 127, 127], "meta": { "name": "Mercury", "description": "The smallest planet in our solar system."}}

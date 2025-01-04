@@ -9,7 +9,8 @@
             "color": [255, 255, 0],
             "velocity": [0, 0],
             "meta": {
-                "name": "Sun"
+                "name": "Sun",
+                "description": "The star of our solar system."
             }
         },
         {
@@ -19,7 +20,8 @@
             "color": [127, 127, 127],
             "velocity": [0, -509141.5],
             "meta": {
-                "name": "Mercury"
+                "name": "Mercury",
+                "description": "The smallest planet in our solar system."
             }
         },
         {
@@ -29,7 +31,8 @@
             "color": [255, 127, 127],
             "velocity": [0, -376526.3825],
             "meta": {
-                "name": "Venus"
+                "name": "Venus",
+                "description": "The hottest planet in our solar system."
             }
         },
         {
@@ -39,7 +42,8 @@
             "color": [0, 0, 255],
             "velocity": [0, -320167.25],
             "meta": {
-                "name": "Earth"
+                "name": "Earth",
+                "description": "Our home planet."
             }
         },
         {
@@ -49,7 +53,8 @@
             "color": [255, 50, 50],
             "velocity": [0, -258860],
             "meta": {
-                "name": "Mars"
+                "name": "Mars",
+                "description": "The red planet."
             }
         },
         {
@@ -59,7 +64,8 @@
             "color": [252, 201, 129],
             "velocity": [0, -140378.875],
             "meta": {
-                "name": "Jupiter"
+                "name": "Jupiter",
+                "description": "The largest planet in our solar system."
             }
         },
         {
@@ -69,7 +75,8 @@
             "color": [230, 177, 124],
             "velocity": [0, -103637.525],
             "meta": {
-                "name": "Saturn"
+                "name": "Saturn",
+                "description": "The ringed planet."
             }
         },
         {
@@ -79,7 +86,8 @@
             "color": [100, 100, 200],
             "velocity": [0, -73064.869],
             "meta": {
-                "name": "Uranus"
+                "name": "Uranus",
+                "description": "The sideways planet."
             }
         },
         {
@@ -89,7 +97,8 @@
             "color": [100, 100, 255],
             "velocity": [0, -58399.16],
             "meta": {
-                "name": "Neptune"
+                "name": "Neptune",
+                "description": "Discovered by mathematical prediction rather than direct observation."
             }
         }
     ]
