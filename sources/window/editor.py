@@ -9,7 +9,7 @@ from eventListen import Events
 from main import Game, getFont
 from shared.components.Corps import Corps
 from shared.components.Prediction import predict
-from shared.utils.utils import DataKeeper, Button, spacePosToScreenPos, getSize, Inventory, screenPosToSpacePos, Input, barycentre
+from shared.utils.utils import DataKeeper, Button, spacePosToScreenPos, getSize, Inventory, screenPosToSpacePos, Input, barycentre, drawArrow
 
 dk = DataKeeper()
 dk.body = None
@@ -22,6 +22,8 @@ dk.saveTarget = []
 dk.saveCanva = {}
 dk.standBy = False
 dk.tsave = None
+dk.target = None
+dk.arrows = {}
 
 semibold = getFont("SemiBold", 16)
 
@@ -205,18 +207,14 @@ def mousebuttondown(event) -> None:
         Game.space.append(corps)
         dk.body = None
     else:
-        for corps in Game.space:
-            x, y = spacePosToScreenPos(corps.pos)
+        for arrow in dk.arrows:
+            x, y = dk.arrows[arrow]
             sqx, sqy = (pos[0] - x) ** 2, (pos[1] - y) ** 2
-            if pi * (corps.radius * Game.Camera.zoom) ** 2 < 10:
-                if sqrt(sqx + sqy) < 10:
-                    Game.Camera.focus = corps
-                    break
-            if sqrt(sqx + sqy) < corps.radius * Game.Camera.zoom:
-                Game.Camera.focus = corps
+            if sqrt(sqx + sqy) < 10:
+                dk.target = arrow
                 break
         else:
-            Game.Camera.focus = None
+            Game.Camera.focus = None 
             dk.selected.clear()
             dk.mouseselection = screenPosToSpacePos(pos)
     return
@@ -225,9 +223,26 @@ def mousebuttondown(event) -> None:
 def mousebuttonup(event) -> None:
     if Game.window != "editor": return
     button = event.button
+    pos = event.pos
     if button != 1: return
     if dk.mouseselection:
         dk.mouseselection = None
+    if dk.target:
+        targetPos = spacePosToScreenPos(dk.target.pos)
+        x = (pos[0] - targetPos[0]) / Game.Camera.zoom
+        y = (pos[1] - targetPos[1]) / Game.Camera.zoom
+        dk.target.velocity = [x, y]
+        dk.target = None
+    for corps in Game.space:
+        x, y = spacePosToScreenPos(corps.pos)
+        sqx, sqy = (pos[0] - x) ** 2, (pos[1] - y) ** 2
+        if pi * (corps.radius * Game.Camera.zoom) ** 2 < 10:
+            if sqrt(sqx + sqy) < 10:
+                Game.Camera.focus = corps
+                break
+        if sqrt(sqx + sqy) < corps.radius * Game.Camera.zoom:
+            Game.Camera.focus = corps
+            break
     return
 
 def drawGrid() -> None:
@@ -304,7 +319,19 @@ def drawSaving(width, height) -> None:
         inputDescription.visible = True
     return
 
+def drawVelocityArrow() -> None:
+    if not dk.target: return
+    targetPos = spacePosToScreenPos(dk.target.pos)
+    mousePos = pg.mouse.get_pos()
+    drawArrow(targetPos, mousePos)
+    targetPos = spacePosToScreenPos(dk.target.pos)
+    x = (mousePos[0] - targetPos[0]) / Game.Camera.zoom
+    y = (mousePos[1] - targetPos[1]) / Game.Camera.zoom
+    dk.target.velocity = [x, y]
+    return
+
 def load() -> None:
+    Game.timeScale = 1
     Game.Camera.active = True
     Game.Camera.zoom = 1
     w, h = Game.screenSize
@@ -359,9 +386,17 @@ def draw(screen) -> None:
 
     for corps in Game.space:
         corps.draw(screen, Game.Camera)
+        pos = spacePosToScreenPos(corps.pos)
+        x = pos[0] + corps.velocity[0] * Game.Camera.zoom
+        y = pos[1] + corps.velocity[1] * Game.Camera.zoom
+        drawArrow(pos, (x, y))
+        dk.arrows[corps] = (x, y)
+
+    predict(Game, 250, 2)
 
     drawSelected()
     drawMouseSelection()
+    drawVelocityArrow()
 
     if dk.body:
         pos = pg.mouse.get_pos()

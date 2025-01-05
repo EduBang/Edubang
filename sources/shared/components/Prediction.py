@@ -44,7 +44,7 @@ def predict(game, n: int = 0, k: int = 100) -> None:
                 unitVector: tuple[float, float] = Vectors.get_unit_vector(pos, b["pos"])
                 acc: tuple[float, float] = (unitVector[0] * attraction / mass, unitVector[1] * attraction / mass)
 
-                gamma: float = lorentzFactor(sqrt(velocity[0] ** 2 + velocity[1] ** 2))
+                gamma: float = 1 # lorentzFactor(sqrt(velocity[0] ** 2 + velocity[1] ** 2))
 
                 velocity[0] += acc[0] * k / gamma
                 velocity[1] += acc[1] * k / gamma
@@ -68,7 +68,7 @@ def predict(game, n: int = 0, k: int = 100) -> None:
                 if isColliding(i, j, d):
                     x, y = lastPosI if i.mass > j.mass else lastPosJ
                     radius: float = sqrt(((pi * i.radius ** 2) + (pi * j.radius ** 2)) / pi)
-                    pg.draw.circle(game.screen, (255, 255, 255), spacePosToScreenPos((x, y)), radius, 1)
+                    pg.draw.circle(game.screen, (255, 255, 255), spacePosToScreenPos((x, y)), radius * game.Camera.zoom, 1)
                     futureCollided.append(i)
                     futureCollided.append(j)
                     c = Corps(i.mass + j.mass, radius, (x, y), (0, 0, 0), mergeEnergy((i.mass, i.pos, lastPosI), (j.mass, j.pos, lastPosJ)))
