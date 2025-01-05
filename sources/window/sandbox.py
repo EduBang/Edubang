@@ -17,7 +17,8 @@ from shared.utils.utils import (
     draw_cinetic_energy_vector, draw_attraction_norm2, scientificNotation,
     spacePosToScreenPos, orbitalPeriod, C_EDUBANG,
     totalEnergy, kineticEnergy, momentum,
-    getAttractor, barycentre, toDate
+    getAttractor, barycentre, toDate,
+    displayMultilineText
 )
 from shared.components.Captors import isColliding
 from shared.components.Prediction import predict
@@ -307,23 +308,6 @@ def menu(screen) -> None:
     screen.blit(text, (20, 500))
     pg.draw.line(screen, (102, 102, 102), (20, 530), (100, 530))
 
-def displayMultilineText(text: str, font, position: tuple[int, int], width: int) -> int:
-    text: list = text.split(" ")
-    lines: list = []
-    h: int = font.size(" ")[1]
-
-    while len(text) > 0:
-        line: str = ""
-        while len(text) > 0 and font.size(line + text[0])[0] < width:
-            line += text.pop(0) + " "
-        lines.append(line)
-    
-    for i, line in enumerate(lines):
-        surface = font.render(line, False, (255, 255, 255))
-        Game.screen.blit(surface, (position[0], position[1] + h * i))
-
-    return h * len(lines)
-
 def stats(corps) -> None:
     screen = Game.screen
     width, height = Game.screenSize
@@ -459,7 +443,7 @@ def draw(screen) -> None:
         draw_attraction_norm2(screen)
 
     if showPrediction:
-        predict(Game, 20)
+        predict(Game, 200, 1)
 
     if showBarycentre:
         bX, bY = spacePosToScreenPos(barycentre(Game.space))
@@ -501,7 +485,7 @@ def update() -> None:
     if dk.wait: return
     dk.timer += Game.DT * 2.195
     for corps in Game.space:
-        corps.update_position([0, 0], Game.DT)
+        # corps.update_position([0, 0], Game.DT)
         for otherCorps in Game.space:
             if corps == otherCorps: continue
             distance: float = updateCorps(corps, otherCorps)

@@ -2,7 +2,7 @@ from math import pi, sqrt
 
 import pygame as pg
 
-from ..utils.utils import spacePosToScreenPos, mergeEnergy, lorentzFactor
+from ..utils.utils import spacePosToScreenPos, mergeEnergy
 from .Vectors import Vectors
 from .Physics import Physics
 from .Captors import isColliding
@@ -36,6 +36,10 @@ def predict(game, n: int = 0, k: int = 100) -> None:
             velocity = a["velocity"]
             x, y = pos = a["pos"]
             mass = a["mass"]
+
+            # x += velocity[0] / k
+            # y += velocity[1] / k
+
             for b in space:
                 if b["corps"] in futureCollided or a == b: continue
 
@@ -44,10 +48,8 @@ def predict(game, n: int = 0, k: int = 100) -> None:
                 unitVector: tuple[float, float] = Vectors.get_unit_vector(pos, b["pos"])
                 acc: tuple[float, float] = (unitVector[0] * attraction / mass, unitVector[1] * attraction / mass)
 
-                gamma: float = 1 # lorentzFactor(sqrt(velocity[0] ** 2 + velocity[1] ** 2))
-
-                velocity[0] += acc[0] * k / gamma
-                velocity[1] += acc[1] * k / gamma
+                velocity[0] += acc[0] * k
+                velocity[1] += acc[1] * k
                     
                 x += velocity[0] * k
                 y += velocity[1] * k

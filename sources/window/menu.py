@@ -234,7 +234,7 @@ def update() -> None:
         reset()
 
     for corps in Game.space:
-        corps.update_position([0, 0], Game.DT)
+        # corps.update_position([0, 0], Game.DT)
         for otherCorps in Game.space:
             if corps == otherCorps: continue
             distance: float = updateCorps(corps, otherCorps)

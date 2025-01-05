@@ -23,6 +23,7 @@ C_EDUBANG: int = 10750
 exponentFont = getFont("Medium", 12)
 titleFont = getFont("Regular", 20)
 descriptionFont = getFont("Regular", 14)
+descriptionFontInventory = getFont("Regular", 12)
 
 FOCUS_COLOR: tuple[int, int, int] = (13, 178, 190)
 
@@ -615,6 +616,7 @@ with proto("Inventory") as Inventory:
                 pg.draw.rect(Game.screen, (255, 255, 255), pg.Rect((dx, dy), (w, h)), 1, 8)
                 surface = Game.font.render(body["meta"]["name"], False, (255, 255, 255))
                 Game.screen.blit(surface, (dx + 10, dy + 10))
+                displayMultilineText(body["meta"]["description"], descriptionFontInventory, (dx + 10, dy + 35), 100, stop=3)
                 pg.draw.circle(Game.screen, body["color"], (dx + 130, dy + 50), 10)
                 self.clickableZones[body["file"]] = ((dx, dy), (dx + 180, dy + 100))
                 dx += 190
@@ -1279,7 +1281,7 @@ def drawArrow(startPos: tuple[int, int], endPos: tuple[int, int], *, color: tupl
 
 def getAttractor(corps):
     """
-    Récupère l'astre qui attire le plus un astre.
+    Récupère l'astre qui attire le plus un astre
 
     Arguments:
         corps (Corps): Astre cible
@@ -1293,7 +1295,7 @@ def getAttractor(corps):
         distance: float = Vectors.get_distance(c.pos, corps.pos)
         attraction: float = Physics.get_attraction(c.mass, corps.mass, distance, c.velocity, corps.velocity)
         attractors[attraction] = c
-    return attractors[max(attractors)] if len(attractors) > 1 else None
+    return attractors[max(attractors)] if len(attractors) > 0 else None
 
 def closeTo(n: float | int) -> int:
     """
@@ -1330,7 +1332,7 @@ def getSize() -> tuple[int, int, str]:
 
 def toDate(secondsSinceStarting: float) -> tuple[int, int, int, int, int]:
     """
-    Convertit des secondes en date.
+    Convertit des secondes en date
 
     Arguments:
         secondsSinceStarting (float): Secondes écoulées depuis le début
@@ -1344,5 +1346,41 @@ def toDate(secondsSinceStarting: float) -> tuple[int, int, int, int, int]:
     days: int = floor(secondsSinceStarting - years * 365 - months * 30 - weeks * 7)
     hours: int = floor((secondsSinceStarting - years * 365 - months * 30 - weeks * 7 - days) * 24)
     return (years, months, weeks, days, hours)
+
+def displayMultilineText(text: str, font, position: tuple[int, int], width: int, *, stop: int = -1, end: str = "...") -> int:
+    """
+    Affiche un texte sur plusieurs lignes
+
+    Arguments:
+        text (str): Texte à afficher
+        font (pg.Font): Police utilisée pour écrite le texte
+        position (tuple[int, int]): Position du texte
+        width (int): Largeur maximale que peut atteindre le texte
+        stop (int): Le nombre de lignes maximale
+        end (str): Texte à afficher à la fin de la dernière ligne si le nombre de ligne dépasse la limitation
+
+    Retourne:
+        int: Hauteur du texte
+    """
+    text: list = text.split(" ")
+    lines: list = []
+    h: int = font.size(" ")[1]
+
+    while len(text) > 0:
+        line: str = ""
+        while len(text) > 0 and font.size(line + text[0])[0] < width:
+            line += text.pop(0) + " "
+        lines.append(line)
+    
+    for i, line in enumerate(lines):
+        if i + 1 == stop and len(lines) > i + 1:
+            surface = font.render(line[:-1] + end, False, (255, 255, 255))
+            Game.screen.blit(surface, (position[0], position[1] + h * i))
+            break
+        else:
+            surface = font.render(line, False, (255, 255, 255))
+            Game.screen.blit(surface, (position[0], position[1] + h * i))
+
+    return h * len(lines)
 
 # endregion

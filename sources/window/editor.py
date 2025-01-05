@@ -392,7 +392,7 @@ def draw(screen) -> None:
         drawArrow(pos, (x, y))
         dk.arrows[corps] = (x, y)
 
-    predict(Game, 250, 2)
+    predict(Game, 250, 1)
 
     drawSelected()
     drawMouseSelection()
@@ -405,9 +405,6 @@ def draw(screen) -> None:
 
     if Game.Camera.focus:
         stats(Game.Camera.focus, width, height)
-
-    pg.draw.rect(screen, (10, 9, 9), (0, 0, width, 100))
-    pg.draw.line(screen, (255, 255, 255), (0, 100), (width, 100))
 
     drawSaving(width, height)
 
