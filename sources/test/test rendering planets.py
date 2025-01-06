@@ -9,22 +9,33 @@ def generer_perlin():
     for x in range(Perlin_surface.size):
         liste.append([])
         for y in range(Perlin_surface.size):
-            value = Perlin_surface.noise(x / 20, y / 20)
+            value = Perlin_surface.noise(x / 2000, y / 2000)
             liste[x].append(value * 255)
     return liste
 
 
 
 
-def draw_perlin(liste, screen, pos_x = 640, pos_y = 300, radius = 100):
+def draw_perlin(liste, screen, center, radius = 100):
+    pos = (
+        center[0] - radius,
+        center[1] - radius
+    )
+
+    center = (center[0] + radius, center[1] + radius)
 
     for x, element in enumerate(liste):
-
         for y, value in enumerate(element):
+            
+            dx, dy = (pos[0] + x), (pos[1] + y)
 
-            if sqrt((x + radius / 2) ** 2 + (y + radius / 2) ** 2) <= radius:
-                screen.set_at((int(x + pos_x + radius / 2), int(y + pos_y + radius / 2)),(abs(value), abs(value), abs(value)))
-                
+            
+            if sqrt((center[0] - dx )**2 + (center[1] - dy )**2) <= radius:
+                screen.set_at((int(x + pos[0]), int(y + pos[1])),(abs(value), abs(value), abs(value)))
+
+ 
+
+    
 
 
 
@@ -50,7 +61,7 @@ def main():
         screen.fill((0, 0, 0))
 
         generer_perlin()
-        draw_perlin(liste, screen)
+        draw_perlin(liste, screen, (630, 300))
 
         
         pg.display.flip()
