@@ -13,9 +13,6 @@ def generer_perlin():
             liste[x].append(value * 255)
     return liste
 
-
-
-
 def draw_perlin(liste, screen, pos_x = 640, pos_y = 300, radius = 100):
 
     for x, element in enumerate(liste):
@@ -24,16 +21,6 @@ def draw_perlin(liste, screen, pos_x = 640, pos_y = 300, radius = 100):
 
             if sqrt((x + radius / 2) ** 2 + (y + radius / 2) ** 2) <= radius:
                 screen.set_at((int(x + pos_x + radius / 2), int(y + pos_y + radius / 2)),(abs(value), abs(value), abs(value)))
-                
-
-
-
-
-
-
-
-
-
 
 def main():
    
