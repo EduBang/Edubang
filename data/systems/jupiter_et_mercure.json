@@ -1,1 +1,28 @@
-{"title": "Jupiter et Mercure", "description": "Mercure qui orbite Jupiter.", "space": [{"mass": 3.3011e+23, "radius": 2439.7, "position": [400344.86641421437, 0.0], "color": [127, 127, 127], "velocity": [17171.50007888322, -562943.4154963114], "meta": {"name": "Mercury", "description": "The smallest planet in our solar system."}}, {"mass": 1.8986e+27, "radius": 69911, "position": [0.0, 0.0], "color": [252, 201, 129], "velocity": [0, 0], "meta": {"name": "Jupiter", "description": "The largest planet in our solar system."}}]}
+{
+  "title": "Jupiter et Mercure",
+  "description": "Mercure qui orbite Jupiter.",
+  "space": [
+    {
+      "mass": 3.3011e23,
+      "radius": 2439.7,
+      "position": [400344.86641421437, 0.0],
+      "color": [127, 127, 127],
+      "velocity": [17171.50007888322, -562943.4154963114],
+      "meta": {
+        "name": "Mercury",
+        "description": "The smallest planet in our solar system."
+      }
+    },
+    {
+      "mass": 1.8986e27,
+      "radius": 69911,
+      "position": [0.0, 0.0],
+      "color": [252, 201, 129],
+      "velocity": [0, 0],
+      "meta": {
+        "name": "Jupiter",
+        "description": "The largest planet in our solar system."
+      }
+    }
+  ]
+}
