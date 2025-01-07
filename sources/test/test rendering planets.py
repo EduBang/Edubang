@@ -3,18 +3,22 @@ from math import *
 from nsi25perlin import PerlinNoise as perlin 
 from perlin_noise import PerlinNoise
 import opensimplex
+# Utilisation de chaînes brutes pour éviter les problèmes d'échappement
+path_normal_map = r"C:\Users\sacha\OneDrive\Documents\GitHub\Edubang\sources\test\normal_map.png"
+normal_map = pg.image.load(path_normal_map)
 
                 
 planet_pos = (500, 500) # Position du centre de la planète
 radius = 100 # Rayon de la planète
 Perlin_surface = perlin(radius) #sous dimentionner pour pixeliser
 liste = []
+pg.transform.scale(normal_map, (radius * 2, radius * 2))
 
 def generer_perlin():
     for x in range(Perlin_surface.size):
         liste.append([])
         for y in range(Perlin_surface.size):
-            value = Perlin_surface.noise(x / 7, y / 7)
+            value = Perlin_surface.noise(x / 10, y / 7)
             liste[x].append(value * 255)
     return liste
 
@@ -30,7 +34,7 @@ def upscale(matrix, factor):
 
 
 def draw_perlin(new_liste, screen, planet_pos, radius):
-    start_pos = (planet_pos[0] - radius // 2, planet_pos[1] - radius // 2)
+    start_pos = (planet_pos[0] - radius, planet_pos[1] - radius)
 
     for x, element in enumerate(new_liste):
         for y, value in enumerate(element):
