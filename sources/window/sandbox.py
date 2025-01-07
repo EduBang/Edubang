@@ -278,7 +278,7 @@ def loader() -> None:
     dk.wait = False
     return
 
-def load(*args, **kwargs) -> None:
+def load() -> None:
     for i in range(60):
         img = pg.image.load(path.join("./data/videos/loadingScreen", "%s.jpg" % i))
         img = pg.transform.scale(img, (108, 108))
@@ -337,20 +337,22 @@ def stats(corps) -> None:
     velocity: float = round(sqrt((corps.velocity[0] / C_EDUBANG) ** 2 + (corps.velocity[1] / C_EDUBANG) ** 2), 3)
     text = Game.font.render("Vitesse orbitale : %s km/s" % velocity, False, (255, 255, 255))
     screen.blit(text, (width - 330, 230 + offset))
+    
+    offset += 20
 
     text = subtitle.render("Caractéristiques physiques", False, (255, 255, 255))
-    screen.blit(text, (width - 330, 460 + offset))
+    screen.blit(text, (width - 330, 260 + offset))
 
     text = Game.font.render("Rayon : %s km" % int(corps.radius), False, (255, 255, 255))
-    screen.blit(text, (width - 330, 490 + offset))
+    screen.blit(text, (width - 330, 290 + offset))
 
     text = Game.font.render("Masse :", False, (255, 255, 255))
-    screen.blit(text, (width - 330, 520 + offset))
-    scientificNotation(corps.mass, (width - 267, 520 + offset), end="kg")
+    screen.blit(text, (width - 330, 320 + offset))
+    scientificNotation(corps.mass, (width - 267, 320 + offset), end="kg")
 
     surfaceGravity: float = round((G * corps.mass) / ((corps.radius * 1e3) ** 2), 3)
     text = Game.font.render("Gravité de surface : %s m/s²" % surfaceGravity, False, (255, 255, 255))
-    screen.blit(text, (width - 330, 550 + offset))
+    screen.blit(text, (width - 330, 350 + offset))
     return
 
 def sAfterOne(n: int) -> str:
