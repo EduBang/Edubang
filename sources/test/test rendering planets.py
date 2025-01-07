@@ -4,7 +4,7 @@ from nsi25perlin import PerlinNoise as perlin
 import numpy as np
 
 # Utilisation de chaînes brutes pour éviter les problèmes d'échappement
-path_normal_map = r"C:\Users\sacha\OneDrive\Documents\GitHub\Edubang\sources\test\normal_map.png"
+path_normal_map = r"sources/test/normal_map.png"
 normal_map = pg.image.load(path_normal_map)
 
 planet_pos = (500, 500)  # Position du centre de la planète
