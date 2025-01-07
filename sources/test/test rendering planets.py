@@ -87,7 +87,7 @@ def main():
     generer_perlin()
     scaled_perlin = upscale(liste, 4)
     planet_texture = pg.Surface((radius * 2, radius * 2))
-
+    draw_perlin(scaled_perlin, planet_texture, planet_pos, radius)
     time = 0  # Variable de temps pour faire tourner la lumière
 
     while running:
@@ -97,11 +97,13 @@ def main():
 
         screen.fill((0, 0, 0))
 
-        # Calculer la direction de la lumière en fonction du temps
+        # Définir la position de la lumière au centre de la planète
+        light_pos = planet_pos
+
+        # Calculer la direction de la lumière en fonction du temps pour qu'elle pointe vers l'extérieur
         light_direction = np.array([cos(time), sin(time)])
         light_direction = light_direction / np.linalg.norm(light_direction)  # Normalisation de la direction de la lumière
 
-        draw_perlin(scaled_perlin, planet_texture, planet_pos, radius)
         lighting_texture = apply_lighting(planet_texture, light_direction, planet_pos, radius)
 
         # Afficher l'image éclairée
