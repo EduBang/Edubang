@@ -1,7 +1,6 @@
 import pygame as pg
-from math import sqrt, sin, cos, pi
+from math import sqrt, sin, cos
 from nsi25perlin import PerlinNoise as perlin
-import numpy as np
 
 # Utilisation de chaînes brutes pour éviter les problèmes d'échappement
 path_normal_map = r"sources/test/normal_map.png"
@@ -59,14 +58,14 @@ def apply_lighting(texture, light_direction, planet_pos, radius):
         for y in range(height):
             dx = x - width / 2
             dy = y - height / 2
-            distance = np.sqrt(dx ** 2 + dy ** 2)
+            distance = sqrt(dx ** 2 + dy ** 2)
 
             if distance == 0:
                 continue
 
-            normal = np.array([dx / distance, dy / distance])
-            intensity = np.dot(normal, light_direction)
-            intensity = np.clip(intensity, 0, 1)
+            normal = [dx / distance, dy / distance]
+            intensity = normal[0] * light_direction[0] + normal[1] * light_direction[1]
+            intensity = max(0, min(1, intensity))
 
             r, g, b, a = texture.get_at((x, y))
             r = int(r * intensity)
@@ -101,8 +100,12 @@ def main():
         light_pos = planet_pos
 
         # Calculer la direction de la lumière en fonction du temps pour qu'elle pointe vers l'extérieur
-        light_direction = np.array([cos(time), sin(time)])
-        light_direction = light_direction / np.linalg.norm(light_direction)  # Normalisation de la direction de la lumière
+        light_direction = (cos(time), sin(time))
+        norm = sqrt(light_direction[0] ** 2 + light_direction[1] ** 2)
+        light_direction = (
+            light_direction[0] / norm,
+            light_direction[1] / norm
+        ) # Normalisation de la direction de la lumière
 
         lighting_texture = apply_lighting(planet_texture, light_direction, planet_pos, radius)
 
@@ -112,7 +115,7 @@ def main():
         pg.display.flip()
         clock.tick(60)  # Cap the frame rate at 60 FPS
 
-        time += 0.01  # Incrémenter le temps pour faire tourner la lumière
+        time += .01  # Incrémenter le temps pour faire tourner la lumière
 
     pg.quit()
 
