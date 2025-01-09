@@ -9,7 +9,7 @@ from eventListen import Events
 from main import Game, getFont
 from shared.components.Corps import Corps
 from shared.components.Prediction import predict
-from shared.utils.utils import DataKeeper, Button, spacePosToScreenPos, getSize, Inventory, screenPosToSpacePos, Input, barycentre, drawArrow
+from shared.utils.utils import DataKeeper, Button, spacePosToScreenPos, getSize, Inventory, screenPosToSpacePos, Input, barycentre, drawArrow, MessageBox
 
 dk = DataKeeper()
 dk.body = None
@@ -24,6 +24,8 @@ dk.standBy = False
 dk.tsave = None
 dk.target = None
 dk.arrows = {}
+
+mb = MessageBox("Retourner au menu ? (Échap)")
 
 semibold = getFont("SemiBold", 16)
 
@@ -124,6 +126,19 @@ def keydown(event) -> None:
     if key == pg.K_ESCAPE:
         if dk.saving: resetSaveCanva()
         if dk.body: dk.body = None
+        if Game.Camera.focus:
+            Game.Camera.focus = None
+        else:
+            if mb.active:
+                mb.active = False
+                dk.active = False
+                dk.loadingFinished = False
+                dk.image = None
+                dk.stars = []
+                Game.reset()
+                Game.select("menu")
+            else:
+                mb.active = True
 
     if dk.standBy: return
     
@@ -157,6 +172,7 @@ def keydown(event) -> None:
         dk.saving = True
         dk.saveTarget = dk.selected.copy()
         Game.keys[key] = False
+
     return
 
 @Events.observe
