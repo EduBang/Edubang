@@ -9,71 +9,50 @@ normal_map = pg.image.load(path_normal_map)
 planet_pos = (500, 500)  # Position du centre de la planète
 radius = 100  # Rayon de la planète
 Perlin_surface = perlin(radius)  # sous-dimensionner pour pixeliser
-liste = []
 
-def generer_perlin():
-    for x in range(Perlin_surface.size):
-        liste.append([])
-        for y in range(Perlin_surface.size):
-            value = Perlin_surface.noise(x / 7, y / 7)
-            liste[x].append(value * 255)
-    return liste
+def generer_perlin(surface):
+    size = surface.size
+    return [[surface.noise(x / 7, y / 7) * 255 for y in range(size)] for x in range(size)]
 
 def upscale(matrix, factor):
-    new_matrix = []
-    for row in matrix:
-        new_row = []
-        for element in row:
-            new_row.extend([element] * factor)
-        for _ in range(factor):
-            new_matrix.append(new_row)
-    return new_matrix
+    return [[element for element in row for _ in range(factor)] for row in matrix for _ in range(factor)]
 
-def draw_perlin(new_liste, surface, planet_pos, radius):
-    start_pos = (planet_pos[0] - radius, planet_pos[1] - radius)
-
-    for x, element in enumerate(new_liste):
-        for y, value in enumerate(element):
-            pixel_pos = (x + start_pos[0], y + start_pos[1])
-
+def draw_perlin(matrix, surface, planet_pos, radius):
+    start_x, start_y = planet_pos[0] - radius, planet_pos[1] - radius
+    for x, row in enumerate(matrix):
+        for y, value in enumerate(row):
+            pixel_pos = (x + start_x, y + start_y)
             if sqrt((planet_pos[0] - pixel_pos[0]) ** 2 + (planet_pos[1] - pixel_pos[1]) ** 2) <= radius:
-                if value <= 0:
-                    surface.set_at((x, y), (11, 89, 134))  # eau profonde
-                elif value <= 5:
-                    surface.set_at((x, y), (19, 128, 191))  # eau peu profonde
-                elif value <= 35:
-                    surface.set_at((x, y), (228, 197, 23))  # sable
-                elif value <= 100:
-                    surface.set_at((x, y), (75, 161, 68))  # herbe
-                elif value <= 150:
-                    surface.set_at((x, y), (148, 141, 132))  # montagne
-                else:
-                    surface.set_at((x, y), (82, 82, 82))  # montagne haute
+                color = get_color(value)
+                surface.set_at((x, y), color)
 
-def apply_lighting(texture, light_direction, planet_pos, radius):
+def get_color(value):
+    if value <= 0:
+        return (11, 89, 134)  # eau profonde
+    elif value <= 5:
+        return (19, 128, 191)  # eau peu profonde
+    elif value <= 35:
+        return (228, 197, 23)  # sable
+    elif value <= 100:
+        return (75, 161, 68)  # herbe
+    elif value <= 150:
+        return (148, 141, 132)  # montagne
+    else:
+        return (82, 82, 82)  # montagne haute
+
+def apply_lighting(texture, light_direction):
     width, height = texture.get_size()
     lighting_surface = pg.Surface((width, height), pg.SRCALPHA)
-
     for x in range(width):
         for y in range(height):
-            dx = x - width / 2
-            dy = y - height / 2
+            dx, dy = x - width / 2, y - height / 2
             distance = sqrt(dx ** 2 + dy ** 2)
-
             if distance == 0:
                 continue
-
             normal = [dx / distance, dy / distance]
-            intensity = normal[0] * light_direction[0] + normal[1] * light_direction[1]
-            intensity = max(0, min(1, intensity))
-
+            intensity = max(0, min(1, normal[0] * light_direction[0] + normal[1] * light_direction[1]))
             r, g, b, a = texture.get_at((x, y))
-            r = int(r * intensity)
-            g = int(g * intensity)
-            b = int(b * intensity)
-
-            lighting_surface.set_at((x, y), (r, g, b, a))
-
+            lighting_surface.set_at((x, y), (int(r * intensity), int(g * intensity), int(b * intensity), a))
     return lighting_surface
 
 def main():
@@ -83,8 +62,8 @@ def main():
     clock = pg.time.Clock()
     running = True
 
-    generer_perlin()
-    scaled_perlin = upscale(liste, 4)
+    perlin_matrix = generer_perlin(Perlin_surface)
+    scaled_perlin = upscale(perlin_matrix, 4)
     planet_texture = pg.Surface((radius * 2, radius * 2))
     draw_perlin(scaled_perlin, planet_texture, planet_pos, radius)
     time = 0  # Variable de temps pour faire tourner la lumière
@@ -96,18 +75,12 @@ def main():
 
         screen.fill((0, 0, 0))
 
-        # Définir la position de la lumière au centre de la planète
-        light_pos = planet_pos
-
         # Calculer la direction de la lumière en fonction du temps pour qu'elle pointe vers l'extérieur
         light_direction = (cos(time), sin(time))
         norm = sqrt(light_direction[0] ** 2 + light_direction[1] ** 2)
-        light_direction = (
-            light_direction[0] / norm,
-            light_direction[1] / norm
-        ) # Normalisation de la direction de la lumière
+        light_direction = (light_direction[0] / norm, light_direction[1] / norm)  # Normalisation de la direction de la lumière
 
-        lighting_texture = apply_lighting(planet_texture, light_direction, planet_pos, radius)
+        lighting_texture = apply_lighting(planet_texture, light_direction)
 
         # Afficher l'image éclairée
         screen.blit(lighting_texture, (planet_pos[0] - radius, planet_pos[1] - radius))
@@ -115,7 +88,7 @@ def main():
         pg.display.flip()
         clock.tick(60)  # Cap the frame rate at 60 FPS
 
-        time += .01  # Incrémenter le temps pour faire tourner la lumière
+        time += 0.01  # Incrémenter le temps pour faire tourner la lumière
 
     pg.quit()
 

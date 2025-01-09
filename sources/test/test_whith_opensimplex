@@ -1,20 +1,92 @@
 # import pygame as pg
-# from sympy import vector
-# from opensimplex import OpenSimplex
+# from math import sqrt, sin, cos, pi
+# import opensimplex
+# import numpy as np
 
 # pg.init()
 # pg.display.set_caption("Test Rendering Planets")
 # screen = pg.display.set_mode((1000, 1000))  # Initialiser la fenêtre d'affichage
 
-# def draw_circle(display: pg.Surface, radius: int, position: vector) -> None:
-#     for x in range(-radius, radius, 1):
-#         for y in range(-radius, radius, 1):
+# class Vector:
+#     def __init__(self, x, y, z=0):
+#         self.x = x
+#         self.y = y
+#         self.z = z
+
+#     def normalize(self):
+#         length = sqrt(self.x ** 2 + self.y ** 2 + self.z ** 2)
+#         if length != 0:
+#             self.x /= length
+#             self.y /= length
+#             self.z /= length
+
+#     def dot(self, other):
+#         return self.x * other.x + self.y * other.y + self.z * other.z
+
+# # Renommer l'instance de la classe Vector pour éviter le conflit de nom
+# vector_instance = Vector(500, 500)
+# radius = 100
+
+# # Générer une carte de hauteur avec OpenSimplex
+# def generate_height_map(size, scale):
+#     noise = opensimplex.OpenSimplex(seed=42)
+#     height_map = np.zeros((size, size))
+#     for y in range(size):
+#         for x in range(size):
+#             height_map[y, x] = noise.noise2(x / scale, y / scale)
+#     return height_map
+
+# # Appliquer la carte de hauteur pour moduler les normales et simuler l'éclairage
+# def draw_circle(display: pg.Surface, radius: int, vector_instance, light_direction, height_map, offset, scale_factor) -> None:
+#     size = len(height_map)
+#     center = size // 2
+#     for x in range(-radius, radius, scale_factor):
+#         for y in range(-radius, radius, scale_factor):
 #             if (x * x) + (y * y) <= radius * radius:
-#                 display.set_at((position.x + x, position.y + y), (255, 0, 0))
+#                 # Calculer les coordonnées avec défilement horizontal
+#                 x_offset = (x + offset) % size
+#                 height = height_map[center + y, x_offset]
+#                 normal = Vector(x, y)
+#                 normal.normalize()
+#                 light_power = normal.dot(light_direction)
+#                 light_power = max(0, min(1, light_power))
+
+#                 # Déterminer la couleur en fonction de la hauteur
+#                 if height < -0.05:
+#                     color = (0, 0, 128)  # Eau profonde
+#                 elif height < 0:
+#                     color = (0, 0, 255)  # Eau peu profonde
+#                 elif height < 0.05:
+#                     color = (194, 178, 128)  # Sable
+#                 elif height < 0.2:
+#                     color = (34, 139, 34)  # Herbe
+#                 elif height < 0.4:
+#                     color = (160, 82, 45)  # Montagne basse
+#                 else:
+#                     color = (139, 137, 137)  # Montagne haute
+
+#                 # Appliquer l'éclairage
+#                 color = tuple(int(c * light_power) for c in color)
+
+#                 # Appliquer une déformation pour donner un effet 3D tout en maintenant la forme sphérique
+#                 deformation_factor = sqrt(1 - (x / radius) ** 2)
+#                 deformed_x = int(vector_instance.x + x * deformation_factor)
+#                 deformed_y = int(vector_instance.y + y * deformation_factor)
+
+#                 # Dessiner un rectangle pour pixeliser
+#                 for i in range(scale_factor):
+#                     for j in range(scale_factor):
+#                         display.set_at((deformed_x + i, deformed_y + j), color)
 
 # def main():
 #     clock = pg.time.Clock()
 #     running = True
+#     time = 0  # Variable de temps pour faire défiler le paysage
+
+#     size = 2 * radius
+#     scale = 50.0  # Augmenter l'échelle pour plus de détails
+#     height_map = generate_height_map(size, scale)
+#     scale_factor = 4  # Facteur de pixelisation
 
 #     while running:
 #         for event in pg.event.get():
@@ -22,9 +94,18 @@
 #                 running = False
 
 #         screen.fill((0, 0, 0))
-#         draw_circle(screen, 100, (500, 500))
+
+#         # Calculer la direction de la lumière en fonction du temps pour qu'elle pointe vers l'extérieur
+#         light_direction = Vector(cos(time), sin(time), 0)
+#         light_direction.normalize()
+
+#         # Appliquer le défilement horizontal à la planète
+#         offset = int(time * 100)  # Utiliser le temps pour faire défiler la planète
+#         draw_circle(screen, radius, vector_instance, light_direction, height_map, offset, scale_factor)
 #         pg.display.flip()
 #         clock.tick(60)  # Cap the frame rate at 60 FPS
+
+#         time += 0.01  # Incrémenter le temps pour faire défiler le paysage
 
 #     pg.quit()
 
