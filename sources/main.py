@@ -41,10 +41,7 @@ with proto("Game") as Game:
         isAlive = getattr(self.subprocess, "is_alive", False)
         if isAlive:
             threadId = self.subprocess.ident
-            if not threadId: return
-            pointer = pythonapi.PyThreadState_SetAsyncExc(c_long(threadId), py_object(SystemExit))
-            if pointer > 1:
-                pythonapi.PyThreadState_SetAsyncExc(threadId, 0)
+            pythonapi.PyThreadState_SetAsyncExc(c_long(threadId), py_object(SystemExit))
             self.subprocess = None
         pg.quit()
         exit(0)

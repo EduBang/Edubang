@@ -14,7 +14,7 @@ from shared.utils.utils import (
     Input, Text, CheckBox,
     Button, SizeViewer, loadSpace,
     loadStars, draw_velocity_vector,
-    draw_cinetic_energy_vector, draw_attraction_norm2, scientificNotation,
+    draw_cinetic_energy_vector, draw_attraction_norm, scientificNotation,
     spacePosToScreenPos, orbitalPeriod, C_EDUBANG,
     totalEnergy, kineticEnergy, momentum,
     getAttractor, barycentre, toDate,
@@ -442,7 +442,7 @@ def draw(screen) -> None:
         # draw_cinetic_energy_vector(screen, corps)
 
     if showAttractionNorm:
-        draw_attraction_norm2(screen)
+        draw_attraction_norm(screen)
 
     if showPrediction:
         predict(Game, 200, 1)

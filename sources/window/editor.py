@@ -1,6 +1,4 @@
-from json import load as loadJson
 from json import dumps
-from os import listdir, path
 from math import pi, sqrt
 from datetime import datetime
 
@@ -442,6 +440,8 @@ def draw(screen) -> None:
         screen.blit(surface, (width // 2 - tW // 2, height // 2 - tH // 2 + 300))
         if dk.tsave[0] <= 0:
             dk.tsave = None
+
+    mb.draw()
     return
 
 def update() -> None:
