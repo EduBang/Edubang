@@ -23,12 +23,12 @@ Cette partie décrit le mode d'utilisation d'Edubang ainsi que son fonctionnemen
 
 ### Windows 10 et plus
 
-1. Installer Python [3.12.5](https://www.python.org/downloads/release/python-3125/) ou plus.
+1. Installer Python [3.10.7](https://www.python.org/downloads/release/python-3107/) ou plus.
 2. Démarrer EduBang en exécutant le fichier [start.bat](/start.bat), ce fichier installera toutes les dépendances puis exécutera EduBang.
 
 ### macOS
 
-1. Installer Python [3.12.5](https://www.python.org/downloads/release/python-3125/) ou plus.
+1. Installer Python [3.10.7](https://www.python.org/downloads/release/python-3107/) ou plus.
 2. Installer toutes les dépendances qui se trouvent dans le fichier [requirements.txt](/requirements.txt) avec pip.
 3. Démarrer EduBang en exécutant le fichier [main.py](/sources/main.py)
 
@@ -111,13 +111,13 @@ Par défaut, il existe un système "Solar System", représentant notre système 
 # Code source
 
 L'entièreté du code source d'EduBang se trouve dans le répertoire [_sources_](/sources/). <br/>
-EduBang nécessite une version de Python supérieur ou égale à [**3.12.5**](https://www.python.org/downloads/release/python-3125/). <br/>
+EduBang nécessite une version de Python supérieur ou égale à [**3.10.7**](https://www.python.org/downloads/release/python-3107/). <br/>
 EduBang a besoin des modules suivants pour fonctionner :
-- [pygame](https://pypi.org/project/pygame/)
-- [pillow](https://pypi.org/project/pillow/)
-- [proto-obj](https://pypi.org/project/proto-obj/)
-- [nsi25perlin](https://pypi.org/project/nsi25perlin/)
-- [eventListen (0.0.5)](https://pypi.org/project/eventListen/0.0.5/)
+- [pygame (2.6.1)](https://pypi.org/project/pygame/2.6.1)
+- [pillow (11.1.0)](https://pypi.org/project/pillow/11.1.0)
+- [proto-obj (0.0.4)](https://pypi.org/project/proto-obj/0.0.4)
+- [nsi25perlin (0.0.2)](https://pypi.org/project/nsi25perlin/0.0.2)
+- [eventListen (0.1.2)](https://pypi.org/project/eventListen/0.1.2/)
 
 ## Configurations
 
