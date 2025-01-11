@@ -5,7 +5,7 @@ from os import listdir, path
 from eventListen import Events
 
 from main import Game, getFont
-from shared.utils.utils import Button, DataKeeper, KeyBind, Text
+from shared.utils.utils import Button, DataKeeper, KeyBind, Text, Button
 
 dk = DataKeeper()
 
@@ -44,15 +44,37 @@ def backFunction() -> None:
     Game.select("settings")
     return
 
+def resetKeybinds() -> None:
+    Game.resetKeybinds()
+    i: int = 0
+    keybinds: list = list(Game.keybinds)
+    for element in interface:
+        if element.size == (180, 60): continue
+
+        if hasattr(element, "kb"):
+            keybind = keybinds[i]
+            k = Game.keybinds[keybind]
+            element.keys = k["code"]
+            element.keyname = k["key"]
+            element.kb = (keybind, k)
+            i += 1
+        
+    return
+
 def load() -> None:
     backButton = Button((100, 200), (180, 60))
     backButton.text = "Retour"
     backButton.onPressed = backFunction
     interface.append(backButton)
 
+    resetButton = Button((100, 300), (180, 60))
+    resetButton.text = "Réinitialiser"
+    resetButton.onPressed = resetKeybinds
+    interface.append(resetButton)
+
     h: int = 100
     keybindsFiles = [path.join("data/settings", f) for f in listdir("data/settings") if path.isfile(path.join("data/settings", f))]
-    for i, keybindFile in enumerate(keybindsFiles):
+    for keybindFile in keybindsFiles:
         keybinds = {}
         with open(keybindFile, "r", encoding="utf-8") as f:
             keybinds = loadJson(f)
@@ -62,7 +84,7 @@ def load() -> None:
         title.scrollable = True
         interface.append(title)
         h += 70
-        for j, k in enumerate(keybinds):
+        for k in keybinds:
             keybind = keybinds[k]
             kb = KeyBind(keybind["code"], keybind["key"], (700, h))
             kb.kb = (k, keybind)
@@ -70,10 +92,12 @@ def load() -> None:
             kb.scrollable = True
             text = Text(keybind["name"], (400, h + 10), color=(255, 255, 255))
             text.scrollable = True
-            interface.append(kb)
             interface.append(text)
+            interface.append(kb)
             h += 70
         h += 50
+    
+    dk.intScroll = (0, -h)
     return
 
 def draw(screen) -> None:

@@ -2,6 +2,7 @@ from json import load as loadJson
 from json import dumps
 from os import listdir, path
 from math import pi, sqrt
+from datetime import datetime
 
 import pygame as pg
 from eventListen import Events
@@ -108,6 +109,10 @@ def doSave() -> None:
             data: dict = {}
             data["title"] = name
             data["description"] = description
+            data["meta"] = {
+                "user": Game.user,
+                "lastModified": int(datetime.now().timestamp())
+            }
             data["space"] = space
 
             f.write(dumps(data))

@@ -114,9 +114,10 @@ Il est donc important d'avoir une configuration correcte pour pouvoir profiter e
 
 |                        | Configuration minimale | Configuration optimale           |
 |------------------------|------------------------|----------------------------------|
-| Système d'exploitation | Windows 10, MacOS      | Windows 10, MacOS                |
+| Système d'exploitation | Windows 10, macOS      | Windows 10/11, macOS                |
 | Processeur             | Dual Core 2.7 GHz      | Intel Core i5 ou Ryzen 5 ou plus |
-| Matériel               | Clavier                | Clavier, Pavé numérique, Souris  |
+| Matériel               | Clavier, Souris                | Clavier, Pavé numérique, Souris  |
+| Notes supplémentaires  | Aucun                  | Un casque audio ou des enceintes <br/> sont recommandés. |
 
 ## Organisation du code
 

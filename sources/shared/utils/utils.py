@@ -4,6 +4,7 @@ from types import MethodType
 from random import randint
 from math import pi, sqrt, atan2, sin, cos, log10, floor
 from copy import deepcopy
+from datetime import datetime
 
 import pygame as pg
 
@@ -24,6 +25,7 @@ exponentFont = getFont("Medium", 12)
 titleFont = getFont("Regular", 20)
 descriptionFont = getFont("Regular", 14)
 descriptionFontInventory = getFont("Regular", 12)
+footerFont = getFont("Regular", 10)
 
 FOCUS_COLOR: tuple[int, int, int] = (13, 178, 190)
 
@@ -31,15 +33,15 @@ UNICODES: dict[int, str] = {
     0x9: "tab",
     0x20: "espace",
     0x7F: "del",
-    0x400000e2: "alt",
-    0x400000e0: "ctrl"
+    0x400000E2: "alt",
+    0x400000E0: "ctrl"
 }
 
 UNICODES_DARWIN: dict[int, str] = {
     0x30: "tab",
     0x31: "espace",
     0x37: "alt",
-    0x3b: "cmd"
+    0x3B: "cmd"
 }
 
 Game.ctrl = pg.KMOD_LCTRL if Game.os == "Windows" else pg.KMOD_META
@@ -544,6 +546,12 @@ with proto("System") as System:
         Game.screen.blit(surface, (self.position[0] + 10, self.position[1] + 10))
         surface = descriptionFont.render(self.system["description"], False, (255, 255, 255))
         Game.screen.blit(surface, (self.position[0] + 10, self.position[1] + 40))
+        dateSplit: list[str, str] = str(datetime.fromtimestamp(self.system["meta"]["lastModified"])).split(" ")
+        dateRSplit: list[str, str, str] = dateSplit[0].split("-")
+        dateRSplit.reverse()
+        date: str = "%s à %s" % ("/".join(dateRSplit), dateSplit[1])
+        surface = footerFont.render("Modifié le %s par %s" % (date, self.system["meta"]["user"]), False, (255, 255, 255))
+        Game.screen.blit(surface, (self.position[0] + 10, self.position[1] + self.size[1] - 20))
         return
     
     def mousemotionS(self, event) -> None:

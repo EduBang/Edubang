@@ -1,6 +1,10 @@
 {
   "title": "Jupiter et Mercure",
   "description": "Mercure qui orbite Jupiter.",
+  "meta": {
+    "user": "EduBang",
+    "lastModified": 1727690400
+  },
   "space": [
     {
       "mass": 3.3011e23,
