@@ -6,11 +6,9 @@ G: float = 6.6743e-11
 c: int = 299_792_458 # m/s
 UA: float = 149_597_870.7 # km, Selon l'Union Astronomique Internationale en 2012
 
-type Velocity = tuple[float, float]
-
 with proto("Physics") as Physics:
     @Physics
-    def getRelativeVelocity(self, v1: Velocity, v2: Velocity) -> float:
+    def getRelativeVelocity(self, v1: tuple[float, float], v2: tuple[float, float]) -> float:
         v1: float = sqrt(v1[0] ** 2 + v1[1] ** 2)
         v2: float = sqrt(v2[0] ** 2 + v2[1] ** 2)
         return sqrt(v1 ** 2 + v2 ** 2)

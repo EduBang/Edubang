@@ -5,9 +5,11 @@ from os import listdir, path
 from eventListen import Events
 
 from main import Game, getFont
-from shared.utils.utils import Button, DataKeeper, KeyBind, Text, Button
+from shared.utils.utils import Button, DataKeeper, KeyBind, Text, Button, SCROLL_SPEED
 
-dk = DataKeeper()
+dk = DataKeeper()   
+dk.offsetY = 0
+dk.intScroll = (float("-inf"), float("+inf")) # On s'inspire de la notation mathématique des intervalles : ]-∞;+∞[
 
 interface: list = []
 
@@ -15,6 +17,20 @@ interface: list = []
 def window(w) -> None:
     if w != "keybind": return
     interface.clear()
+    dk.offsetY = 0
+    dk.intScroll = (float("-inf"), float("+inf")) 
+    return
+
+@Events.observe
+def mousewheel(event) -> None:
+    if Game.window != "keybind": return
+    if dk.offsetY + SCROLL_SPEED <= dk.intScroll[1] and event.y > 0 or dk.offsetY - SCROLL_SPEED >= dk.intScroll[0] and event.y < 0:
+        Events.trigger("positionChanged", event.y * SCROLL_SPEED)
+        dk.offsetY += event.y * SCROLL_SPEED
+    return
+
+def positionChanged(self, y) -> None:
+    self.position[1] += y
     return
 
 def backFunction() -> None:
@@ -81,7 +97,7 @@ def load() -> None:
             f.close()
         title = Text(keybindFile.split("\\")[1][:-5], (500, h), color=(255, 255, 255))
         title.font = getFont("Bold", 24)
-        title.scrollable = True
+        Events.setEvent(title, "positionChanged", positionChanged)
         interface.append(title)
         h += 70
         for k in keybinds:
@@ -89,15 +105,15 @@ def load() -> None:
             kb = KeyBind(keybind["code"], keybind["key"], (700, h))
             kb.kb = (k, keybind)
             kb.file = keybindFile
-            kb.scrollable = True
+            Events.setEvent(kb, "positionChanged", positionChanged)
             text = Text(keybind["name"], (400, h + 10), color=(255, 255, 255))
-            text.scrollable = True
+            Events.setEvent(text, "positionChanged", positionChanged)
             interface.append(text)
             interface.append(kb)
             h += 70
         h += 50
-    
-    dk.intScroll = (0, -h)
+
+    dk.intScroll = (-h + Game.screenSize[1], 0)
     return
 
 def draw(screen) -> None:

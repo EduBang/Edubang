@@ -1,5 +1,5 @@
-pygame
-pillow
-proto-obj
-nsi25Perlin
-eventListen==0.0.5
+pygame==2.6.1
+pillow==11.1.0
+proto-obj==0.0.4
+nsi25Perlin==0.0.2
+eventListen==0.1.2

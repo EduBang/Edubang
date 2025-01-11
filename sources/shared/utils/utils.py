@@ -15,8 +15,6 @@ from shared.components.Vectors import Vectors
 from shared.components.Physics import Physics, G, c
 from shared.components.Corps import Corps
 
-type EnergyInfos = tuple[int, tuple[int, int], tuple[int, int]]
-
 # La constante d'EduBang
 # valeur de calibrage, origine à déterminer
 C_EDUBANG: int = 10750
@@ -858,7 +856,7 @@ def processMergingNames(a, b, c) -> None:
         c.name = x2.name if 10 < dominationIndex else mergeNames((x1.mass, x1.name), (x2.mass, x2.name))
     return
 
-def mergeEnergy(d1: EnergyInfos, d2: EnergyInfos) -> list[float, float]:
+def mergeEnergy(d1: tuple[int, tuple[int, int], tuple[int, int]], d2: tuple[int, tuple[int, int], tuple[int, int]]) -> list[float, float]:
     """
     Fusionne les énergies cinétiques de 2 corps.
 
