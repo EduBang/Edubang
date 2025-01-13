@@ -15,6 +15,18 @@ with proto("Perlin") as Perlin:
         self.stretching = stretching
         self.zoom = zoom
 
+    """
+    Génère une surface de bruit de Perlin avec les paramètres donnés
+
+    Args:
+        surface (PerlinNoise): écran
+        surface_size (int): Taille de la surface en largeur et hauteur
+        center_pos (tuple[int, int]): Position centrale de la surface (position de la planète)
+        intensity (int): Intensité du bruit (entre 1 et 255)
+        stretching (tuple[int, int]): Étirement du bruit (x et y) > 1
+        zoom (int): Zoom du bruit (pixelisation)
+    """
+
     @Perlin
     def generate_perlin(self, surface, stretching, intensity):
         return [[surface.noise(x / stretching[0], y / stretching[1]) * intensity for y in range(self.surface_size)] for x in range(self.surface_size)]
@@ -32,29 +44,13 @@ with proto("Perlin") as Perlin:
                 if sqrt((center_pos[0] - pixel_pos[0]) ** 2 + (center_pos[1] - pixel_pos[1]) ** 2) <= radius:
                     surface.set_at((x, y), value)
 
-        perlin_matrix = generate_perlin(Perlin.surface_size, Perlin.stretching, Perlin.intensity)
+    perlin_matrix = generate_perlin(Perlin.surface_size, Perlin.stretching, Perlin.intensity)
 
-        scaled_perlin = upscale(perlin_matrix, Perlin.zoom)
+    scaled_perlin = upscale(perlin_matrix, Perlin.zoom)
 
-        perlin_texture = pg.Surface(Perlin.surface_size, Perlin.surface_size)
+    perlin_texture = pg.Surface(Perlin.surface_size, Perlin.surface_size)
 
-        draw_perlin(scaled_perlin, perlin_texture, Perlin.center_pos, Perlin.surface_size // 2)
-
-        return perlin_texture
+    draw_perlin(scaled_perlin, perlin_texture, Perlin.center_pos, Perlin.surface_size // 2)
 
 
 
-    """
-    Génère une surface de bruit de Perlin avec les paramètres donnés
-
-    Args:
-        surface (PerlinNoise): écran
-        surface_size (int): Taille de la surface en largeur et hauteur
-        center_pos (tuple[int, int]): Position centrale de la surface (position de la planète)
-        intensity (int): Intensité du bruit (entre 1 et 255)
-        stretching (tuple[int, int]): Étirement du bruit (x et y) > 1
-        zoom (int): Zoom du bruit (pixelisation)
-
-    Returns:
-        list[list[int]]: Matrice de bruit de Perlin a la taille de la planette et aux paramètres donnés.
-    """
