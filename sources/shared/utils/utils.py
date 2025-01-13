@@ -762,6 +762,26 @@ with proto("SizeViewer") as SizeViewer:
         })
         return
 
+with proto("ColorPicker") as ColorPicker:
+    def drawColorPicker(self) -> None:
+        for i in range(255):
+            for j in range(255):
+                x = self.position[0] + i
+                y = self.position[1] + j
+                alpha = (1 - j / 255)
+                rA, gA, bA = (self.color[0] * alpha, self.color[1] * alpha, self.color[2] * alpha)
+                r, g, b = (rA, gA, bA)
+                kR, kG, kB = (255 - i, 255 - i, 255 - i)
+                Game.screen.set_at((x, y), (kR + rA, gA, kB + bA))
+        return
+    
+    @ColorPicker
+    def new(self, position: tuple[int, int]) -> None:
+        self.position = position
+        self.color = (0, 255, 0)
+        self.draw = MethodType(drawColorPicker, self)
+        return
+        
 # endregion
 
 # region Fonctions physiques
