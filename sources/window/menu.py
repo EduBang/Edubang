@@ -7,7 +7,7 @@ from eventListen import Events
 from nsi25perlin import PerlinNoise
 
 from main import Game, getFont
-from shared.utils.utils import updateCorps, process_collide, Button, C_EDUBANG, spacePosToScreenPos, DataKeeper, loadSpace
+from shared.utils.utils import updateCorps, process_collide, Button, ColorPicker, C_EDUBANG, spacePosToScreenPos, DataKeeper, loadSpace
 from shared.components.Corps import Corps
 from shared.components.Captors import isColliding
 from shared.components.Prediction import predict
@@ -184,6 +184,9 @@ def load() -> None:
     quitButton.icon = icons[3]
     quitButton.onPressed = quitFunction
     interface.append(quitButton)
+    
+    colorPicker = ColorPicker((100, 100))
+    interface.append(colorPicker)
 
     dk.brand = pg.transform.scale(pg.image.load("./data/images/brand.png"), (426, 100))
     return
