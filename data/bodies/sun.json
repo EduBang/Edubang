@@ -1,1 +1,6 @@
-{"mass": 1.9885e+30, "radius": 696342, "color": [255, 255, 0], "meta": { "name": "Sun", "description": "The star of our solar system."}}
+{
+  "mass": 1.9885e30,
+  "radius": 696342,
+  "color": [255, 255, 0],
+  "meta": { "name": "Sun", "description": "The star of our solar system." }
+}

@@ -1,1 +1,9 @@
-{"mass": 1.8986e+27, "radius": 69911, "color": [252, 201, 129], "meta": { "name": "Jupiter", "description": "The largest planet in our solar system."}}
+{
+  "mass": 1.8986e27,
+  "radius": 69911,
+  "color": [252, 201, 129],
+  "meta": {
+    "name": "Jupiter",
+    "description": "The largest planet in our solar system."
+  }
+}

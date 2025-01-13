@@ -99,6 +99,7 @@ Vous pouvez faire une association de touche en les combinants.
 ```
 Menu
 ├── Découvrir
+│   └── Système stellaire
 ├── Éditeur de système
 ├── Paramètres
 │   └── Contrôles

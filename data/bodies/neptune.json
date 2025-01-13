@@ -1,1 +1,9 @@
-{"mass": 1.0243e+26, "radius": 24622, "color": [100, 100, 255], "meta": { "name": "Neptune", "description": "Discovered by mathematical prediction rather than direct observation."}}
+{
+  "mass": 1.0243e26,
+  "radius": 24622,
+  "color": [100, 100, 255],
+  "meta": {
+    "name": "Neptune",
+    "description": "Discovered by mathematical prediction rather than direct observation."
+  }
+}

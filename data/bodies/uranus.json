@@ -1,1 +1,6 @@
-{"mass": 8.681e+25, "radius": 25362, "color": [100, 100, 200], "meta": { "name": "Uranus", "description": "The sideways planet."}}
+{
+  "mass": 8.681e25,
+  "radius": 25362,
+  "color": [100, 100, 200],
+  "meta": { "name": "Uranus", "description": "The sideways planet." }
+}

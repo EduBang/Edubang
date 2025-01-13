@@ -1,1 +1,22 @@
-{"increaseTime": {"name": "Acc\u00e9l\u00e9rer le temps", "code": [101], "key": ["e"]}, "decreaseTime": {"name": "D\u00e9c\u00e9l\u00e9rer le temps", "code": [97], "key": ["a"]}, "pause": {"name": "Mettre la simulation en pause", "code": [32], "key": ["espace"]}, "resetSimulation": {"name": "R\u00e9initialiser la simulation", "code": [103], "key": ["g"]}}
+{
+  "increaseTime": {
+    "name": "Acc\u00e9l\u00e9rer le temps",
+    "code": [101],
+    "key": ["e"]
+  },
+  "decreaseTime": {
+    "name": "D\u00e9c\u00e9l\u00e9rer le temps",
+    "code": [97],
+    "key": ["a"]
+  },
+  "pause": {
+    "name": "Mettre la simulation en pause",
+    "code": [32],
+    "key": ["espace"]
+  },
+  "resetSimulation": {
+    "name": "R\u00e9initialiser la simulation",
+    "code": [103],
+    "key": ["g"]
+  }
+}
