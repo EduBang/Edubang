@@ -8,6 +8,7 @@ from math import pi, sqrt
 from importlib import util
 from random import choice
 from copy import deepcopy
+
 environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
 
 import pygame as pg
@@ -15,6 +16,19 @@ from proto import proto
 from eventListen import Events
 
 pg.init()
+
+# Initialisation
+pg.display.set_caption("EduBang")
+icon = pg.image.load("data/images/appicon.png")
+pg.display.set_icon(icon)
+MUSIC_END_EVENT: int = pg.USEREVENT + 1
+hoverable: list = []
+screen = pg.display.set_mode((1280, 720), pg.RESIZABLE)
+pg.key.set_repeat(500, 50)
+
+pg.font.init()
+pg.mixer.init()
+pg.mixer.music.set_endevent(MUSIC_END_EVENT)
 
 clock = pg.time.Clock()
 
