@@ -72,7 +72,7 @@ showPrediction: bool = False
 showBarycentre: bool = False
 
 @Events.observe
-def interface(w) -> None:
+def window(w) -> None:
     if w != "sandbox": return
     interface.clear()
     return

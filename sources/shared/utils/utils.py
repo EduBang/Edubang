@@ -134,7 +134,7 @@ with proto("Button") as Button:
             "mousebuttondown": MethodType(mousebuttondownBTN, self),
             "mousebuttonup": MethodType(mousebuttonupBTN, self),
             "mousewheel": MethodType(mousewheelBTN, self),
-            "interface": MethodType(windowBTN, self)
+            "window": MethodType(windowBTN, self)
         })
         return
 
@@ -205,7 +205,7 @@ with proto("CheckBox") as CheckBox:
             "mousebuttondown": MethodType(mousebuttondownCB, self),
             "mousebuttonup": MethodType(mousebuttonupCB, self),
             "mousewheel": MethodType(mousewheelCB, self),
-            "interface": MethodType(windowCB, self)
+            "window": MethodType(windowCB, self)
         })
         return
 
@@ -317,7 +317,7 @@ with proto("KeyBind") as KeyBind:
             "mousebuttondown": MethodType(mousebuttondownKB, self),
             "mousebuttonup": MethodType(mousebuttonupKB, self),
             "mousewheel": MethodType(mousewheelKB, self),
-            "interface": MethodType(windowKB, self),
+            "window": MethodType(windowKB, self),
             "keydown": MethodType(keydownKB, self)
         })
         return
@@ -447,7 +447,7 @@ with proto("Input") as Input:
             "mousebuttondown": MethodType(mousebuttondownI, self),
             "mouseubuttonup": MethodType(mousebuttonupI, self),
             "mousewheel": MethodType(mousewheelI, self),
-            "interface": MethodType(windowI, self),
+            "window": MethodType(windowI, self),
             "keydown": MethodType(keydownI, self)
         })
         return
@@ -533,7 +533,7 @@ with proto("SlideBar") as SlideBar:
             "mousebuttondown": MethodType(mousebuttondownSB, self),
             "mousebuttonup": MethodType(mousebuttonupSB, self),
             "mousewheel": MethodType(mousewheelSB, self),
-            "interface": MethodType(windowSB, self)
+            "window": MethodType(windowSB, self)
         })
         return
 
@@ -598,7 +598,7 @@ with proto("System") as System:
             "mousemotion": MethodType(mousemotionS, self),
             "mousebuttonup": MethodType(mousebuttonupS, self),
             "mousewheel": MethodType(mousewheelS, self),
-            "interface": MethodType(windowS, self)
+            "window": MethodType(windowS, self)
         })
 
 with proto("Inventory") as Inventory:
@@ -686,7 +686,7 @@ with proto("Inventory") as Inventory:
         Events.group(self, {
             "mousemotion": MethodType(mousemotionIn, self),
             "mousebuttonup": MethodType(mousebuttonupIn, self),
-            "interface": MethodType(windowIn, self)
+            "window": MethodType(windowIn, self)
         })
         return
 
@@ -758,7 +758,7 @@ with proto("SizeViewer") as SizeViewer:
             "mousemotion": MethodType(mousemotionSV, self),
             "mousebuttondown": MethodType(mousebuttondownSV, self),
             "mousebuttonup": MethodType(mousebuttonupSV, self),
-            "interface": MethodType(windowSV, self)
+            "window": MethodType(windowSV, self)
         })
         return
 

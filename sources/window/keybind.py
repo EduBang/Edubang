@@ -14,7 +14,7 @@ dk.intScroll = (float("-inf"), float("+inf")) # On s'inspire de la notation math
 interface: list = []
 
 @Events.observe
-def interface(w) -> None:
+def window(w) -> None:
     if w != "keybind": return
     interface.clear()
     dk.offsetY = 0
