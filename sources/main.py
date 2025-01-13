@@ -65,8 +65,8 @@ with proto("Game") as Game:
         self.keys = {}
         self.invertedKeybinds = {}
         self.settings = {}
-        self.musics = []
-        self.music = None
+        self.music = []
+        self.sound = None
         self.screen = screen
         self.os = system()
         self.user = getlogin()
@@ -97,9 +97,9 @@ with proto("Game") as Game:
             Game.settings = loadJson(f)
             f.close()
 
-        musics = [path.join("data/musics", f) for f in listdir("data/musics") if path.isfile(path.join("data/musics", f))]
-        for music in musics:
-            self.musics.append(music)
+        music = [path.join("data/music", f) for f in listdir("data/music") if path.isfile(path.join("data/music", f))]
+        for sound in music:
+            self.music.append(sound)
         pg.mixer.music.set_volume(self.settings["volume"] / 100)
         self.resetKeys()
         self.select("menu")
@@ -132,7 +132,7 @@ with proto("Game") as Game:
         if self.tmusic and self.settings["volume"] != 0:
             Game.tmusic -= (Game.deltaTime * 2.195)
             width, height = self.screenSize
-            text: str = "Playing %s" % self.music[12:-4]
+            text: str = "Playing %s" % self.sound[12:-4]
             surface = Game.italic.render(text, False, (255, 255, 255))
             surface.set_alpha(int(255 * Game.tmusic / 5))
             tW, tH = Game.italic.size(text)
@@ -170,12 +170,12 @@ with proto("Game") as Game:
 
     @Game
     def changeMusic(self) -> None:
-        self.music = choice(self.musics)
+        self.sound = choice(self.music)
         return
     
     @Game
     def playMusic(self) -> None:
-        pg.mixer.music.load(self.music)
+        pg.mixer.music.load(self.sound)
         pg.mixer.music.play()
         self.tmusic = 5
         return
