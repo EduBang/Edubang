@@ -1,5 +1,5 @@
 import pygame as pg
-from math import sqrt, sin, cos
+from math import sqrt, sin, cos, pi
 from nsi25perlin import PerlinNoise as perlin
 
 # Utilisation de chaînes brutes pour éviter les problèmes d'échappement
@@ -8,7 +8,7 @@ normal_map = pg.image.load(path_normal_map)
 
 planet_pos = (500, 500)  # Position du centre de la planète
 radius = 100  # Rayon de la planète
-Perlin_surface = perlin(radius)  # sous-dimensionner pour pixeliser
+Perlin_surface = perlin(radius // 2)  # sous-dimensionner pour pixeliser
 
 def generate_texture_with_lighting():
     def generer_perlin(surface):
@@ -79,10 +79,14 @@ def main():
 
         screen.fill((0, 0, 0))
 
-        # Calculer la direction de la lumière en fonction du temps pour qu'elle pointe vers l'extérieur
-        light_direction = (cos(time), sin(time))
+        # Calculer la direction de la lumière en fonction du temps pour qu'elle orbite autour de la planète
+        light_distance = 300  # Distance de la lumière par rapport à la planète
+        light_x = planet_pos[0] + light_distance * cos(time)
+        light_y = planet_pos[1] + light_distance * sin(time)
+        light_direction = (light_x - planet_pos[0], light_y - planet_pos[1])
         norm = sqrt(light_direction[0] ** 2 + light_direction[1] ** 2)
         light_direction = (light_direction[0] / norm, light_direction[1] / norm)  # Normalisation de la direction de la lumière
+
         lighting_texture = apply_lighting(planet_texture, light_direction)
         # Afficher l'image éclairée
         screen.blit(lighting_texture, (planet_pos[0] - radius, planet_pos[1] - radius))
