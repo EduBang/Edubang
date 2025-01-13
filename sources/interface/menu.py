@@ -185,7 +185,7 @@ def load() -> None:
     quitButton.onPressed = quitFunction
     interface.append(quitButton)
     
-    colorPicker = ColorPicker((100, 100))
+    colorPicker = ColorPicker((400, 300))
     interface.append(colorPicker)
 
     dk.brand = pg.transform.scale(pg.image.load("./data/images/brand.png"), (426, 100))
