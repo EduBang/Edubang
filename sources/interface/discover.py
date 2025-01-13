@@ -10,7 +10,7 @@ dk = DataKeeper()
 interface: list = []
 
 @Events.observe
-def window(w) -> None:
+def interface(w) -> None:
     if w != "discover": return
     interface.clear()
     return

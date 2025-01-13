@@ -49,7 +49,7 @@ interface: list = []
 v: list[int, int] = [100, 1]
 
 @Events.observe
-def window(w) -> None:
+def interface(w) -> None:
     if w != "menu": return
     interface.clear()
     return

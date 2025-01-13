@@ -56,7 +56,7 @@ with proto("Game") as Game:
         self.space = []
         self.originSpace = []
         self.Camera = CameraHandler()
-        self.window = ""
+        self.interface = ""
         self.windows = {}
         self.font = getFont("Medium")
         self.italic = getFont("MediumItalic")
@@ -75,10 +75,10 @@ with proto("Game") as Game:
         self.subprocess = None
         self.screenSize = screen.get_size()
 
-        ws = [w for w in listdir("sources/window") if path.isfile(path.join("sources/window", w))]
+        ws = [w for w in listdir("sources/interface") if path.isfile(path.join("sources/interface", w))]
         for w in ws:
             module_name = w[:-3]
-            file_path = path.join("./sources/window", w)
+            file_path = path.join("./sources/interface", w)
             spec = util.spec_from_file_location(module_name, file_path)
             module = util.module_from_spec(spec)
             spec.loader.exec_module(module)
@@ -128,7 +128,7 @@ with proto("Game") as Game:
 
     @Game
     def draw(self) -> None:
-        self.windows[self.window][1](screen)
+        self.windows[self.interface][1](screen)
         if self.tmusic and self.settings["volume"] != 0:
             Game.tmusic -= (Game.deltaTime * 2.195)
             width, height = self.screenSize
@@ -144,15 +144,15 @@ with proto("Game") as Game:
 
     @Game
     def update(self) -> None:
-        self.windows[self.window][2]()
+        self.windows[self.interface][2]()
         return
 
     @Game
     def select(self, w) -> None:
         if not w in self.windows.keys(): return
-        Events.trigger("window", w)
+        Events.trigger("interface", w)
         self.windows[w][0]()
-        self.window = w
+        self.interface = w
         return
     
     @Game
@@ -236,7 +236,7 @@ with proto("CameraHandler") as CameraHandler:
 Game.load()
 
 @Events.observe
-def window(w) -> None:
+def interface(w) -> None:
     hoverable.clear()
     return
 
