@@ -75,10 +75,10 @@ with proto("Game") as Game:
         self.subprocess = None
         self.screenSize = screen.get_size()
 
-        ws = [w for w in listdir("sources/window") if path.isfile(path.join("sources/window", w))]
+        ws = [w for w in listdir("sources/interface") if path.isfile(path.join("sources/interface", w))]
         for w in ws:
             module_name = w[:-3]
-            file_path = path.join("./sources/window", w)
+            file_path = path.join("./sources/interface", w)
             spec = util.spec_from_file_location(module_name, file_path)
             module = util.module_from_spec(spec)
             spec.loader.exec_module(module)
