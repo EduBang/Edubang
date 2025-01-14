@@ -2,6 +2,9 @@ import pygame as pg
 from math import sqrt
 from nsi25perlin import PerlinNoise  # Assurez-vous que ce module est installé et accessible
 from proto import proto
+from PIL import Image
+
+
 
 with proto("Perlin") as Perlin:
     """
@@ -21,7 +24,25 @@ with proto("Perlin") as Perlin:
         self.intensity = intensity
         self.stretching = stretching
         self.zoom = zoom
+        self.radius = surface_size // 2
         self.noise = PerlinNoise()
+        img = Image.new("RGBA", (surface_size, surface_size))
+        start_x, start_y = self.center_pos[0] - self.radius, self.center_pos[1] -self. radius
+        for x, row in enumerate(self.generate_perlin()):
+            for y, value in enumerate(row):
+                pixel_pos = (x + start_x, y + start_y)
+                if sqrt((self.center_pos[0] - pixel_pos[0]) ** 2 + (self.center_pos[1] - pixel_pos[1]) ** 2) <= self.radius:
+                    # Convertir value en une couleur RGB
+                    
+
+                    value = min(max(int(value), 0), 255)
+                    color = (value, value, value)
+                    
+                    img.putpixel((x, y), (*color, 255))
+                else:
+                    img.putpixel((x, y), (0, 0, 0, 0))
+
+        self.image = pg.image.fromstring(img.tobytes(), img.size, img.mode)# .convert_alpha()
 
     @Perlin
     def generate_perlin(self):
@@ -33,12 +54,6 @@ with proto("Perlin") as Perlin:
 
     @Perlin
     def draw_perlin(self, matrix, surface, radius):
-        start_x, start_y = self.center_pos[0] - radius, self.center_pos[1] - radius
-        for x, row in enumerate(matrix):
-            for y, value in enumerate(row):
-                pixel_pos = (x + start_x, y + start_y)
-                if sqrt((self.center_pos[0] - pixel_pos[0]) ** 2 + (self.center_pos[1] - pixel_pos[1]) ** 2) <= radius:
-                    # Convertir value en une couleur RGB
-                    value = min(max(int(value), 0), 255)
-                    color = (value, value, value)
-                    surface.set_at((x, y), color)
+        pg.draw(self.image, (self.center_pos[0] - radius, self.center_pos[1] - radius))
+        return
+        
