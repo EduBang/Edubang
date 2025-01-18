@@ -19,6 +19,9 @@ from shared.components.Corps import Corps
 # valeur de calibrage, origine à déterminer
 C_EDUBANG: int = 10750
 
+squareAlpha = pg.image.load("data/images/squareAlpha.png")
+colorPalette = pg.image.load("data/images/colorPalette.png")
+
 exponentFont = getFont("Medium", 12)
 titleFont = getFont("Regular", 20)
 descriptionFont = getFont("Regular", 14)
@@ -764,30 +767,15 @@ with proto("SizeViewer") as SizeViewer:
 
 with proto("ColorPicker") as ColorPicker:
     def drawColorPickerSquare(self) -> None:
-        for i in range(255):
-            for j in range(255):
-                x = self.position[0] + i
-                y = self.position[1] + j
-                alpha = (1 - j / 255)
-                r, g, b = (self.color[0], self.color[1], self.color[2])
-                k = (255 - i)
-                R, G, B = (
-                    (k * ((255 - r) / 255) + r) * alpha,
-                    (k * ((255 - g) / 255) + g) * alpha,
-                    (k * ((255 - b) / 255) + b) * alpha
-                )
-                Game.screen.set_at((x + 285, y + 20), (R, G, B))
+        pos = (self.position[0] + 285, self.position[1] + 20)
+        pg.draw.rect(Game.screen, self.color, (pos, (255, 255)))
+        Game.screen.blit(squareAlpha, pos)
         pos = (self.aim[0] + self.position[0] + 19, self.aim[1] + self.position[1] + 20)
-        pg.draw.circle(Game.screen, Game.screen.get_at(pos), pos, 10)
-        pg.draw.circle(Game.screen, (255, 255, 255), pos, 10, 1)
-        return
+        pg.draw.circle(Game.screen, Game.screen.get_at(pos), pos, 15)
+        pg.draw.circle(Game.screen, (255, 255, 255), pos, 15, 1)
     
     def drawColorPickerBar(self) -> None:
-        for i in range(100):
-            color = pg.Color(0)
-            color.hsla = (3.6 * i, 100, 50, 100)
-            x = self.position[0] + 5 * i
-            pg.draw.rect(Game.screen, color, (x + 20, self.position[1] + 310, 5, 10))
+        Game.screen.blit(colorPalette, (self.position[0] + 20, self.position[1] + 310))
         color = pg.Color(0)
         color.hsla = (3.6 * self.value, 100, 50, 100)
         pg.draw.rect(Game.screen, color, (self.position[0] + self.value * 5 + 20, self.position[1] + 305, 10, 20))
@@ -796,7 +784,7 @@ with proto("ColorPicker") as ColorPicker:
     
     def drawColorPicker(self) -> None:
         if not self.focus:
-            pg.draw.rect(Game.screen, self.color, (self.position, (60, 60)), 0, 8)
+            pg.draw.rect(Game.screen, self.target, (self.position, (60, 60)), 0, 8)
         else:
             pg.draw.rect(Game.screen, (10, 9, 9), (self.position, (560, 340)), 0, 8)
             pg.draw.rect(Game.screen, self.target, ((self.position[0] + 20, self.position[1] + 20), (255, 255)))
@@ -820,38 +808,42 @@ with proto("ColorPicker") as ColorPicker:
                 Events.trigger("hovering", self)
             else:
                 Events.trigger("unhovering", self)
+            if self.mouse:
+                if square:
+                    self.target = Game.screen.get_at((x, y))
+                    self.aim = (
+                        x - (self.position[0] + 20),
+                        y - (self.position[1] + 20)
+                    )
+                if bar:
+                    self.value = (x - (self.position[0] + 20)) / 5
+                    color = pg.Color(0)
+                    color.hsla = (3.6 * self.value, 100, 50, 100)
+                    self.color = (color.r, color.g, color.b)
+                    pos = (
+                        self.aim[0] + self.position[0] + 20,
+                        self.aim[1] + self.position[1] + 20
+                    )
+                    self.target = Game.screen.get_at(pos)[:-1]
         return
 
     def mousebuttondownCP(self, event) -> None:
         button = event.button
         if button != 1: return
         x, y = event.pos
+        if x > self.position[0] and x < self.position[0] + 60 and y > self.position[1] and y < self.position[1] + 60:
+            self.focus = True
         if self.focus:
-            if x > self.position[0] and x < self.position[0] + 560 and y > self.position[1] and y < self.position[1] + 340:
-                return
-            else:
-                self.focus = False
-        return
-    
-    def mousebuttonupCP(self, event) -> None:
-        button = event.button
-        if button != 1: return
-        x, y = event.pos
-        if not self.focus:
-            if x > self.position[0] and x < self.position[0] + 60 and y > self.position[1] and y < self.position[1] + 60:
-                self.focus = not self.focus
-            else:
-                self.focus = False
-        else:
             square = x > self.position[0] + 285 and x < self.position[0] + 540 and y > self.position[1] + 20 and y < self.position[1] + 275
             bar = x > self.position[0] + 20 and x < self.position[0] + 520 and y > self.position[1] + 305 and y < self.position[1] + 325
+            self.mouse = square or bar
             if square:
                 self.target = Game.screen.get_at((x, y))
                 self.aim = (
                     x - (self.position[0] + 20),
                     y - (self.position[1] + 20)
                 )
-            elif bar:
+            if bar:
                 self.value = (x - (self.position[0] + 20)) / 5
                 color = pg.Color(0)
                 color.hsla = (3.6 * self.value, 100, 50, 100)
@@ -860,9 +852,17 @@ with proto("ColorPicker") as ColorPicker:
                     self.aim[0] + self.position[0] + 20,
                     self.aim[1] + self.position[1] + 20
                 )
-                self.target = Game.screen.get_at(pos)
-            else:
-                self.focus = False
+                self.target = Game.screen.get_at(pos)[:-1]
+        return
+    
+    def mousebuttonupCP(self, event) -> None:
+        button = event.button
+        if button != 1: return
+        x, y = event.pos
+        if not (x > self.position[0] and x < self.position[0] + 560 and y > self.position[1] and y < self.position[1] + 340):
+            self.focus = False
+        if self.focus:
+            self.mouse = False
         return
     
     def mousewheelCP(self, event) -> None:
@@ -878,7 +878,7 @@ with proto("ColorPicker") as ColorPicker:
                 self.aim[0] + self.position[0] + 20,
                 self.aim[1] + self.position[1] + 20
             )
-            self.target = Game.screen.get_at(pos)
+            self.target = Game.screen.get_at(pos)[:-1]
         return
 
     def windowCP(self, w) -> None:
@@ -894,6 +894,7 @@ with proto("ColorPicker") as ColorPicker:
         self.values = (0, 100)
         self.value = 0
         self.focus = False
+        self.mouse = False
         self.draw = MethodType(drawColorPicker, self)
         self.onHover = onHover
         Events.group(self, {
