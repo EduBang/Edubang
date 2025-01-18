@@ -7,7 +7,7 @@ from eventListen import Events
 from nsi25perlin import PerlinNoise
 
 from main import Game, getFont
-from shared.utils.utils import updateCorps, process_collide, Button, ColorPicker, C_EDUBANG, spacePosToScreenPos, DataKeeper, loadSpace
+from shared.utils.utils import updateCorps, process_collide, Button, ColorPicker, C_EDUBANG, spacePosToScreenPos, DataKeeper, loadSpace, l
 from shared.components.Corps import Corps
 from shared.components.Captors import isColliding
 from shared.components.Prediction import predict
@@ -154,7 +154,7 @@ def load() -> None:
     icons: list = [pg.transform.scale(pg.image.load("./data/images/%s.png" % i), (38, 50)) for i in ("play", "pencil", "settings", "power")]
 
     discoverButton = Button((100, 300), (170, 60), color=(13, 178, 190))
-    discoverButton.text = "Découvrir"
+    discoverButton.text = l("discover")
     discoverButton.font = semibold
     discoverButton.textColor = (255, 255, 255)
     discoverButton.icon = icons[0]
@@ -162,7 +162,7 @@ def load() -> None:
     interface.append(discoverButton)
 
     editorButton = Button((100, 400), (265, 60), color=(13, 178, 190))
-    editorButton.text = "Éditeur de système"
+    editorButton.text = l("editor")
     editorButton.font = semibold
     editorButton.textColor = (255, 255, 255)
     editorButton.icon = icons[1]
@@ -170,7 +170,7 @@ def load() -> None:
     interface.append(editorButton)
 
     settingsButton = Button((100, 500), (190, 60), color=(13, 178, 190))
-    settingsButton.text = "Paramètres"
+    settingsButton.text = l("settings")
     settingsButton.font = semibold
     settingsButton.textColor = (255, 255, 255)
     settingsButton.icon = icons[2]
@@ -178,7 +178,7 @@ def load() -> None:
     interface.append(settingsButton)
 
     quitButton = Button((100, 600), (240, 60), color=(13, 178, 190))
-    quitButton.text = "Quitter EduBang"
+    quitButton.text = l("quit")
     quitButton.font = semibold
     quitButton.textColor = (255, 255, 255)
     quitButton.icon = icons[3]
@@ -225,7 +225,7 @@ def draw(screen) -> None:
     for element in interface:
         element.draw()
 
-    surface = semibold.render("NE PAS DIFFUSER - CONFIDENTIEL", False, (128, 128, 128))
+    surface = semibold.render(l("notShare"), False, (128, 128, 128))
     screen.blit(surface, (w - 450, h - 100))
 
     return

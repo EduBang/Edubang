@@ -8,7 +8,7 @@ from eventListen import Events
 from main import Game, getFont
 from shared.components.Corps import Corps
 from shared.components.Prediction import predict
-from shared.utils.utils import DataKeeper, Button, spacePosToScreenPos, getSize, Inventory, screenPosToSpacePos, Input, barycentre, drawArrow, MessageBox
+from shared.utils.utils import DataKeeper, Button, spacePosToScreenPos, getSize, Inventory, screenPosToSpacePos, Input, barycentre, drawArrow, MessageBox, l
 
 dk = DataKeeper()
 dk.body = None
@@ -24,7 +24,7 @@ dk.tsave = None
 dk.target = None
 dk.arrows = {}
 
-mb = MessageBox("Retourner au menu ? (Échap)")
+mb = MessageBox(l("returnToMenu"))
 
 semibold = getFont("SemiBold", 16)
 

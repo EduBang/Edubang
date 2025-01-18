@@ -74,6 +74,7 @@ with proto("Game") as Game:
         self.pause = False
         self.subprocess = None
         self.screenSize = screen.get_size()
+        self.language = "fr"
 
         ws = [w for w in listdir("sources/interface") if path.isfile(path.join("sources/interface", w))]
         for w in ws:
@@ -132,7 +133,7 @@ with proto("Game") as Game:
         if self.tmusic and self.settings["volume"] != 0:
             Game.tmusic -= (Game.deltaTime * 2.195)
             width, height = self.screenSize
-            text: str = "Playing %s" % self.sound[12:-4]
+            text: str = "Playing %s" % self.sound[11:-4]
             surface = Game.italic.render(text, False, (255, 255, 255))
             surface.set_alpha(int(255 * Game.tmusic / 5))
             tW, tH = Game.italic.size(text)
@@ -150,9 +151,9 @@ with proto("Game") as Game:
     @Game
     def select(self, w) -> None:
         if not w in self.windows.keys(): return
+        self.window = w
         Events.trigger("window", w)
         self.windows[w][0]()
-        self.window = w
         return
     
     @Game

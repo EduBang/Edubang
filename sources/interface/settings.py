@@ -5,7 +5,7 @@ from eventListen import Events
 import pygame as pg
 
 from main import Game
-from shared.utils.utils import Button, DataKeeper, SlideBar, Text
+from shared.utils.utils import Button, DataKeeper, SlideBar, Text, l
 
 dk = DataKeeper()
 
@@ -44,12 +44,12 @@ def backFunction() -> None:
 
 def load() -> None:
     backButton = Button((100, 200), (180, 60))
-    backButton.text = "Retour"
+    backButton.text = l("back")
     backButton.onPressed = backFunction
     interface.append(backButton)
 
     keybindButton = Button((100, 300), (180, 60))
-    keybindButton.text = "Contrôles"
+    keybindButton.text = l("keybind")
     keybindButton.onPressed = goKeybind
     interface.append(keybindButton)
 
@@ -68,7 +68,7 @@ def load() -> None:
 
 def draw(screen) -> None:
     screen.fill((0, 0, 0))
-    surface = Game.title.render("Paramètres", False, (255, 255, 255))
+    surface = Game.title.render(l("title"), False, (255, 255, 255))
     screen.blit(surface, (100, 100))
 
     for element in interface:

@@ -4,7 +4,7 @@ from os import listdir, path
 from eventListen import Events
 
 from main import Game
-from shared.utils.utils import DataKeeper, System, Button
+from shared.utils.utils import DataKeeper, System, Button, l
 
 dk = DataKeeper()
 interface: list = []
@@ -21,7 +21,7 @@ def backFunction() -> None:
 
 def load() -> None:
     backButton = Button((100, 200), (180, 60))
-    backButton.text = "Retour"
+    backButton.text = l("back")
     backButton.onPressed = backFunction
     interface.append(backButton)
 
@@ -38,7 +38,7 @@ def load() -> None:
 def draw(screen) -> None:
     screen.fill((0, 0, 0))
 
-    surface = Game.title.render("Découvrir", False, (255, 255, 255))
+    surface = Game.title.render(l("title"), False, (255, 255, 255))
     screen.blit(surface, (100, 100))
 
     for element in interface:

@@ -5,7 +5,7 @@ from os import listdir, path
 from eventListen import Events
 
 from main import Game, getFont
-from shared.utils.utils import Button, DataKeeper, KeyBind, Text, Button, SCROLL_SPEED
+from shared.utils.utils import Button, DataKeeper, KeyBind, Text, Button, SCROLL_SPEED, l
 
 dk = DataKeeper()   
 dk.offsetY = 0
@@ -79,12 +79,12 @@ def resetKeybinds() -> None:
 
 def load() -> None:
     backButton = Button((100, 200), (180, 60))
-    backButton.text = "Retour"
+    backButton.text = l("back")
     backButton.onPressed = backFunction
     interface.append(backButton)
 
     resetButton = Button((100, 300), (180, 60))
-    resetButton.text = "Réinitialiser"
+    resetButton.text = l("reset")
     resetButton.onPressed = resetKeybinds
     interface.append(resetButton)
 
@@ -118,7 +118,7 @@ def load() -> None:
 
 def draw(screen) -> None:
     screen.fill((0, 0, 0))
-    surface = Game.title.render("Contrôles", False, (255, 255, 255))
+    surface = Game.title.render(l("title"), False, (255, 255, 255))
     screen.blit(surface, (100, 100))
 
     for element in interface:
