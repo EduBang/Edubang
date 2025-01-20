@@ -76,11 +76,29 @@ for languageFile in languageFiles:
 # region Prototypes
 
 def onHover() -> None:
+    """
+    Fonction qui change le curseur en main
+    
+    Arguments:
+        None
+        
+    Retourne:
+        None
+    """
     pg.mouse.set_cursor(pg.SYSTEM_CURSOR_HAND)
     return
 
 with proto("Button") as Button:
     def drawButton(self) -> None:
+        """
+        Fonction de base qui dessine un bouton
+        
+        Arguments:
+            None
+            
+        Retourne:
+            None
+        """
         if not self.active: return 
         offset: int = 0
         pg.draw.rect(Game.screen, self.color, pg.Rect(self.position, self.size), 0, 8)
@@ -98,6 +116,15 @@ with proto("Button") as Button:
         return
     
     def mousemotionBTN(self, event) -> None:
+        """
+        Fonction qui gère l'événement "mousemotion" pour le bouton
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+            
+        Retourne:
+            None
+        """
         if not self.active: return
         x, y = event.pos
         if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
@@ -108,6 +135,15 @@ with proto("Button") as Button:
         return
 
     def mousebuttondownBTN(self, event) -> None:
+        """
+        Fonction qui gère l'événement "mousebuttondown" pour le bouton
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+            
+        Retourne:
+            None
+        """ 
         if not self.active: return
         button = event.button
         x, y = event.pos
@@ -117,6 +153,15 @@ with proto("Button") as Button:
         return
     
     def mousebuttonupBTN(self, event) -> None:
+        """
+        Fonction qui gère l'événement "mousebuttonup" pour le bouton
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+        
+        Retourne:
+            None
+        """
         if not self.active: return
         button = event.button
         x, y = event.pos
@@ -126,6 +171,15 @@ with proto("Button") as Button:
         return
 
     def mousewheelBTN(self, event) -> None:
+        """
+        Fonction qui gère l'événement "mousewheel" pour le bouton
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+        
+        Retourne:
+            None
+        """
         if not self.active: return
         if not self.scrollable: return
         self.offsetY = SCROLL_SPEED * event.y
@@ -133,11 +187,31 @@ with proto("Button") as Button:
         return
 
     def windowBTN(self, w) -> None:
+        """
+        Fonction qui gère l'événement "window" pour le bouton
+        
+        Arguments:
+            w (str): Le nom de la page
+        
+        Retourne:
+            None
+        """
         Events.stopObserving(self)
         return
 
     @Button
     def new(self, position: tuple[int, int], size: tuple[int, int], *, color: tuple[int, int, int] = (255, 255, 255)) -> None:
+        """
+        L'initateur du bouton
+        
+        Arguments:
+            position (tuple[int, int]): Position du bouton
+            size (tuple[int, int]): Dimensions du bouton
+            color: (tuple[int, int, int]): Couleur du bouton
+            
+        Retourne:
+            None
+        """
         self.text = "Button"
         self.position = list(position)
         self.size = size
@@ -163,6 +237,9 @@ with proto("Button") as Button:
 
 with proto("CheckBox") as CheckBox:
     def drawCheckBox(self) -> None:
+        """
+        Fonction de base qui dessine une case à cocher
+        """
         color = FOCUS_COLOR if self.checked else (255, 255, 255)
         pg.draw.rect(Game.screen, color, pg.Rect(self.position, self.size), 0, 4)
         if color == FOCUS_COLOR:
@@ -174,6 +251,15 @@ with proto("CheckBox") as CheckBox:
         return
     
     def mousemotionCB(self, event) -> None:
+        """
+        Fonction qui gère l'événement "mousemotion" pour la case à cocher
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+        
+        Retourne:
+            None
+        """
         x, y = event.pos
         if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
             self.onHover()
@@ -183,6 +269,15 @@ with proto("CheckBox") as CheckBox:
         return
 
     def mousebuttondownCB(self, event) -> None:
+        """
+        Fonction qui gère l'événement "mousebuttondown" pour la case à cocher
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+        
+        Retourne:
+            None
+        """
         button = event.button
         x, y = event.pos
         if button != 1: return
@@ -191,6 +286,15 @@ with proto("CheckBox") as CheckBox:
         return
     
     def mousebuttonupCB(self, event) -> None:
+        """
+        Fonction qui gère l'événement "mousebuttonup" pour la case à cocher
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+        
+        Retourne:
+            None
+        """
         button = event.button
         x, y = event.pos
         if button != 1: return
@@ -199,22 +303,59 @@ with proto("CheckBox") as CheckBox:
         return
     
     def mousewheelCB(self, event) -> None:
+        """
+        Fonction qui gère l'événement "mousewheel" pour la case à cocher
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+        
+        Retourne:
+            None
+        """
         if not self.scrollable: return
         self.offsetY = SCROLL_SPEED * event.y
         self.position[1] += self.offsetY
         return
 
     def windowCB(self, w) -> None:
+        """
+        Fonction qui gère l'événement "window" pour la case à cocher
+        
+        Arguments:
+            w (str): Le nom de la page
+        
+        Retourne:
+            None
+        """
         Events.stopObserving(self)
         return
 
     @CheckBox
     def onPressed(self) -> None:
+        """
+        Fonction de base qui gère l'événement "onPressed" de la case à cocher
+        
+        Arguments:
+            None
+        
+        Retourne:
+            None
+        """
         self.checked = not self.checked
         return
     
     @CheckBox
     def new(self, position: tuple[int, int], checked: bool = False) -> None:
+        """
+        L'initateur de la case à cocher
+        
+        Arguments:
+            position (tuple[int, int]): Position de la case à cocher
+            checked (bool): Défini son état
+            
+        Retourne:
+            None
+        """
         self.checked = checked
         self.position = list(position)
         self.size  = [30, 30]
@@ -235,6 +376,15 @@ with proto("CheckBox") as CheckBox:
 with proto("MessageBox") as MessageBox:
     @MessageBox
     def draw(self) -> None:
+        """
+        Fonction de base qui dessine la boite de message
+        
+        Arguments:
+            None
+            
+        Retourne:
+            None
+        """
         if not self.active: return
         widthScreen, heightScreen = Game.screenSize
         surface = Game.font.render(self.text, False, (0, 0, 0))
@@ -249,12 +399,30 @@ with proto("MessageBox") as MessageBox:
     
     @MessageBox
     def new(self, message: str) -> None:
+        """
+        L'initateur de la boite de message
+        
+        Arguments:
+            message (str): Le message à transmettre
+            
+        Retourne:
+            None
+        """
         self.text = message
         self.active = False
         return
 
 with proto("KeyBind") as KeyBind:
     def drawKeyBind(self):
+        """
+        Fonction de base qui dessine le keybind
+        
+        Arguments:
+            None
+            
+        Retourne:
+            None
+        """
         color: tuple[int, int, int] = FOCUS_COLOR if self.focus else (255, 255, 255)
         pg.draw.rect(Game.screen, color, pg.Rect(self.position, self.size), 0, 4)
         surface = self.font.render(" + ".join(self.keyname), False, (0, 0, 0))
@@ -262,6 +430,15 @@ with proto("KeyBind") as KeyBind:
         return
     
     def mousemotionKB(self, event) -> None:
+        """
+        Fonction qui gère l'événement "mousemotion" pour le keybind
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+        
+        Retourne:
+            None
+        """
         x, y = event.pos
         if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
             self.onHover()
@@ -271,6 +448,15 @@ with proto("KeyBind") as KeyBind:
         return
 
     def mousebuttondownKB(self, event) -> None:
+        """
+        Fonction qui gère l'événement "mousebuttondown" pour le keybind
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+        
+        Retourne:
+            None
+        """
         button = event.button
         x, y = event.pos
         if button != 1: return
@@ -281,6 +467,15 @@ with proto("KeyBind") as KeyBind:
         return
     
     def mousebuttonupKB(self, event) -> None:
+        """
+        Fonction qui gère l'événement "mousebuttonup" pour le keybind
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+        
+        Retourne:
+            None
+        """
         button = event.button
         x, y = event.pos
         if button != 1: return
@@ -291,16 +486,43 @@ with proto("KeyBind") as KeyBind:
         return
     
     def mousewheelKB(self, event) -> None:
+        """
+        Fonction qui gère l'événement "mousewheel" pour le keybind
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+        
+        Retourne:
+            None
+        """
         if not self.scrollable: return
         self.offsetY = SCROLL_SPEED * event.y
         self.position[1] += self.offsetY
         return
 
     def windowKB(self, w) -> None:
+        """
+        Fonction qui gère l'événement "window" pour le keybind
+        
+        Arguments:
+            w (str): Le nom de la page
+        
+        Retourne:
+            None
+        """
         Events.stopObserving(self)
         return
 
     def keydownKB(self, event) -> None:
+        """
+        Fonction qui gère l'événement "keydown" pour le keybind
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+        
+        Retourne:
+            None
+        """
         if self.focus:
             self.keys = []
             self.keyname = []
@@ -319,11 +541,31 @@ with proto("KeyBind") as KeyBind:
 
     @KeyBind
     def onPressed(self) -> None:
+        """
+        Fonction de base qui gère l'événement "onPressed" pour le keybind
+        
+        Arguments:
+            None
+        
+        Retourne:
+            None
+        """
         self.focus = not self.focus
         return
 
     @KeyBind
     def new(self, keys: list[int], keyname: str, position: tuple[int, int]) -> None:
+        """
+        L'initateur du keybind
+        
+        Arguments:
+            keys (list[int]): Les codes des touches
+            keyname (str): Le nom de la liaison de touches
+            position (tuple[int, int]): La position du keybind
+        
+        Retourne:
+            None
+        """
         self.focus = False
         self.keys = keys
         self.keyname = keyname
@@ -348,11 +590,29 @@ with proto("KeyBind") as KeyBind:
 with proto("Text") as Text:
     @Text
     def draw(self) -> None:
+        """
+        Fonction de base qui affiche le texte sur l'écran
+        
+        Arguments:
+            None
+            
+        Retourne:
+            None
+        """
         surface = self.font.render(self.text, self.antialiasing, self.color)
         Game.screen.blit(surface, self.position)
         return
 
     def mousewheelT(self, event) -> None:
+        """
+        Fonction qui gère l'événement "mousewheel" pour le Texte
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+        
+        Retourne:
+            None
+        """
         if not self.scrollable: return
         self.offsetY = SCROLL_SPEED * event.y
         self.position[1] += self.offsetY
@@ -360,6 +620,19 @@ with proto("Text") as Text:
 
     @Text
     def new(self, text: str, position: tuple[int, int], antialiasing: bool = False, color: tuple[int, int, int] = (0, 0, 0), font=Game.font) -> None:
+        """
+        L'initateur du Texte
+        
+        Arguments:
+            text (str): Le texte à afficher
+            position (tuple[int, int]): La position du Texte
+            antialiasing (bool): Activer l'anticrénelage
+            color (tuple[int, int, int]): La couleur du Texte
+            font (pg.Font): La police de texte
+        
+        Retourne:
+            None
+        """
         self.text = text
         self.position = list(position)
         self.antialiasing = antialiasing
@@ -373,6 +646,15 @@ with proto("Text") as Text:
 
 with proto("Input") as Input:
     def drawInput(self) -> None:
+        """
+        Fonction de base qui dessine l'entrée de texte
+        
+        Arguments:
+            None
+        
+        Retourne:
+            None
+        """
         if not self.visible: return
         color: tuple[int, int, int] = FOCUS_COLOR if self.focus and self.active else (255, 255, 255)
         fontColor: tuple[int, int, int] = (150, 150, 150) if self.placeholder and not self.text else (0, 0, 0)
@@ -386,6 +668,15 @@ with proto("Input") as Input:
         return
     
     def mousemotionI(self, event) -> None:
+        """
+        Fonction qui gère l'événement "mousemotion" pour l'entrée de texte
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+        
+        Retourne:
+            None
+        """
         if not self.active: return
         x, y = event.pos
         if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
@@ -396,6 +687,15 @@ with proto("Input") as Input:
         return
 
     def mousebuttondownI(self, event) -> None:
+        """
+        Fonction qui gère l'événement "mousebuttondown" pour l'entrée de texte
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+        
+        Retourne:
+            None
+        """
         if not self.active: return
         button = event.button
         x, y = event.pos
@@ -410,6 +710,15 @@ with proto("Input") as Input:
         return
     
     def mousebuttonupI(self, event) -> None:
+        """
+        Fonction qui gère l'événement "mousebuttonup" pour l'entrée de texte
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+        
+        Retourne:
+            None
+        """
         if not self.active: return
         button = event.button
         x, y = event.pos
@@ -422,6 +731,15 @@ with proto("Input") as Input:
         return
     
     def mousewheelI(self, event) -> None:
+        """
+        Fonction qui gère l'événement "mousewheel" pour l'entrée de texte
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+        
+        Retourne:
+            None
+        """
         if not self.active: return
         if not self.scrollable: return
         self.offsetY = SCROLL_SPEED * event.y
@@ -429,10 +747,28 @@ with proto("Input") as Input:
         return
 
     def windowI(self, w) -> None:
+        """
+        Fonction qui gère l'événement "window" pour l'entrée de texte
+        
+        Arguments:
+            w (str): Le nom de la page
+        
+        Retourne:
+            None
+        """
         Events.stopObserving(self)
         return
 
     def keydownI(self, event) -> None:
+        """
+        Fonction qui gère l'événement "keydown" pour l'entrée de texte
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+        
+        Retourne:
+            None
+        """
         if not self.active: return
         if self.focus:
             if event.key in [pg.K_RETURN, pg.K_ESCAPE, pg.K_TAB]:
@@ -448,6 +784,17 @@ with proto("Input") as Input:
 
     @Input
     def new(self, text: str, position: tuple[int, int], size: tuple[int, int]) -> None:
+        """
+        L'initiateur de l'entrée de texte
+        
+        Arguments:
+            text (str): Le texte déjà présent dans la boite
+            position (tuple[int, int]): La position de l'entrée de texte
+            size: (tuple[int, int]): La taille de l'entrée de texte
+            
+        Retourne:
+            None
+        """
         self.active = True
         self.visible = True
         self.focus = False
@@ -477,6 +824,15 @@ with proto("Input") as Input:
 
 with proto("SlideBar") as SlideBar:
     def drawSlideBar(self) -> None:
+        """
+        Fonction de base qui dessine une barre coulissante
+        
+        Arguments:
+            None
+        
+        Retourne:
+            None
+        """
         if self.active:
             pos = pg.mouse.get_pos()
             value = pos[0] - self.position[0]
@@ -488,6 +844,15 @@ with proto("SlideBar") as SlideBar:
         return
     
     def mousemotionSB(self, event) -> None:
+        """
+        Fonction qui gère l'événement "mousemotion" pour la barre coulissante
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+        
+        Retourne:
+            None
+        """
         x, y = event.pos
         if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
             self.onHover()
@@ -497,6 +862,15 @@ with proto("SlideBar") as SlideBar:
         return
 
     def mousebuttondownSB(self, event) -> None:
+        """
+        Fonction qui gère l'événement "mousebuttondown" pour la barre coulissante
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+        
+        Retourne:
+            None
+        """
         button = event.button
         x, y = event.pos
         if button != 1: return
@@ -507,6 +881,15 @@ with proto("SlideBar") as SlideBar:
         return
     
     def mousebuttonupSB(self, event) -> None:
+        """
+        Fonction qui gère l'événement "mousebuttonup" pour la barre coulissante
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+        
+        Retourne:
+            None
+        """
         button = event.button
         x, y = event.pos
         if button != 1: return
@@ -517,6 +900,15 @@ with proto("SlideBar") as SlideBar:
         return
     
     def mousewheelSB(self, event) -> None:
+        """
+        Fonction qui gère l'événement "mousewheel" pour la barre coulissante
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+        
+        Retourne:
+            None
+        """
         x, y = pg.mouse.get_pos()
         if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
             self.value += event.y
@@ -527,21 +919,57 @@ with proto("SlideBar") as SlideBar:
         return
 
     def windowSB(self, w) -> None:
+        """
+        Fonction qui gère l'événement "window" pour la barre coulissante
+        
+        Arguments:
+            w (str): Le nom de la page
+        
+        Retourne:
+            None
+        """
         Events.stopObserving(self)
         return
 
     @SlideBar
     def onPressed(self) -> None:
+        """
+        Fonction de base qui gère l'événement "onPressed" pour la barre coulissante
+        
+        Arguments:
+            None
+        
+        Retourne:
+            None
+        """
         self.active = True
         return
 
     @SlideBar
     def onReleased(self) -> None:
+        """
+        Fonction de base qui gère l'événement "onReleased" pour la barre coulissante
+        
+        Arguments:
+            None
+        
+        Retourne:
+            None
+        """
         self.active = False
         return
 
     @SlideBar
     def new(self, position: tuple[int, int]) -> None:
+        """
+        L'initiateur de la barre coulissante
+        
+        Arguments:
+            position (tuple[int, int]): La position de la barre coulissante
+            
+        Retourne:
+            None
+        """
         self.active = False
         self.values = [0, 100]
         self.value = self.values[0]
@@ -562,6 +990,15 @@ with proto("SlideBar") as SlideBar:
 
 with proto("System") as System:
     def drawSystem(self) -> None:
+        """
+        Fonction de base qui dessine la boite d'un système
+        
+        Arguments:
+            None
+            
+        Retourne:
+            None
+        """
         pg.draw.rect(Game.screen, (255, 255, 255), pg.Rect(self.position, self.size), 1, 8)
         surface = titleFont.render(self.system["title"], False, (255, 255, 255))
         Game.screen.blit(surface, (self.position[0] + 10, self.position[1] + 10))
@@ -576,6 +1013,15 @@ with proto("System") as System:
         return
     
     def mousemotionS(self, event) -> None:
+        """
+        Fonction qui gère l'événement "mousemotion" pour la boite d'un système
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+        
+        Retourne:
+            None
+        """
         x, y = event.pos
         if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
             self.onHover()
@@ -585,6 +1031,15 @@ with proto("System") as System:
         return
     
     def mousebuttonupS(self, event) -> None:
+        """
+        Fonction qui gère l'événement "mousebuttonup" pour la boite d'un système
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+        
+        Retourne:
+            None
+        """
         button = event.button
         x, y = event.pos
         if button != 1: return
@@ -599,17 +1054,45 @@ with proto("System") as System:
         return
 
     def mousewheelS(self, event) -> None:
+        """
+        Fonction qui gère l'événement "mousewheel" pour la boite d'un système
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+        
+        Retourne:
+            None
+        """
         if not self.scrollable: return
         self.offsetY = SCROLL_SPEED * event.y
         self.position[1] += self.offsetY
         return
 
     def windowS(self, w) -> None:
+        """
+        Fonction qui gère l'événement "window" pour la boite d'un système
+        
+        Arguments:
+            None
+        
+        Retourne:
+            None
+        """
         Events.stopObserving(self)
         return
 
     @System
     def new(self, system: dict, index: int) -> None:
+        """
+        L'initiateur de la boite d'un système
+        
+        Arguments:
+            system (dict): Les données d'un système
+            index (int): L'ordre du système sur l'écran
+        
+        Retourne:
+            None
+        """
         self.system = system
         self.position = [400, 100 + 120 * index]
         self.size = (500, 100)
@@ -626,6 +1109,15 @@ with proto("System") as System:
 
 with proto("Inventory") as Inventory:
     def drawInventory(self):
+        """
+        Fonction de base qui dessine l'inventaire
+        
+        Arguments:
+            None
+            
+        Retourne:
+            None
+        """
         if not self.active: return
         bodies = self.bodies.copy()
         width, height = Game.screenSize
@@ -657,6 +1149,15 @@ with proto("Inventory") as Inventory:
         return
     
     def mousemotionIn(self, event) -> None:
+        """
+        Fonction qui gère l'événement "mousemotion" pour l'inventaire
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+        
+        Retourne:
+            None
+        """
         if not self.active: return
         x, y = event.pos
         for cz in self.clickableZones.values():
@@ -669,6 +1170,15 @@ with proto("Inventory") as Inventory:
         return
     
     def mousebuttonupIn(self, event) -> None:
+        """
+        Fonction qui gère l'événement "mousebuttonup" pour l'inventaire
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+        
+        Retourne:
+            None
+        """
         if not self.active: return
         button = event.button
         x, y = event.pos
@@ -684,11 +1194,29 @@ with proto("Inventory") as Inventory:
                     return
 
     def windowIn(self, w) -> None:
+        """
+        Fonction qui gère l'événement "window" pour l'inventaire
+        
+        Arguments:
+            w (str): Le nom de la page
+        
+        Retourne:
+            None
+        """
         Events.stopObserving(self)
         return
     
     @Inventory
     def update(self) -> None:
+        """
+        Fonction qui met à jour l'inventaire
+        
+        Arguments:
+            None
+        
+        Retourne:
+            None
+        """
         self.bodies = []
         bodyFiles = [path.join("data/bodies", f) for f in listdir("data/bodies") if path.isfile(path.join("data/bodies", f))]
         for i, bodyFile in enumerate(bodyFiles):
@@ -701,6 +1229,15 @@ with proto("Inventory") as Inventory:
 
     @Inventory
     def new(self):
+        """
+        L'initiateur de l'inventaire
+        
+        Arguments:
+            None
+            
+        Retourne:
+            None
+        """
         self.active = False
         self.clickableZones = {}
         self.update()
@@ -716,12 +1253,30 @@ with proto("Inventory") as Inventory:
 with proto("DataKeeper") as DataKeeper:
     @DataKeeper
     def new(self):
+        """
+        L'initiateur du DataKeeper, de la sauvegarde des variables
+        
+        Arguments:
+            None
+            
+        Retourne:
+            None
+        """
         return
 
 with proto("Path") as Path:
     # dessiner trajectoire terre
     @Path
     def draw_corps_path(self, screen, path, color):
+        """
+        Dessine une trajectoire
+        
+        Arguments:
+            None
+        
+        Retourne:
+            None
+        """
         for pos in path:
             pg.draw.circle(screen, color, spacePosToScreenPos(pos), 1)
         return
@@ -1127,6 +1682,16 @@ def loadStars(n: int = 100, position: tuple[int, int] = (-1000, 1000)) -> list[t
 
 # region Vecteur
 def draw_velocity_vector(screen, corps) -> None:
+    """
+    Dessine une ligne représentant le vecteur de la vélocité d'un astre
+    
+    Arguments:
+        screen (pg.Surface): L'écran PyGame
+        corps (Corps): Astre étudié
+        
+    Retourne:
+        None
+    """
     if len(corps.path) > 1:
         corps_velocity = Physics.get_velocity(corps.path[-2], corps.path[-1], Game.dt)
         unit_vector_mouv = Vectors.get_unit_vector_mouv(corps.path[-2], corps.path[-1])
@@ -1144,6 +1709,16 @@ def draw_velocity_vector(screen, corps) -> None:
     return
     
 def draw_cinetic_energy_vector(screen, corps) -> None:
+    """
+    Dessine une ligne représentant le vecteur de l'énergie cinétique
+    
+    Arguments:
+        screen (pg.Surface): L'écran PyGame
+        corps: (Corps): Astre étudié
+        
+    Retourne:
+        None
+    """
     if len(corps.path) > 1:
         unit_vector_mouv = Vectors.get_unit_vector_mouv(corps.path[-2], corps.path[-1])
         cinetic_energy = Game.normalizeCinetic(corps)
@@ -1161,11 +1736,33 @@ def draw_cinetic_energy_vector(screen, corps) -> None:
     return
 
 def draw_text(screen, text, position, font, color=(255, 255, 255)):
+    """
+    Affiche du texte sur l'écran PyGame
+    
+    Arguments:
+        screen (pg.Surface): L'écran PyGame
+        text (str): Texte à afficher
+        position (tuple[int, int]): Position du texte
+        font (pg.Font): Police de texte
+        color: (tuple[int, int, int]): Couleur du texte
+        
+    Retourne:
+        None
+    """
     rendered_text = font.render(text, True, color)
     screen.blit(rendered_text, position)
     return
 
 def draw_attraction_norm(screen) -> None:
+    """
+    Dessine une flèche représentant le vecteur de la norme attractionnelle
+    
+    Arguments:
+        screen (pg.Surface): L'écran PyGame
+        
+    Retourne:
+        None
+    """
     attractionVectorSum = mouseSpacePos = AVS = screenPosToSpacePos(pg.mouse.get_pos())
 
     for corps in Game.space:
@@ -1201,7 +1798,6 @@ def draw_attraction_norm(screen) -> None:
     pg.draw.line(screen, (255, 255, 255), (x + 4, y - 4), (x + 16, y - 16), 1)
     surface = Game.font.render("%s m/s²" % valeur, False, (255, 255, 255))
     screen.blit(surface, (x + 18, y - 30))
-
     return
 
 # endregion
@@ -1433,6 +2029,15 @@ def closeTo(n: float | int) -> int:
     return closest[0]
 
 def getSize() -> tuple[int, int, str]:
+    """
+    Récupère la distance entre deux points d'une certaine distance en mètre selon le zoom de la caméra
+    
+    Arguments:
+        None
+        
+    Retourne:
+        tuple[int, int, str]: Respectivement: distance entre les points en px, distance "réelle", unité
+    """
     d: float = round(100 * 1e3 / Game.Camera.zoom, 3)
     unit: str = "m"
     if d > 1e3:
