@@ -95,7 +95,7 @@ def load() -> None:
         with open(keybindFile, "r", encoding="utf-8") as f:
             keybinds = loadJson(f)
             f.close()
-        title = Text(keybindFile.split("\\")[1][:-5], (500, h), color=(255, 255, 255))
+        title = Text(keybindFile[14:-5], (500, h), color=(255, 255, 255))
         title.font = getFont("Bold", 24)
         Events.setEvent(title, "positionChanged", positionChanged)
         interface.append(title)
