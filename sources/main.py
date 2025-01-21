@@ -183,17 +183,17 @@ with proto("Game") as Game:
 
     @Game
     def getHeaviest(self):
-        c, m = self.space[0], self.space[0].mass
+        c = self.space[0]
         for corps in self.space:
-            if corps.mass > m:
-                c, m = corps, corps.mass
+            if corps.mass > c.mass:
+                c = corps
         return c
 
     @Game
     def resetKeybinds(self):
         if self.os != "Windows": return
         camera: dict = {"cameraUp": {"name": "D\u00e9placement vers le haut", "code": [122], "key": ["z"]}, "cameraLeft": {"name": "D\u00e9placement vers la gauche", "code": [113], "key": ["q"]}, "cameraDown": {"name": "D\u00e9placement vers le bas", "code": [115], "key": ["s"]}, "cameraRight": {"name": "D\u00e9placement vers la droite", "code": [100], "key": ["d"]}, "resetCamera": {"name": "R\u00e9initialiser la cam\u00e9ra", "code": [114], "key": ["r"]}, "zoomIn": {"name": "Zoomer la cam\u00e9ra", "code": [1073741911], "key": ["+"]}, "zoomOut": {"name": "D\u00e9zoomer la cam\u00e9ra", "code": [45], "key": ["-"]}}
-        editor: dict = {"inventory": {"name": "Ouvrir l'inventaire", "code": [9], "key": ["tab"]}, "delete": {"name": "Supprimer un corps", "code": [102], "key": ["f"]}, "selectAll": {"name": "Tout s\u00e9lectionner", "code": [1073742048, 97], "key": ["ctrl", "a"]}, "save": {"name": "Sauvegarder", "code": [1073742048, 115], "key": ["ctrl", "s"]}}
+        editor: dict = {"inventory": {"name": "Ouvrir l'inventaire", "code": [9], "key": ["tab"]}, "delete": {"name": "Supprimer un corps", "code": [127], "key": ["del"]}, "selectAll": {"name": "Tout s\u00e9lectionner", "code": [1073742048, 97], "key": ["ctrl", "a"]}, "save": {"name": "Sauvegarder", "code": [1073742048, 115], "key": ["ctrl", "s"]}}
         simulation: dict = {"increaseTime": {"name": "Acc\u00e9l\u00e9rer le temps", "code": [101], "key": ["e"]}, "decreaseTime": {"name": "D\u00e9c\u00e9l\u00e9rer le temps", "code": [97], "key": ["a"]}, "pause": {"name": "Mettre la simulation en pause", "code": [32], "key": ["espace"]}, "resetSimulation": {"name": "R\u00e9initialiser la simulation", "code": [103], "key": ["g"]}}
         with open("data/settings/camera.json", "w", encoding="utf-8") as wf:
             wf.write(dumps(camera))

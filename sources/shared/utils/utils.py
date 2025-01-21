@@ -72,8 +72,15 @@ languageFiles = [path.join("data/language", f) for f in listdir("data/language")
 for languageFile in languageFiles:
     with open(languageFile, mode="r", encoding="utf-8") as f:
         languages[languageFile[14:-5]] = loadJson(f)
+        f.close()
 
 # region Prototypes
+
+with proto("Enums", {
+    "Violet": (128, 24, 99),
+    "DarkViolet": (97, 22, 76)
+}) as Enums:
+    pass
 
 def onHover() -> None:
     """
@@ -1910,12 +1917,12 @@ def scientificNotation(value: float | int, position: tuple[int, int], *, end: st
     """
     Affiche une valeur en notation scientifique.
 
-    Arguments : 
+    Arguments: 
         value (float | int): Valeur à afficher en notation scientifique.
         position (tuple[int, int]): Position de l'affichage.
         end (str | None): Texte à afficher à la fin de la notation scientifique.
     
-    Retourne :
+    Retourne:
         None
     """
     strValue: list[str, str] = str(value).split("e")
@@ -1943,11 +1950,11 @@ def orbitalPeriod(mass: float | int, semimajorAxe: float | int) -> float:
     Calcule la période orbitale d'un corps autour d'un autre.
     Formule selon la troisième loi de Kepler.
 
-    Arguments : 
+    Arguments: 
         mass (float | int): Masse du corps principal en kg.
         semimajorAxe (float | int): Demi-grand axe de l'orbite en km.
     
-    Retourne :
+    Retourne:
         float : La période orbitale en jours.
     """
     return (2 * pi * sqrt((semimajorAxe * 1e3) ** 3 / (G * mass))) / 86400
