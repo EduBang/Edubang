@@ -1290,6 +1290,15 @@ with proto("Path") as Path:
 
 with proto("SizeViewer") as SizeViewer:
     def drawSizeViewer(self):
+        """
+        Fonction de base pour dessiner une règle de mesure
+        
+        Arguments:
+            None
+            
+        Retourne:
+            None
+        """
         width, distance, unit = getSize()
         text: str = "%s %s" % (distance, unit)
         x, y = self.position
@@ -1303,6 +1312,15 @@ with proto("SizeViewer") as SizeViewer:
         return
 
     def mousemotionSV(self, event) -> None:
+        """
+        Fonction qui gère l'événement "mousemotion" pour la règle de mesure
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+        
+        Retourne:
+            None
+        """
         x, y = event.pos
         if self.focus:
             self.position = [x - self.size[0] // 2, y]
@@ -1314,6 +1332,15 @@ with proto("SizeViewer") as SizeViewer:
         return
 
     def mousebuttondownSV(self, event) -> None:
+        """
+        Fonction qui gère l'événement "mousebuttondown" pour la règle de mesure
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+        
+        Retourne:
+            None
+        """
         button = event.button
         x, y = event.pos
         if button != 1: return
@@ -1323,17 +1350,44 @@ with proto("SizeViewer") as SizeViewer:
         return
     
     def mousebuttonupSV(self, event) -> None:
+        """
+        Fonction qui gère l'événement "mousebuttonup" pour la règle de mesure
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+        
+        Retourne:
+            None
+        """
         button = event.button
         if button != 1: return
         self.focus = False
         return
 
     def windowSV(self, w) -> None:
+        """
+        Fonction qui gère l'événement "window" pour la règle de mesure
+        
+        Arguments:
+            w (str): Le nom de la page
+        
+        Retourne:
+            None
+        """
         Events.stopObserving(self)
         return
 
     @SizeViewer
     def new(self, position: tuple[int, int]) -> None:
+        """
+        L'initiateur de la règle de mesure
+        
+        Arguments:
+            position (tuple[int, int]): La position de la règle sur l'écran
+            
+        Retourne:
+            None
+        """
         self.position = list(position)
         self.draw = MethodType(drawSizeViewer, self)
         self.size = (0, 0)
@@ -1349,6 +1403,15 @@ with proto("SizeViewer") as SizeViewer:
 
 with proto("ColorPicker") as ColorPicker:
     def drawColorPickerSquare(self) -> None:
+        """
+        Fonction de base qui dessine le carré de sélection de la couleur
+        
+        Arguments:
+            None
+            
+        Retourne:
+            None
+        """
         pos = (self.position[0] + 285, self.position[1] + 20)
         pg.draw.rect(Game.screen, self.color, (pos, (255, 255)))
         Game.screen.blit(squareAlpha, pos)
@@ -1357,6 +1420,15 @@ with proto("ColorPicker") as ColorPicker:
         pg.draw.circle(Game.screen, (255, 255, 255), pos, 15, 1)
     
     def drawColorPickerBar(self) -> None:
+        """
+        Fonction de base qui dessine la barre de sélection de la couleur
+        
+        Arguments:
+            None
+            
+        Retourne:
+            None
+        """
         Game.screen.blit(colorPalette, (self.position[0] + 20, self.position[1] + 310))
         color = pg.Color(0)
         color.hsla = (3.6 * self.value, 100, 50, 100)
@@ -1365,6 +1437,15 @@ with proto("ColorPicker") as ColorPicker:
         return
     
     def drawColorPicker(self) -> None:
+        """
+        Fonction de base qui dessine le sélecteur de couleur
+        
+        Arguments:
+            None
+        
+        Retourne:
+            None
+        """
         if not self.focus:
             pg.draw.rect(Game.screen, self.target, (self.position, (60, 60)), 0, 8)
         else:
@@ -1375,6 +1456,15 @@ with proto("ColorPicker") as ColorPicker:
         return
 
     def mousemotionCP(self, event) -> None:
+        """
+        Fonction qui gère l'événement "mousemotion" pour le sélecteur de couleur
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+        
+        Retourne:
+            None
+        """
         x, y = event.pos
         if not self.focus:
             if x > self.position[0] and x < self.position[0] + 60 and y > self.position[1] and y < self.position[1] + 60:
@@ -1410,6 +1500,15 @@ with proto("ColorPicker") as ColorPicker:
         return
 
     def mousebuttondownCP(self, event) -> None:
+        """
+        Fonction qui gère l'événement "mousebuttondown" pour le sélecteur de couleur
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+        
+        Retourne:
+            None
+        """
         button = event.button
         if button != 1: return
         x, y = event.pos
@@ -1438,6 +1537,15 @@ with proto("ColorPicker") as ColorPicker:
         return
     
     def mousebuttonupCP(self, event) -> None:
+        """
+        Fonction qui gère l'événement "mousebuttonup" pour le sélecteur de couleur
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+        
+        Retourne:
+            None
+        """
         button = event.button
         if button != 1: return
         x, y = event.pos
@@ -1448,6 +1556,15 @@ with proto("ColorPicker") as ColorPicker:
         return
     
     def mousewheelCP(self, event) -> None:
+        """
+        Fonction qui gère l'événement "mousewheel" pour le sélecteur de couleur
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+        
+        Retourne:
+            None
+        """
         x, y = pg.mouse.get_pos()
         if x > self.position[0] + 20 and x < self.position[0] + 520 and y > self.position[1] + 305 and y < self.position[1] + 325:
             self.value += event.y
@@ -1464,11 +1581,29 @@ with proto("ColorPicker") as ColorPicker:
         return
 
     def windowCP(self, w) -> None:
+        """
+        Fonction qui gère l'événement "window" pour le sélecteur de couleur
+        
+        Arguments:
+            w (str): Le nom de la page
+        
+        Retourne:
+            None
+        """
         Events.stopObserving(self)
         return
 
     @ColorPicker
     def new(self, position: tuple[int, int]) -> None:
+        """
+        L'initiateur du sélecteur de couleur
+        
+        Arguments:
+            position (tuple[int, int]): La position du sélecteur de couleur
+            
+        Retourne:
+            None
+        """
         self.position = position
         self.color = (255, 0, 0)
         self.target = (255, 0, 0)
