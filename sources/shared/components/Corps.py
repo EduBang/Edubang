@@ -4,11 +4,33 @@ from proto import proto
 import pygame as pg
 
 def lorentzFactor(v: float | int) -> float:
+    """
+    Calcule de facteur de Lorentz
+
+    Arguments:
+        v (float | int): La vitesse de l'objet
+    
+    Retourne:
+        float: Le facteur de Lorentz
+    """
     return 1 / sqrt(1 - (v ** 2 / 0x13F4D4EACDD7564))
 
 with proto("Corps") as Corps:
     @Corps
     def new(self, mass: int | float, radius: int, pos: tuple[int, int], color: tuple[int, int, int], v_initial: tuple[float, float]) -> None:
+        """
+        L'initiateur du corps
+        
+        Arguments:
+            mass (int | float): La masse de l'astre en kg
+            radius (int): Le rayon de l'astre en km
+            pos (tuple[int, int]): La position de l'astre dans l'espace
+            color (tuple[int, int, int]): La couleur de l'astre
+            v_initial (tuple[int, int]): La vitesse initiale de l'astre
+
+        Retourne:
+            None
+        """
         self.mass = mass # kilogramme
         self.radius = radius # kilomètre
         self.pos = pos
@@ -19,6 +41,12 @@ with proto("Corps") as Corps:
     
     @Corps
     def draw(self, screen, camera) -> None:
+        """
+        Fonction qui dessine l'astre
+        
+        Arguments:
+            screen (pg.Surface): L'écran PyGame
+        """
         x: float = (self.pos[0] * camera.zoom) + camera.x
         y: float = (self.pos[1] * camera.zoom) + camera.y
         if pi * (self.radius * camera.zoom) ** 2 < 10: # Si le corps est trop petit sur l'écran, alors il va l'afficher avec une croix
