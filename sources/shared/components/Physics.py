@@ -26,9 +26,12 @@ with proto("Physics") as Physics:
     def get_velocity(self, pos_init, pos_final, dt) -> float | int:
         velocity: float | int = 0
         if dt != 0:
+            #print("test")
+            #print(pos_final, pos_init)
             velocity_vector = (pos_final[0] - pos_init[0], pos_final[1] - pos_init[1])
             norm_velocity_vector = sqrt(velocity_vector[0] ** 2 + velocity_vector[1] ** 2)
             velocity = norm_velocity_vector / dt
+            #print(f"velo : {velocity}")
         return velocity
         
     

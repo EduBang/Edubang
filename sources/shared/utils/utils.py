@@ -1587,24 +1587,34 @@ def mergeEnergy(d1: tuple[int, tuple[int, int], tuple[int, int]], d2: tuple[int,
         tuple[float, float] : Energie cinétique résultante
     """
     mass: int = d1[0] + d2[0]
-
+    # print(f"Mass: {mass}")
+    # print(f"get_velo : {Physics.get_velocity(d1[1], d1[2], Game.DT)}")
     cineticEnergyCorps1: float = Physics.get_cinetic_energy(d1[0], Physics.get_velocity(d1[1], d1[2], Game.DT))
     cineticEnergyCorps2: float = Physics.get_cinetic_energy(d2[0], Physics.get_velocity(d2[1], d2[2], Game.DT))
+    #print(f"Cinetic Energy Corps 1: {cineticEnergyCorps1}")
+    #print(f"Cinetic Energy Corps 2: {cineticEnergyCorps2}")
 
-    unitVectorMouvCorps1: float = Vectors.get_unit_vector_mouv(d1[1], d1[2])
-    unitVectorMouvCorps2: float = Vectors.get_unit_vector_mouv(d2[1], d2[2])
+    unitVectorMouvCorps1: tuple[float, float] = Vectors.get_unit_vector_mouv(d1[1], d1[2])
+    unitVectorMouvCorps2: tuple[float, float] = Vectors.get_unit_vector_mouv(d2[1], d2[2])
+    #print(f"Unit Vector Mouv Corps 1: {unitVectorMouvCorps1}")
+    #print(f"Unit Vector Mouv Corps 2: {unitVectorMouvCorps2}")
 
-    cineticEnergyVectorCorps1: float = cineticEnergyCorps1 * unitVectorMouvCorps1[0], cineticEnergyCorps1 * unitVectorMouvCorps1[1]
-    cineticEnergyVectorCorps2: float = cineticEnergyCorps2 * unitVectorMouvCorps2[0], cineticEnergyCorps2 * unitVectorMouvCorps2[1]
-    
-    sumVectorCineticEnergyCorps1: float = (cineticEnergyVectorCorps1[0] / d1[0], cineticEnergyVectorCorps1[1] / d1[0])
-    sumVectorCineticEnergyCorps2: float = (cineticEnergyVectorCorps2[0] / d2[0], cineticEnergyVectorCorps2[1] / d2[0])
+    cineticEnergyVectorCorps1: tuple[float, float] = (cineticEnergyCorps1 * unitVectorMouvCorps1[0], cineticEnergyCorps1 * unitVectorMouvCorps1[1])
+    cineticEnergyVectorCorps2: tuple[float, float] = (cineticEnergyCorps2 * unitVectorMouvCorps2[0], cineticEnergyCorps2 * unitVectorMouvCorps2[1])
+    #print(f"Cinetic Energy Vector Corps 1: {cineticEnergyVectorCorps1}")
+    #print(f"Cinetic Energy Vector Corps 2: {cineticEnergyVectorCorps2}")
 
-    x: float = (sumVectorCineticEnergyCorps1[0] + sumVectorCineticEnergyCorps2[0]) / mass
-    y: float = (sumVectorCineticEnergyCorps1[1] + sumVectorCineticEnergyCorps2[1]) / mass
+    sumVectorCineticEnergyCorps1: tuple[float, float] = (cineticEnergyVectorCorps1[0] / d1[0], cineticEnergyVectorCorps1[1] / d1[0])
+    sumVectorCineticEnergyCorps2: tuple[float, float] = (cineticEnergyVectorCorps2[0] / d2[0], cineticEnergyVectorCorps2[1] / d2[0])
+    #print(f"Sum Vector Cinetic Energy Corps 1: {sumVectorCineticEnergyCorps1}")
+    #print(f"Sum Vector Cinetic Energy Corps 2: {sumVectorCineticEnergyCorps2}")
+
+    x: float = (sumVectorCineticEnergyCorps1[0] + sumVectorCineticEnergyCorps2[0])
+    y: float = (sumVectorCineticEnergyCorps1[1] + sumVectorCineticEnergyCorps2[1])
+    #print(f"Resulting x: {x}")
+    #print(f"Resulting y: {y}")
 
     return [x, y]
-
 def process_collide(corps1, corps2):
     """
     Procède la fusion de 2 corps
@@ -1629,6 +1639,10 @@ def process_collide(corps1, corps2):
     corps.radius = radius
     corps.color = color
     corps.velocity = mergeEnergy((corps1.mass, corps1.pos, corps1.path[-1]), (corps2.mass, corps2.pos, corps2.path[-1]))
+    #print(f" velocité : {corps.velocity}")
+    #print(f" merge energy : {mergeEnergy((corps1.mass, corps1.pos, corps1.path[-2]), (corps2.mass, corps2.pos, corps2.path[-2]))}")
+
+
     corps.path = []
     processMergingNames(corps1, corps2, corps)
     if Game.Camera.focus in [corps1, corps2]:
