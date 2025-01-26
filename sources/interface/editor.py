@@ -1,18 +1,19 @@
 from json import dumps
+from json import load as loadJson
+from os import listdir, path
 from math import pi, sqrt
 from datetime import datetime
 
 import pygame as pg
 from eventListen import Events
 
-from main import Game, getFont
+from main import Game, getFont, brand
 from shared.components.Corps import Corps
 from shared.components.Prediction import predict
-from shared.utils.utils import DataKeeper, Button, spacePosToScreenPos, getSize, Inventory, screenPosToSpacePos, Input, barycentre, drawArrow, MessageBox, l
+from shared.utils.utils import DataKeeper, Button, spacePosToScreenPos, getSize, screenPosToSpacePos, Input, barycentre, drawArrow, MessageBox, l, Enums, Card
 
 dk = DataKeeper()
 dk.body = None
-dk.inventory = None
 dk.mouseselection = None
 dk.selected = []
 dk.specialKeys = []
@@ -23,14 +24,16 @@ dk.standBy = False
 dk.tsave = None
 dk.target = None
 dk.arrows = {}
+dk.bodies = []
+dk.hideHUD = False
 
 mb = MessageBox(l("returnToMenu"))
 
 semibold = getFont("SemiBold", 16)
+subtitle = getFont("Bold")
+unitFont = getFont("Regular", 12)
 
 interface: list = []
-
-unitFont = getFont("Regular", 12)
 
 def pause() -> None:
     dk.standBy = True
@@ -118,7 +121,7 @@ def doSave() -> None:
             f.close()
     resetSaveCanva()
     dk.tsave = [5, "%s sauvegardé" % name, (0, 255, 0)]
-    dk.inventory.update()
+    # dk.inventory.update()
     return
 
 @Events.observe
@@ -126,29 +129,30 @@ def keydown(event) -> None:
     if Game.window != "editor": return
     key = event.key
 
-    if key == pg.K_ESCAPE:
-        if dk.saving: resetSaveCanva()
-        if dk.body: dk.body = None
-        if Game.Camera.focus:
-            Game.Camera.focus = None
-        else:
-            if mb.active:
-                mb.active = False
-                dk.active = False
-                dk.loadingFinished = False
-                dk.image = None
-                dk.stars = []
-                Game.reset()
-                Game.select("menu")
+    if not dk.hideHUD:
+        if key == pg.K_ESCAPE:
+            if dk.saving: resetSaveCanva()
+            elif dk.body: dk.body = None
+            elif Game.Camera.focus: Game.Camera.focus = None
             else:
-                mb.active = True
+                if mb.active:
+                    mb.active = False
+                    dk.active = False
+                    dk.loadingFinished = False
+                    dk.image = None
+                    dk.stars = []
+                    dk.bodies = []
+                    Game.reset()
+                    Game.select("menu")
+                else:
+                    mb.active = True
 
-    if dk.standBy: return
-    
-    if key == pg.K_KP_PLUS and Game.Camera.zoom < Game.Camera.maxZoom:
-        Game.Camera.zoom *= 1.05
-    elif key == pg.K_KP_MINUS and Game.Camera.zoom > Game.Camera.minZoom:
-        Game.Camera.zoom /= 1.05
+        if dk.standBy: return
+        
+        if key == pg.K_KP_PLUS and Game.Camera.zoom < Game.Camera.maxZoom:
+            Game.Camera.zoom *= 1.05
+        elif key == pg.K_KP_MINUS and Game.Camera.zoom > Game.Camera.minZoom:
+            Game.Camera.zoom /= 1.05
 
     keys = []
     
@@ -163,8 +167,11 @@ def keydown(event) -> None:
     if key:
         Game.keys[key] = True
 
-    if Game.keys["inventory"]:
-        dk.inventory.active = not dk.inventory.active
+    if Game.keys["hideHUD"]:
+        dk.hideHUD = not dk.hideHUD
+        Events.trigger("hideHUD", dk.hideHUD)
+    
+    if dk.hideHUD: return
     if Game.keys["delete"]:
         for corps in dk.selected:
             Game.space.remove(corps)
@@ -175,7 +182,6 @@ def keydown(event) -> None:
         dk.saving = True
         dk.saveTarget = dk.selected.copy()
         Game.keys[key] = False
-
     return
 
 @Events.observe
@@ -213,10 +219,10 @@ def inventory(body) -> None:
 @Events.observe
 def mousebuttondown(event) -> None:
     if Game.window != "editor": return
+    if dk.hideHUD: return
     button = event.button
     pos = event.pos
     if button != 1: return
-    if dk.inventory.active: return
     body = dk.body
     if body:
         pos = event.pos
@@ -241,6 +247,7 @@ def mousebuttondown(event) -> None:
 @Events.observe
 def mousebuttonup(event) -> None:
     if Game.window != "editor": return
+    if dk.hideHUD: return
     button = event.button
     pos = event.pos
     if button != 1: return
@@ -349,6 +356,27 @@ def drawVelocityArrow() -> None:
     dk.target.velocity = [x, y]
     return
 
+def drawInventory(h: int) -> None:
+    pg.draw.rect(Game.screen, Enums.Background, (0, 0, 300, h))
+
+    Game.screen.blit(brand, (20, 20))
+
+    text = subtitle.render("Preset", False, (255, 255, 255))
+    Game.screen.blit(text, (20, 100))
+    pg.draw.line(Game.screen, (102, 102, 102), (20, 130), (100, 130))
+
+    temp = dk.bodies.copy()
+    i = 0
+    while len(temp) > 0:
+        for j in range(3):
+            if len(temp) < 1: break
+            card = temp.pop(0)
+            card.position = (20 + 90 * j, 160 + 110 * i)
+            card.draw()
+        i += 1
+
+    return
+
 def load() -> None:
     Game.timeScale = 1
     Game.Camera.active = True
@@ -357,9 +385,15 @@ def load() -> None:
     Game.Camera.x = w // 2
     Game.Camera.y = h // 2
 
-    inventory = Inventory()
-    dk.inventory = inventory
-    interface.append(inventory)
+    bodyFiles = [path.join("data/bodies", f) for f in listdir("data/bodies") if path.isfile(path.join("data/bodies", f))]
+    for i, bodyFile in enumerate(bodyFiles):
+        body = {}
+        with open(bodyFile, "r", encoding="utf-8") as f:
+            body = loadJson(f)
+            body["file"] = bodyFile
+            c = Card(body, (0, 0))
+            f.close()
+        dk.bodies.append(c)
 
     saveButton = Button((0, 0), (180, 60))
     saveButton.text = "Sauvegarder"
@@ -413,35 +447,38 @@ def draw(screen) -> None:
 
     predict(Game, 250, 1)
 
-    drawSelected()
-    drawMouseSelection()
-    drawVelocityArrow()
+    if not dk.hideHUD:
+        drawSelected()
+        drawMouseSelection()
+        drawVelocityArrow()
 
-    if dk.body:
-        pos = pg.mouse.get_pos()
-        radius: float | int = dk.body["radius"]
-        pg.draw.circle(screen, (255, 255, 255), pos, radius * Game.Camera.zoom, 1)
+        if dk.body:
+            pos = pg.mouse.get_pos()
+            radius: float | int = dk.body["radius"]
+            pg.draw.circle(screen, (255, 255, 255), pos, radius * Game.Camera.zoom, 1)
 
-    if Game.Camera.focus:
-        stats(Game.Camera.focus, width, height)
+        if Game.Camera.focus:
+            stats(Game.Camera.focus, width, height)
 
-    drawSaving(width, height)
+        drawSaving(width, height)
 
-    for element in interface:
-        element.draw()
+        drawInventory(height)
 
-    if dk.tsave:
-        dk.tsave[0] -= (Game.deltaTime * 2.195)
-        width, height = Game.screenSize
-        text: str = dk.tsave[1]
-        surface = Game.italic.render(text, False, dk.tsave[2])
-        surface.set_alpha(int(255 * dk.tsave[0] / 5))
-        tW, tH = Game.italic.size(text)
-        screen.blit(surface, (width // 2 - tW // 2, height // 2 - tH // 2 + 300))
-        if dk.tsave[0] <= 0:
-            dk.tsave = None
+        for element in interface:
+            element.draw()
 
-    mb.draw()
+        if dk.tsave:
+            dk.tsave[0] -= (Game.deltaTime * 2.195)
+            width, height = Game.screenSize
+            text: str = dk.tsave[1]
+            surface = Game.italic.render(text, False, dk.tsave[2])
+            surface.set_alpha(int(255 * dk.tsave[0] / 5))
+            tW, tH = Game.italic.size(text)
+            screen.blit(surface, (width // 2 - tW // 2, height // 2 - tH // 2 + 300))
+            if dk.tsave[0] <= 0:
+                dk.tsave = None
+
+        mb.draw()
     return
 
 def update() -> None:

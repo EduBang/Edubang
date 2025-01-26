@@ -149,16 +149,18 @@ def reset() -> None:
     return
 
 def load() -> None:
+    v[0] = 100
+    v[1] = 1
     cases[randint(0, 4)]()
 
-    icons: list = [pg.transform.scale(pg.image.load("./data/images/%s.png" % i), (38, 50)) for i in ("play", "pencil", "settings", "power")]
+    icons: list = [pg.transform.scale(pg.image.load("./data/images/%s.png" % i), (38, 50)) for i in ("start", "pencil", "settings", "power")]
 
     discoverButton = Button((100, 300), (170, 60), color=(13, 178, 190))
     discoverButton.text = l("discover")
     discoverButton.font = semibold
     discoverButton.textColor = (255, 255, 255)
     discoverButton.icon = icons[0]
-    discoverButton.onPressed = goDiscover
+    discoverButton.onReleased = goDiscover
     interface.append(discoverButton)
 
     editorButton = Button((100, 400), (265, 60), color=(13, 178, 190))
@@ -166,7 +168,7 @@ def load() -> None:
     editorButton.font = semibold
     editorButton.textColor = (255, 255, 255)
     editorButton.icon = icons[1]
-    editorButton.onPressed = goEditor
+    editorButton.onReleased = goEditor
     interface.append(editorButton)
 
     settingsButton = Button((100, 500), (190, 60), color=(13, 178, 190))
@@ -174,7 +176,7 @@ def load() -> None:
     settingsButton.font = semibold
     settingsButton.textColor = (255, 255, 255)
     settingsButton.icon = icons[2]
-    settingsButton.onPressed = goSettings
+    settingsButton.onReleased = goSettings
     interface.append(settingsButton)
 
     quitButton = Button((100, 600), (240, 60), color=(13, 178, 190))
@@ -182,7 +184,7 @@ def load() -> None:
     quitButton.font = semibold
     quitButton.textColor = (255, 255, 255)
     quitButton.icon = icons[3]
-    quitButton.onPressed = quitFunction
+    quitButton.onReleased = quitFunction
     interface.append(quitButton)
 
     dk.brand = pg.transform.scale(pg.image.load("./data/images/brand.png"), (426, 100))
@@ -223,7 +225,8 @@ def draw(screen) -> None:
         element.draw()
 
     surface = semibold.render(l("notShare"), False, (128, 128, 128))
-    screen.blit(surface, (w - 450, h - 100))
+    width, _ = semibold.size(l("notShare"))
+    screen.blit(surface, (w - width - 100, h - 100))
 
     return
 

@@ -11,6 +11,7 @@ from copy import deepcopy
 
 environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
 
+from PIL import Image
 import pygame as pg
 from proto import proto
 from eventListen import Events
@@ -31,6 +32,10 @@ pg.mixer.init()
 pg.mixer.music.set_endevent(MUSIC_END_EVENT)
 
 clock = pg.time.Clock()
+
+brand = Image.open("data/images/brand.png")
+brand = brand.resize((175, 41), Image.Resampling.BICUBIC)
+brand = pg.image.fromstring(brand.tobytes(), brand.size, brand.mode)
 
 def getFont(font, size: int = 16) -> pg.font.Font:
     return pg.font.Font("data/fonts/Open_Sans/OpenSans-%s.ttf" % font, size)
@@ -193,8 +198,9 @@ with proto("Game") as Game:
     def resetKeybinds(self):
         if self.os != "Windows": return
         camera: dict = {"cameraUp": {"name": "D\u00e9placement vers le haut", "code": [122], "key": ["z"]}, "cameraLeft": {"name": "D\u00e9placement vers la gauche", "code": [113], "key": ["q"]}, "cameraDown": {"name": "D\u00e9placement vers le bas", "code": [115], "key": ["s"]}, "cameraRight": {"name": "D\u00e9placement vers la droite", "code": [100], "key": ["d"]}, "resetCamera": {"name": "R\u00e9initialiser la cam\u00e9ra", "code": [114], "key": ["r"]}, "zoomIn": {"name": "Zoomer la cam\u00e9ra", "code": [1073741911], "key": ["+"]}, "zoomOut": {"name": "D\u00e9zoomer la cam\u00e9ra", "code": [45], "key": ["-"]}}
-        editor: dict = {"inventory": {"name": "Ouvrir l'inventaire", "code": [9], "key": ["tab"]}, "delete": {"name": "Supprimer un corps", "code": [127], "key": ["del"]}, "selectAll": {"name": "Tout s\u00e9lectionner", "code": [1073742048, 97], "key": ["ctrl", "a"]}, "save": {"name": "Sauvegarder", "code": [1073742048, 115], "key": ["ctrl", "s"]}}
+        editor: dict = {"delete": {"name": "Supprimer un corps", "code": [127], "key": ["del"]}, "selectAll": {"name": "Tout s\u00e9lectionner", "code": [1073742048, 97], "key": ["ctrl", "a"]}, "save": {"name": "Sauvegarder", "code": [1073742048, 115], "key": ["ctrl", "s"]}}
         simulation: dict = {"increaseTime": {"name": "Acc\u00e9l\u00e9rer le temps", "code": [101], "key": ["e"]}, "decreaseTime": {"name": "D\u00e9c\u00e9l\u00e9rer le temps", "code": [97], "key": ["a"]}, "pause": {"name": "Mettre la simulation en pause", "code": [32], "key": ["espace"]}, "resetSimulation": {"name": "R\u00e9initialiser la simulation", "code": [103], "key": ["g"]}}
+        renderer: dict = {"hideHUD": {"name": "Cacher/Montrer l'affichage", "code": [9], "key": ["tab"]}}
         with open("data/settings/camera.json", "w", encoding="utf-8") as wf:
             wf.write(dumps(camera))
             wf.close()
@@ -204,7 +210,10 @@ with proto("Game") as Game:
         with open("data/settings/simulation.json", "w", encoding="utf-8") as wf:
             wf.write(dumps(simulation))
             wf.close()
-        Game.keybinds = {**camera, **editor, **simulation}
+        with open("data/settings/renderer.json", "w", encoding="utf-8") as wf:
+            wf.write(dumps(renderer))
+            wf.close()
+        Game.keybinds = {**camera, **editor, **simulation, **renderer}
         Game.resetKeys()
         return
 

@@ -28,6 +28,8 @@ titleFont = getFont("Regular", 20)
 descriptionFont = getFont("Regular", 14)
 descriptionFontInventory = getFont("Regular", 12)
 footerFont = getFont("Regular", 10)
+cardFont = getFont("Regular", 12)
+languageFont = getFont("Regular", 20)
 
 FOCUS_COLOR: tuple[int, int, int] = (13, 178, 190)
 
@@ -78,7 +80,8 @@ for languageFile in languageFiles:
 
 with proto("Enums", {
     "Violet": (128, 24, 99),
-    "DarkViolet": (97, 22, 76)
+    "DarkViolet": (97, 22, 76),
+    "Background": (10, 9, 9)
 }) as Enums:
     pass
 
@@ -122,6 +125,19 @@ with proto("Button") as Button:
         Game.screen.blit(surface, (x + offset / 2, y))
         return
     
+    def hideHUDBTN(self, hide: bool) -> None:
+        """
+        Fonction qui gère l'événement "hideHUD" pour le bouton
+        
+        Arguments:
+            hide (bool): Masquer ou afficher le bouton
+            
+        Retourne:
+            None
+        """
+        self.visible = not hide
+        return
+
     def mousemotionBTN(self, event) -> None:
         """
         Fonction qui gère l'événement "mousemotion" pour le bouton
@@ -132,6 +148,7 @@ with proto("Button") as Button:
         Retourne:
             None
         """
+        if not self.visible: return
         if not self.active: return
         x, y = event.pos
         if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
@@ -151,6 +168,7 @@ with proto("Button") as Button:
         Retourne:
             None
         """ 
+        if not self.visible: return
         if not self.active: return
         button = event.button
         x, y = event.pos
@@ -169,6 +187,7 @@ with proto("Button") as Button:
         Retourne:
             None
         """
+        if not self.visible: return
         if not self.active: return
         button = event.button
         x, y = event.pos
@@ -187,6 +206,7 @@ with proto("Button") as Button:
         Retourne:
             None
         """
+        if not self.visible: return
         if not self.active: return
         if not self.scrollable: return
         self.offsetY = SCROLL_SPEED * event.y
@@ -233,7 +253,9 @@ with proto("Button") as Button:
         self.scrollable = False
         self.offsetY = 0
         self.active = True
+        self.visible = True
         Events.group(self, {
+            "hideHUD": MethodType(hideHUDBTN, self),
             "mousemotion": MethodType(mousemotionBTN, self),
             "mousebuttondown": MethodType(mousebuttondownBTN, self),
             "mousebuttonup": MethodType(mousebuttonupBTN, self),
@@ -247,6 +269,7 @@ with proto("CheckBox") as CheckBox:
         """
         Fonction de base qui dessine une case à cocher
         """
+        if not self.active: return
         color = FOCUS_COLOR if self.checked else (255, 255, 255)
         pg.draw.rect(Game.screen, color, pg.Rect(self.position, self.size), 0, 4)
         if color == FOCUS_COLOR:
@@ -255,6 +278,19 @@ with proto("CheckBox") as CheckBox:
             pos3 = (self.position[0] + 24, self.position[1] + 7.5)
             pg.draw.line(Game.screen, (255, 255, 255), pos1, pos2, 4)
             pg.draw.line(Game.screen, (255, 255, 255), pos2, pos3, 4)
+        return
+    
+    def hideHUDCB(self, hide: bool) -> None:
+        """
+        Fonction qui gère l'événement "hideHUD" pour la case à cocher
+
+        Arguments:
+            hide (bool): Masquer ou afficher la case à cocher
+
+        Retourne:
+            None
+        """
+        self.active = not hide
         return
     
     def mousemotionCB(self, event) -> None:
@@ -267,6 +303,7 @@ with proto("CheckBox") as CheckBox:
         Retourne:
             None
         """
+        if not self.active: return
         x, y = event.pos
         if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
             self.onHover()
@@ -285,11 +322,12 @@ with proto("CheckBox") as CheckBox:
         Retourne:
             None
         """
+        if not self.active: return
         button = event.button
         x, y = event.pos
         if button != 1: return
         if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
-            self.onPressed()
+            self.checked = not self.checked
         return
     
     def mousebuttonupCB(self, event) -> None:
@@ -302,6 +340,7 @@ with proto("CheckBox") as CheckBox:
         Retourne:
             None
         """
+        if not self.active: return
         button = event.button
         x, y = event.pos
         if button != 1: return
@@ -319,6 +358,7 @@ with proto("CheckBox") as CheckBox:
         Retourne:
             None
         """
+        if not self.active: return
         if not self.scrollable: return
         self.offsetY = SCROLL_SPEED * event.y
         self.position[1] += self.offsetY
@@ -335,20 +375,6 @@ with proto("CheckBox") as CheckBox:
             None
         """
         Events.stopObserving(self)
-        return
-
-    @CheckBox
-    def onPressed(self) -> None:
-        """
-        Fonction de base qui gère l'événement "onPressed" de la case à cocher
-        
-        Arguments:
-            None
-        
-        Retourne:
-            None
-        """
-        self.checked = not self.checked
         return
     
     @CheckBox
@@ -371,7 +397,9 @@ with proto("CheckBox") as CheckBox:
         self.onHover = onHover
         self.scrollable = False
         self.offsetY = 0
+        self.active = True
         Events.group(self, {
+            "hideHUD": MethodType(hideHUDCB, self),
             "mousemotion": MethodType(mousemotionCB, self),
             "mousebuttondown": MethodType(mousebuttondownCB, self),
             "mousebuttonup": MethodType(mousebuttonupCB, self),
@@ -663,6 +691,7 @@ with proto("Input") as Input:
             None
         """
         if not self.visible: return
+        if not self.active: return
         color: tuple[int, int, int] = FOCUS_COLOR if self.focus and self.active else (255, 255, 255)
         fontColor: tuple[int, int, int] = (150, 150, 150) if self.placeholder and not self.text else (0, 0, 0)
         pg.draw.rect(Game.screen, color, pg.Rect(self.position, self.size), 0, 4)
@@ -674,6 +703,19 @@ with proto("Input") as Input:
         Game.screen.blit(surface, (x, y))
         return
     
+    def hideHUDI(self, hide: bool) -> None:
+        """
+        Fonction qui gère l'événement "hideHUD" pour l'entrée de texte
+
+        Arguments:
+            hide (bool): Masquer ou afficher l'entrée de texte
+
+        Retourne:
+            None 
+        """
+        self.active = not hide
+        return
+
     def mousemotionI(self, event) -> None:
         """
         Fonction qui gère l'événement "mousemotion" pour l'entrée de texte
@@ -820,6 +862,7 @@ with proto("Input") as Input:
         self.resetOnClick = False
         self.offsetY = 0
         Events.group(self, {
+            "hideHUD": MethodType(hideHUDI, self),
             "mousemotion": MethodType(mousemotionI, self),
             "mousebuttondown": MethodType(mousebuttondownI, self),
             "mouseubuttonup": MethodType(mousebuttonupI, self),
@@ -1299,6 +1342,7 @@ with proto("SizeViewer") as SizeViewer:
         Retourne:
             None
         """
+        if not self.active: return
         width, distance, unit = getSize()
         text: str = "%s %s" % (distance, unit)
         x, y = self.position
@@ -1311,6 +1355,18 @@ with proto("SizeViewer") as SizeViewer:
         self.size = (w if w > 100 else 100, h + 60)
         return
 
+    def hideHUDSV(self, hide: bool) -> None:
+        """
+        Fonction qui gère l'événement "hideHUD" pour la règle de mesure
+
+        Arguments:
+            hide (bool): Masquer ou afficher la règle de mesure
+
+        Retourne:
+            None
+        """
+        self.active = not hide
+
     def mousemotionSV(self, event) -> None:
         """
         Fonction qui gère l'événement "mousemotion" pour la règle de mesure
@@ -1321,6 +1377,7 @@ with proto("SizeViewer") as SizeViewer:
         Retourne:
             None
         """
+        if not self.active: return
         x, y = event.pos
         if self.focus:
             self.position = [x - self.size[0] // 2, y]
@@ -1341,6 +1398,7 @@ with proto("SizeViewer") as SizeViewer:
         Retourne:
             None
         """
+        if not self.active: return
         button = event.button
         x, y = event.pos
         if button != 1: return
@@ -1359,6 +1417,7 @@ with proto("SizeViewer") as SizeViewer:
         Retourne:
             None
         """
+        if not self.active: return
         button = event.button
         if button != 1: return
         self.focus = False
@@ -1393,7 +1452,9 @@ with proto("SizeViewer") as SizeViewer:
         self.size = (0, 0)
         self.onHover = onHover
         self.focus = False
+        self.active = True
         Events.group(self, {
+            "hideHUD": MethodType(hideHUDSV, self),
             "mousemotion": MethodType(mousemotionSV, self),
             "mousebuttondown": MethodType(mousebuttondownSV, self),
             "mousebuttonup": MethodType(mousebuttonupSV, self),
@@ -1622,7 +1683,207 @@ with proto("ColorPicker") as ColorPicker:
             "window": MethodType(windowCP, self)
         })
         return
+
+with proto("Card") as Card:
+    def drawCard(self) -> None:
+        """
+        Fonction de base qui dessine une carte
         
+        Arguments:
+            None
+            
+        Retourne:
+            None
+        """
+        if not self.active: return 
+        pg.draw.rect(Game.screen, (33, 33, 33), pg.Rect(self.position, self.size), 0, 8)
+        pg.draw.circle(Game.screen, self.body["color"], (self.position[0] + 40, self.position[1] + 40), 30)
+        surface = self.font.render(self.body["meta"]["name"], False, (255, 255, 255))
+        w, h = self.font.size(self.body["meta"]["name"])
+        x = self.position[0] + 40 - w // 2
+        y = self.position[1] + 75
+        Game.screen.blit(surface, (x, y))
+        return
+    
+    def hideHUDC(self, hide: bool) -> None:
+        self.active = not hide
+        return
+
+    def mousemotionC(self, event) -> None:
+        """
+        Fonction qui gère l'événement "mousemotion" pour la carte
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+            
+        Retourne:
+            None
+        """
+        if not self.active: return
+        x, y = event.pos
+        if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
+            self.onHover()
+            Events.trigger("hovering", self)
+        else:
+            Events.trigger("unhovering", self)
+        return
+    
+    def mousebuttonupC(self, event) -> None:
+        """
+        Fonction qui gère l'événement "mousebuttonup" pour la carte
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+        
+        Retourne:
+            None
+        """
+        if not self.active: return
+        button = event.button
+        x, y = event.pos
+        if button != 1: return
+        if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
+            Events.trigger("inventory", self.body)
+        return
+
+    def mousewheelC(self, event) -> None:
+        """
+        Fonction qui gère l'événement "mousewheel" pour la carte
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+        
+        Retourne:
+            None
+        """
+        if not self.active: return
+        if not self.scrollable: return
+        self.offsetY = SCROLL_SPEED * event.y
+        self.position[1] += self.offsetY
+        return
+
+    def windowC(self, w) -> None:
+        """
+        Fonction qui gère l'événement "window" pour la carte
+        
+        Arguments:
+            w (str): Le nom de la page
+        
+        Retourne:
+            None
+        """
+        Events.stopObserving(self)
+        return
+
+    @Card
+    def new(self, body, position: tuple[int, int]) -> None:
+        """
+        L'initateur de la carte
+        
+        Arguments:
+            icon (pg.Image): L'image de la carte
+            text (str): Texte de la carte
+            position: (tuple[int, int]): Position de la carte
+            
+        Retourne:
+            None
+        """
+        self.body = body
+        self.text = body["meta"]["name"]
+        self.position = list(position)
+        self.size = (80, 100)
+        self.font = cardFont
+        # self.icon = icon
+        self.draw = MethodType(drawCard, self)
+        self.onHover = onHover
+        self.scrollable = False
+        self.offsetY = 0
+        self.active = True
+        Events.group(self, {
+            "hideHUD": MethodType(hideHUDC, self),
+            "mousemotion": MethodType(mousemotionC, self),
+            "mousebuttonup": MethodType(mousebuttonupC, self),
+            "mousewheel": MethodType(mousewheelC, self),
+            "window": MethodType(windowC, self)
+        })
+        return
+
+with proto("Language") as Language:
+    def drawLanguage(self) -> None:
+        pg.draw.rect(Game.screen, (33, 33, 33), pg.Rect(self.position, self.size))
+        Game.screen.blit(self.icon, (self.position[0] + 5, self.position[1] + 5))
+        surface = languageFont.render(l(self.lang), False, (255, 255, 255))
+        x = self.position[0] + 80
+        y = self.position[1] + 10
+        Game.screen.blit(surface, (x, y))
+        if Game.language == self.lang:
+            pg.draw.rect(Game.screen, (100, 255, 100), pg.Rect(self.position, self.size), 2)
+        return
+
+    def mousemotionL(self, event) -> None:
+        """
+        Fonction qui gère l'événement "mousemotion" pour le bouton
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+            
+        Retourne:
+            None
+        """
+        x, y = event.pos
+        if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
+            self.onHover()
+            Events.trigger("hovering", self)
+        else:
+            Events.trigger("unhovering", self)
+        return
+
+    def mousebuttonupL(self, event) -> None:
+        """
+        Fonction qui gère l'événement "mousebuttonup" pour le bouton
+        
+        Arguments:
+            event (pg.event.Event): L'événement PyGame
+        
+        Retourne:
+            None
+        """
+        button = event.button
+        x, y = event.pos
+        if button != 1: return
+        if x > self.position[0] and x < self.position[0] + self.size[0] and y > self.position[1] and y < self.position[1] + self.size[1]:
+            Game.language = self.lang
+            Events.trigger("lang", self.lang)
+        return
+
+    def windowL(self, w) -> None:
+        """
+        Fonction qui gère l'événement "window" pour le bouton
+        
+        Arguments:
+            w (str): Le nom de la page
+        
+        Retourne:
+            None
+        """
+        Events.stopObserving(self)
+        return
+
+    @Language
+    def new(self, lang: str, position: tuple[int, int]) -> None:
+        self.lang = lang[14:-5]
+        self.icon = pg.transform.scale(pg.image.load("data/images/flags/%s.png" % self.lang), (60, 40))
+        self.position = position
+        self.size = (230, 50)
+        self.draw = MethodType(drawLanguage, self)
+        self.onHover = onHover
+        Events.group(self, {
+            "mousemotion": MethodType(mousemotionL, self),
+            "mousebuttonup": MethodType(mousebuttonupL, self),
+            "window": MethodType(windowL, self)
+        })
+        return
+
 # endregion
 
 # region Fonctions physiques
@@ -2195,18 +2456,18 @@ def getSize() -> tuple[int, int, str]:
         tuple[int, int, str]: Respectivement: distance entre les points en px, distance "réelle", unité
     """
     d: float = round(100 * 1e3 / Game.Camera.zoom, 3)
-    unit: str = "m"
+    unit: str = l("m")
     if d > 1e3:
-        unit = "km"
+        unit = l("km")
         d = round(100 / Game.Camera.zoom, 3)
     if d > 1e3:
-        unit = "x10³ km"
+        unit = "x10³ %s" % l("km")
         d = round(100 / Game.Camera.zoom / 1e3, 3)
     if d > 1e3:
-        unit = "x10⁶ km"
+        unit = "x10⁶ %s" % l("km")
         d = round(100 / Game.Camera.zoom / 1e6, 3)
     if d > 1e3:
-        unit = "x10⁹ km"
+        unit = "x10⁹ %s" % l("km")
         d = round(100 / Game.Camera.zoom / 1e9, 3)
     distance = closeTo(d)
     width: float = distance * 100 / d

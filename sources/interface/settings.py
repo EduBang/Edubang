@@ -31,6 +31,12 @@ def goKeybind() -> None:
     Game.select("keybind")
     return
 
+def goLanguage() -> None:
+    saveSettings()
+    Game.reset()
+    Game.select("language")
+    return
+
 @Events.observe
 def window(w) -> None:
     if w != "settings": return
@@ -53,15 +59,20 @@ def load() -> None:
     keybindButton.onPressed = goKeybind
     interface.append(keybindButton)
 
+    languageButton = Button((100, 400), (180, 60))
+    languageButton.text = l("language")
+    languageButton.onPressed = goLanguage
+    interface.append(languageButton)
+
     with open("data/settings.json", "r", encoding="utf-8") as f:
         dk.settings = loadJson(f)
         f.close()
 
     for i, setting in enumerate(dk.settings):
-        sb = SlideBar((250, 300 * (i + 1) + 125))
+        sb = SlideBar((500, 100 * (i + 1) + 120))
         sb.setting = setting
         sb.value = int(dk.settings[setting])
-        text = Text(setting, (100, 300 * (i + 1) + 110), color=(255, 255, 255))
+        text = Text(setting, (400, 100 * (i + 1) + 110), color=(255, 255, 255))
         interface.append(sb)
         interface.append(text)
     return

@@ -7,7 +7,7 @@ from PIL import Image, ImageFilter, ImageOps, ImageEnhance
 from eventListen import Events
 from nsi25perlin import PerlinNoise
 
-from main import Game, getFont
+from main import Game, getFont, brand
 from shared.utils.utils import (
     C_EDUBANG, updateCorps, process_collide,
     MessageBox, Path, DataKeeper,
@@ -38,6 +38,7 @@ dk.perlin = PerlinNoise(768)
 dk.wait = True
 dk.timer = 0
 dk.specialKeys = []
+dk.hideHUD = False
 
 def stopFocusFn() -> None:
     Game.Camera.focus = None
@@ -55,9 +56,6 @@ mb = MessageBox(l("returnToMenu"))
 loadingText: str = l("loading")
 
 subtitle = getFont("Bold")
-brand = Image.open("data/images/brand.png")
-brand = brand.resize((175, 41), Image.Resampling.BICUBIC)
-brand = pg.image.fromstring(brand.tobytes(), brand.size, brand.mode)
 icon = Image.open("data/images/icon.png")
 icon = icon.resize((398, 402), Image.Resampling.BICUBIC)
 icon = ImageOps.expand(icon, border=20, fill=(0, 0, 0, 0))
@@ -122,6 +120,9 @@ def keydown(event) -> None:
             for e in Game.space:
                 if e.mass == f.mass and e.radius == f.radius and e.color == f.color:
                     Game.Camera.focus = e
+    if Game.keys["hideHUD"]:
+        dk.hideHUD = not dk.hideHUD
+        Events.trigger("hideHUD", dk.hideHUD)
     key = event.key
     if not dk.active: return
     if key == pg.K_ESCAPE:
@@ -175,6 +176,7 @@ def keyup(event) -> None:
 
 @Events.observe
 def mousebuttondown(event) -> None:
+    if dk.hideHUD: return
     button = event.button
     if not dk.active: return
     if button not in [4, 5]:
@@ -258,7 +260,7 @@ def loader() -> None:
     textShowSV = Text(l("rules"), (20, 555), color=(255, 255, 255))
     interface.append(textShowSV)
 
-    showSV = CheckBox((175, 551), False)
+    showSV = CheckBox((280, 551), False)
     showSV.checked = True
     showSV.sv = None
     interface.append(showSV)
@@ -298,15 +300,15 @@ def menu(screen) -> None:
 
     text = subtitle.render(l("parameterSimulation"), False, (255, 255, 255))
     screen.blit(text, (20, 100))
-    pg.draw.line(screen, (102, 102, 102), (20, 130), (100, 130))
+    pg.draw.line(screen, (102, 102, 102), (20, 130), (200, 130))
 
     text = subtitle.render(l("renderingParameter"), False, (255, 255, 255))
     screen.blit(text, (20, 200))
-    pg.draw.line(screen, (102, 102, 102), (20, 230), (100, 230))
+    pg.draw.line(screen, (102, 102, 102), (20, 230), (200, 230))
 
     text = subtitle.render(l("tools"), False, (255, 255, 255))
     screen.blit(text, (20, 500))
-    pg.draw.line(screen, (102, 102, 102), (20, 530), (100, 530))
+    pg.draw.line(screen, (102, 102, 102), (20, 530), (200, 530))
 
 def stats(corps) -> None:
     screen = Game.screen
@@ -328,32 +330,34 @@ def stats(corps) -> None:
     
     text = subtitle.render(l("orbitalCharacteristics"), False, (255, 255, 255))
     screen.blit(text, (width - 330, 170 + offset))
+    pg.draw.line(screen, (102, 102, 102), (width - 330, 200 + offset), (width - 150, 200 + offset))
 
     attractor = getattr(corps, "orbit", None) or getAttractor(corps)
     days: str = "%s %s" % (round(orbitalPeriod(attractor.mass, Vectors.get_distance(corps.pos, attractor.pos)), 2) if attractor else l("ravolutionPeriodUnknown"), l("revolutionPeriodUnit"))
     text = Game.font.render("%s : %s" % (l("revolutionPeriod"), days), False, (255, 255, 255))
-    screen.blit(text, (width - 330, 200 + offset))
+    screen.blit(text, (width - 330, 210 + offset))
 
     velocity: float = round(sqrt((corps.velocity[0] / C_EDUBANG) ** 2 + (corps.velocity[1] / C_EDUBANG) ** 2), 3)
     text = Game.font.render("%s : %s %s" % (l("orbitalVelocity"), velocity, l("orbitalVelocityUnit")), False, (255, 255, 255))
-    screen.blit(text, (width - 330, 230 + offset))
+    screen.blit(text, (width - 330, 240 + offset))
     
     offset += 20
 
     text = subtitle.render(l("physicalCharacteristics"), False, (255, 255, 255))
-    screen.blit(text, (width - 330, 260 + offset))
+    screen.blit(text, (width - 330, 300 + offset))
+    pg.draw.line(screen, (102, 102, 102), (width - 330, 330 + offset), (width - 150, 330 + offset))
 
     text = Game.font.render("%s : %s %s" % (l("radius"), int(corps.radius), l("radiusUnit")), False, (255, 255, 255))
-    screen.blit(text, (width - 330, 290 + offset))
+    screen.blit(text, (width - 330, 340 + offset))
 
     text = Game.font.render("%s :" % l("mass"), False, (255, 255, 255))
     i, _ = Game.font.size("%s :" % l("mass"))
-    screen.blit(text, (width - 330, 320 + offset))
-    scientificNotation(corps.mass, (width - 330 + i + 5, 320 + offset), end=l("massUnit")) # 267
+    screen.blit(text, (width - 330, 370 + offset))
+    scientificNotation(corps.mass, (width - 330 + i + 5, 370 + offset), end=l("massUnit"))
 
     surfaceGravity: float = round((G * corps.mass) / ((corps.radius * 1e3) ** 2), 3)
     text = Game.font.render("%s : %s %s" % (l("surfaceGravity"), surfaceGravity, l("surfaceGravityUnit")), False, (255, 255, 255))
-    screen.blit(text, (width - 330, 350 + offset))
+    screen.blit(text, (width - 330, 400 + offset))
     return
 
 def sAfterOne(n: int, ident: str) -> str:
@@ -453,30 +457,29 @@ def draw(screen) -> None:
         pg.draw.line(screen, (0, 255, 0), (bX - 8, bY), (bX + 8, bY), 2)
         pg.draw.line(screen, (0, 255, 0), (bX, bY - 8), (bX, bY + 8), 2)
 
-    showTime(screen)
+    if not dk.hideHUD:
+        showTime(screen)
+        menu(screen)
+        if Game.Camera.focus:
+            stats(Game.Camera.focus)
 
-    menu(screen)
+        for element in interface:
+            if hasattr(element, "measure") and not showSV: continue
+            if Game.Camera.focus and hasattr(element, "measure") and element.position[0] > width - 500:
+                element.position[0] = width - 500
+            element.draw()
+            if hasattr(element, "numberOnly"):
+                Game.timeScale = int(element.text) if element.text not in ["-", ""] else 0
+                element.active = not Game.pause
+                if element.focus and Game.pause:
+                    element.focus = False
 
-    if Game.Camera.focus:
-        stats(Game.Camera.focus)
+        if Game.pause:
+            text = Game.font.render(l("pause"), False, (255, 255, 255))
+            tW, tH = Game.font.size(l("pause"))
+            screen.blit(text, (width // 2 - tW // 2, height // 2 - tH // 2 - 200))
 
-    for element in interface:
-        if hasattr(element, "measure") and not showSV: continue
-        if Game.Camera.focus and hasattr(element, "measure") and element.position[0] > width - 500:
-            element.position[0] = width - 500
-        element.draw()
-        if hasattr(element, "numberOnly"):
-            Game.timeScale = int(element.text) if element.text not in ["-", ""] else 0
-            element.active = not Game.pause
-            if element.focus and Game.pause:
-                element.focus = False
-
-    if Game.pause:
-        text = Game.font.render(l("pause"), False, (255, 255, 255))
-        tW, tH = Game.font.size(l("pause"))
-        screen.blit(text, (width // 2 - tW // 2, height // 2 - tH // 2 - 200))
-
-    mb.draw()
+        mb.draw()
     return
 
 def update() -> None:
