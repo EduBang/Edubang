@@ -106,7 +106,7 @@ def load() -> None:
             kb.kb = (k, keybind)
             kb.file = keybindFile
             Events.setEvent(kb, "positionChanged", positionChanged)
-            text = Text(keybind["name"], (400, h + 10), color=(255, 255, 255))
+            text = Text(l(keybind["name"]), (400, h + 10), color=(255, 255, 255))
             Events.setEvent(text, "positionChanged", positionChanged)
             interface.append(text)
             interface.append(kb)

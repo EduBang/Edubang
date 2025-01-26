@@ -1057,8 +1057,8 @@ with proto("System") as System:
         dateSplit: list[str, str] = str(datetime.fromtimestamp(self.system["meta"]["lastModified"])).split(" ")
         dateRSplit: list[str, str, str] = dateSplit[0].split("-")
         dateRSplit.reverse()
-        date: str = "%s à %s" % ("/".join(dateRSplit), dateSplit[1])
-        surface = footerFont.render("Modifié le %s par %s" % (date, self.system["meta"]["user"]), False, (255, 255, 255))
+        date: str = "%s @ %s" % ("/".join(dateRSplit), dateSplit[1])
+        surface = footerFont.render("%s, %s" % (date, self.system["meta"]["user"]), False, (255, 255, 255))
         Game.screen.blit(surface, (self.position[0] + 10, self.position[1] + self.size[1] - 20))
         return
     

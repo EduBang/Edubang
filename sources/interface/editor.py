@@ -361,7 +361,7 @@ def drawInventory(h: int) -> None:
 
     Game.screen.blit(brand, (20, 20))
 
-    text = subtitle.render("Preset", False, (255, 255, 255))
+    text = subtitle.render(l("preset"), False, (255, 255, 255))
     Game.screen.blit(text, (20, 100))
     pg.draw.line(Game.screen, (102, 102, 102), (20, 130), (100, 130))
 

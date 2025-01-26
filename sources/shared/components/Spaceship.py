@@ -37,5 +37,3 @@ with proto("Space_ship") as Space_ship:
         # Mise à jour de la position en fonction de la nouvelle vitesse (avec inertie)
         self.pos = (x, y)
         return
-    
-
