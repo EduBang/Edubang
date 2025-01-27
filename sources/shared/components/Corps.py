@@ -46,6 +46,10 @@ with proto("Corps") as Corps:
         
         Arguments:
             screen (pg.Surface): L'écran PyGame
+            camera (Camera): La caméra
+            
+        Retourne:
+            None
         """
         x: float = (self.pos[0] * camera.zoom) + camera.x
         y: float = (self.pos[1] * camera.zoom) + camera.y
@@ -57,7 +61,17 @@ with proto("Corps") as Corps:
         return
     
     @Corps
-    def update_position(self, acc, dt) -> None:
+    def update_position(self, acc: tuple[float, float], dt: float) -> None:
+        """
+        Fonction qui met é jour la position de l'astre selon l'accélération et du temps
+        
+        Arguments:
+            acc (tuple[float, float]): L'accélération
+            dt (float): Le temps
+        
+        Retourne:
+            None
+        """
         # Mise à jour de la vitesse (conserve l'inertie)
         gamma: float = lorentzFactor(sqrt(self.velocity[0] ** 2 + self.velocity[1] ** 2))
 

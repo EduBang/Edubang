@@ -5,7 +5,6 @@ from proto import proto
 
 
 with proto("Perlin") as Perlin:
-
     @Perlin 
     def new(self, surface, surface_size: int, center_pos: tuple[int, int], intensity: int, stretching: tuple[int, int], zoom: int):
         self.surface = surface
