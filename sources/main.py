@@ -11,6 +11,7 @@ from copy import deepcopy
 
 environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
 
+from PIL import Image
 import pygame as pg
 from proto import proto
 from eventListen import Events
@@ -31,6 +32,10 @@ pg.mixer.init()
 pg.mixer.music.set_endevent(MUSIC_END_EVENT)
 
 clock = pg.time.Clock()
+
+brand = Image.open("data/images/brand.png")
+brand = brand.resize((175, 41), Image.Resampling.BICUBIC)
+brand = pg.image.fromstring(brand.tobytes(), brand.size, brand.mode)
 
 def getFont(font, size: int = 16) -> pg.font.Font:
     return pg.font.Font("data/fonts/Open_Sans/OpenSans-%s.ttf" % font, size)
