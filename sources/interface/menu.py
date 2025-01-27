@@ -153,7 +153,7 @@ def load() -> None:
     v[1] = 1
     cases[randint(0, 4)]()
 
-    icons: list = [pg.transform.scale(pg.image.load("./data/images/%s.png" % i), (38, 50)) for i in ("start", "pencil", "settings", "power")]
+    icons: list = [pg.transform.scale(pg.image.load("./data/images/icons/%s.png" % i), (38, 50)) for i in ("start", "pencil", "settings", "power")]
 
     discoverButton = Button((100, 300), (170, 60), color=(13, 178, 190))
     discoverButton.text = l("discover")
