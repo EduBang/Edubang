@@ -56,13 +56,13 @@ UNICODES: dict[int, str] = {
 UNICODES_DARWIN: dict[int, str] = {
     0x30: "tab",
     0x31: "espace",
-    0x37: "alt",
-    0x3B: "cmd"
+    1073742050: "alt",
+    1073742051: "cmd"
 }
 
 Game.ctrl = pg.KMOD_LCTRL if Game.os == "Windows" else pg.KMOD_META
 C_UNICODES = UNICODES if Game.os == "Windows" else UNICODES_DARWIN
-fnKeys: tuple = (0x400000e2 if Game.os == "Windows" else 0x37, 0x400000e0 if Game.os == "Windows" else 0x3b)
+fnKeys: tuple = (0x400000E2 if Game.os == "Windows" else 1073742050, 0x400000E0 if Game.os == "Windows" else 1073742051)
 
 SCROLL_SPEED: int = 20
 
