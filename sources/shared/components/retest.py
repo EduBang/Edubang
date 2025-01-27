@@ -2,6 +2,7 @@ import pygame as pg
 from math import sqrt, sin, cos, pi
 from proto import proto
 from rePerlin import Perlin
+from PIL import Image
 
 # Utilisation de chaînes brutes pour éviter les problèmes d'échappement
 path_normal_map = r"sources/test/normal_map.png"
@@ -15,17 +16,23 @@ screen = pg.display.set_mode((1000, 1000))  # Initialiser la fenêtre d'affichag
 pg.display.set_caption("Test Rendering Planets")
 clock = pg.time.Clock()
 running = True
-intensity = 0
+intensity = 255
 
 # Initialiser la police
 pg.font.init()
 font = pg.font.SysFont('Arial', 30)
 
+def pil_to_pygame(image):
+    """Convertir une image PIL en surface Pygame."""
+    mode = image.mode
+    size = image.size
+    data = image.tobytes()
+    return pg.image.fromstring(data, size, mode)
+
 def generate_texture(intensity):
     perlin_instance = Perlin(surface_size=radius * 2, center_pos=planet_pos, intensity=intensity, stretching=(7, 7), zoom=4)
-    final_matrix = perlin_instance.fm
-    perlin_instance.draw_perlin(final_matrix, perlin_instance.surface, planet_pos, radius)
-    return perlin_instance.surface
+    pil_image = perlin_instance.generate_img()
+    return pil_to_pygame(pil_image)
 
 planet_surface = generate_texture(intensity)
 

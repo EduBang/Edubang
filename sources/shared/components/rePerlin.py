@@ -1,7 +1,8 @@
 import pygame as pg
-from math import sqrt, sin, cos
+from math import sqrt
 from nsi25perlin import PerlinNoise as perlin
 from proto import proto
+from PIL import Image
 
 with proto("Perlin") as Perlin:
 
@@ -13,7 +14,6 @@ with proto("Perlin") as Perlin:
         self.stretching = stretching
         self.zoom = zoom
         self.perlin = perlin()
-        self.surface = pg.Surface((surface_size * zoom, surface_size * zoom))
         self.fm = self.final_matrix()
 
     @Perlin
@@ -25,27 +25,52 @@ with proto("Perlin") as Perlin:
         return [[element for element in row for _ in range(self.zoom)] for row in matrix for _ in range(self.zoom)]
     
     @Perlin
-    def draw_perlin(self, matrix, surface, center_pos, radius):
-        start_x, start_y = center_pos[0] - radius, center_pos[1] - radius
-        for x, row in enumerate(matrix):
-            for y, value in enumerate(row):
-                pixel_pos = (x + start_x, y + start_y)
-                if sqrt((center_pos[0] - pixel_pos[0]) ** 2 + (center_pos[1] - pixel_pos[1]) ** 2) <= radius:
-                    if value <= 0:
-                        surface.set_at((x, y), (11, 89, 134))  # eau profonde
-                    elif value <= 5:
-                        surface.set_at((x, y), (19, 128, 191))  # eau peu profonde
-                    elif value <= 35:
-                        surface.set_at((x, y), (228, 197, 23))  # sable
-                    elif value <= 100:
-                        surface.set_at((x, y), (75, 161, 68))  # herbe
-                    elif value <= 150:
-                        surface.set_at((x, y), (148, 141, 132))  # montagne
-                    else:
-                        surface.set_at((x, y), (82, 82, 82))  # montagne haute
-
-    @Perlin
     def final_matrix(self):
         perlin_matrix = self.generate_perlin()
         scaled_perlin = self.upscale(perlin_matrix)
         return scaled_perlin
+    
+    @Perlin 
+    def color_matrix(self):
+        fm = self.fm
+        center_pos = self.center_pos
+        color_matrix = []
+        for row in fm:
+            color_row = []
+            for element in row:
+
+                if element <= 0:
+                    color_row.append((11, 89, 134))  # eau profonde
+                elif element <= 5:
+                    color_row.append((19, 128, 191))  # eau peu profonde
+                elif element <= 35:
+                    color_row.append((228, 197, 23))  # plage
+                elif element <= 100:
+                    color_row.append((75, 161, 68))  # herbe
+                elif element <= 150:
+                    color_row.append((148, 141, 132))  # montagne
+                else:
+                    color_row.append((82, 82, 82))  # montagne haute
+            color_matrix.append(color_row)
+        return color_matrix
+
+    @Perlin
+    def generate_img(self):
+        # Créer une nouvelle image avec PIL
+        new_image = Image.new('RGBA', (self.surface_size * self.zoom, self.surface_size * self.zoom))
+        
+        # Obtenir la matrice de couleurs
+        color_matrix = self.color_matrix()
+
+        start_x = self.center_pos[0] - self.surface_size // 2
+        start_y = self.center_pos[1] - self.surface_size // 2
+
+        
+        # Parcourir la matrice de couleurs et définir les pixels dans l'image
+        for x, row in enumerate(color_matrix):
+            for y, color in enumerate(row):
+                if sqrt((x - self.surface_size // 2) ** 2 + (y - self.surface_size // 2) ** 2) > self.surface_size // 2 :
+                    continue
+                new_image.putpixel((y, x), color)
+        
+        return new_image
