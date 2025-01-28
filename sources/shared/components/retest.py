@@ -10,7 +10,7 @@ path_normal_map = r"sources/test/normal_map.png"
 normal_map = pg.image.load(path_normal_map)
 
 planet_pos = (500, 500)  # Position du centre de la planète
-radius = 100  # Rayon de la planète
+radius = 150  # Rayon de la planète
 
 pg.init()
 screen = pg.display.set_mode((1000, 1000))  # Initialiser la fenêtre d'affichage
@@ -36,7 +36,7 @@ def generate_texture(intensity):
     return pil_to_pygame(pil_image)
 
 planet_surface = generate_texture(intensity)
-size_image = pg.transform.scale(image_test, (radius*2, radius*2))
+size_image = pg.transform.scale(image_test, (radius*2 + 10, radius*2 + 10))
 
 while running:
     for event in pg.event.get():
@@ -50,9 +50,9 @@ while running:
                 intensity -= 1
                 planet_surface = generate_texture(intensity)
 
-    screen.fill((255, 255, 255))
+    screen.fill((0, 0, 0))
     screen.blit(planet_surface, (planet_pos[0] - radius, planet_pos[1] - radius))
-    screen.blit(size_image, (planet_pos[0] - radius, planet_pos[1] - radius))
+    screen.blit(size_image, (planet_pos[0] - radius -7 , planet_pos[1] - radius - 7))
     
     # Dessiner le texte avec la valeur de l'intensité
     intensity_text = font.render(f'Intensité: {intensity}', True, (255, 255, 255))
