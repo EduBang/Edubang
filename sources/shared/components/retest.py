@@ -4,6 +4,7 @@ from proto import proto
 from rePerlin import Perlin
 from PIL import Image
 
+image_test = pg.image.load("data/images/test.png")
 # Utilisation de chaînes brutes pour éviter les problèmes d'échappement
 path_normal_map = r"sources/test/normal_map.png"
 normal_map = pg.image.load(path_normal_map)
@@ -35,6 +36,7 @@ def generate_texture(intensity):
     return pil_to_pygame(pil_image)
 
 planet_surface = generate_texture(intensity)
+size_image = pg.transform.scale(image_test, (radius*2, radius*2))
 
 while running:
     for event in pg.event.get():
@@ -48,8 +50,9 @@ while running:
                 intensity -= 1
                 planet_surface = generate_texture(intensity)
 
-    screen.fill((0, 0, 0))
+    screen.fill((255, 255, 255))
     screen.blit(planet_surface, (planet_pos[0] - radius, planet_pos[1] - radius))
+    screen.blit(size_image, (planet_pos[0] - radius, planet_pos[1] - radius))
     
     # Dessiner le texte avec la valeur de l'intensité
     intensity_text = font.render(f'Intensité: {intensity}', True, (255, 255, 255))
