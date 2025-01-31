@@ -7,7 +7,7 @@ from PIL import Image, ImageFilter, ImageOps, ImageEnhance
 from eventListen import Events
 from nsi25perlin import PerlinNoise
 
-from main import Game, getFont, brand
+from main import Game, getFont, brand, l
 from shared.utils.utils import (
     C_EDUBANG, updateCorps, process_collide,
     MessageBox, Path, DataKeeper,
@@ -18,7 +18,7 @@ from shared.utils.utils import (
     spacePosToScreenPos, orbitalPeriod, C_EDUBANG,
     totalEnergy, kineticEnergy, momentum,
     getAttractor, barycentre, toDate,
-    displayMultilineText, l
+    displayMultilineText
 )
 from shared.components.Captors import isColliding
 from shared.components.Prediction import predict
@@ -53,8 +53,6 @@ dk.stopFocus = None
 description = getFont("Regular", 14)
 
 interface: list = []
-
-# mb = MessageBox(l("returnToMenu"))
 
 loadingText: str = l("loading")
 

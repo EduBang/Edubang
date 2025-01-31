@@ -7,10 +7,10 @@ from datetime import datetime
 import pygame as pg
 from eventListen import Events
 
-from main import Game, getFont, brand
+from main import Game, getFont, brand, l
 from shared.components.Corps import Corps
 from shared.components.Prediction import predict
-from shared.utils.utils import DataKeeper, Button, spacePosToScreenPos, getSize, screenPosToSpacePos, Input, barycentre, drawArrow, MessageBox, l, Enums, Card
+from shared.utils.utils import DataKeeper, Button, spacePosToScreenPos, getSize, screenPosToSpacePos, Input, barycentre, drawArrow, MessageBox, Enums, Card
 
 dk = DataKeeper()
 dk.body = None

@@ -4,8 +4,8 @@ from os import listdir, path
 
 from eventListen import Events
 
-from main import Game, getFont
-from shared.utils.utils import Button, DataKeeper, KeyBind, Text, SCROLL_SPEED, l
+from main import Game, getFont, l
+from shared.utils.utils import Button, DataKeeper, KeyBind, Text, SCROLL_SPEED
 
 dk = DataKeeper()   
 dk.offsetY = 0

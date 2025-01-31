@@ -1,6 +1,5 @@
 from json import load as loadJson
 from os import listdir, path
-from inspect import stack
 from types import MethodType
 from random import randint
 from math import pi, sqrt, atan2, sin, cos, log10, floor
@@ -9,7 +8,7 @@ from datetime import datetime
 
 import pygame as pg
 
-from main import Game, getFont
+from main import Game, getFont, l
 from proto import proto
 from eventListen import Events
 from shared.components.Vectors import Vectors
@@ -67,14 +66,6 @@ fnKeys: tuple = (0x400000E2 if Game.os == "Windows" else 1073742050, 0x400000E0 
 SCROLL_SPEED: int = 20
 
 RAD: float = 2 * pi / 3
-
-languages: dict = {}
-
-languageFiles = [path.join("data/language", f) for f in listdir("data/language") if path.isfile(path.join("data/language", f))]
-for languageFile in languageFiles:
-    with open(languageFile, mode="r", encoding="utf-8") as f:
-        languages[languageFile[14:-5]] = loadJson(f)
-        f.close()
 
 # region Prototypes
 
@@ -2535,19 +2526,4 @@ def displayMultilineText(text: str, font, position: tuple[int, int], width: int,
             Game.screen.blit(surface, (position[0], position[1] + h * i))
 
     return h * len(lines)
-
-def l(ident: str) -> str:
-    """
-    Fonction permettant de récupérer la traduction d'un texte à partir de son code d'identification
-    Le nom de cette fonction est intentionnellement courte pour optimiser le temps de développement
-
-    Argument:
-        ident (str): Code d'identification
-    
-    Retourne:
-        str: Texte dans la langue traduite
-    """
-    window = Game.window or path.basename(stack()[1].filename)[:-3]
-    return languages[Game.language]["%s_%s" % (window, ident)]
-
 # endregion

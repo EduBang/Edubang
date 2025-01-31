@@ -2,8 +2,8 @@ from os import listdir, path
 
 from eventListen import Events
 
-from main import Game
-from shared.utils.utils import Button, DataKeeper, Language, Button, l
+from main import Game, l
+from shared.utils.utils import Button, DataKeeper, Language, Button
 
 dk = DataKeeper()
 dk.back = None

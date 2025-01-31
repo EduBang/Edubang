@@ -6,8 +6,8 @@ from PIL import Image
 from eventListen import Events
 from nsi25perlin import PerlinNoise
 
-from main import Game, getFont
-from shared.utils.utils import updateCorps, process_collide, Button, C_EDUBANG, spacePosToScreenPos, DataKeeper, loadSpace, l
+from main import Game, getFont, l
+from shared.utils.utils import updateCorps, process_collide, Button, C_EDUBANG, spacePosToScreenPos, DataKeeper, loadSpace
 from shared.components.Corps import Corps
 from shared.components.Captors import isColliding
 from shared.components.Prediction import predict

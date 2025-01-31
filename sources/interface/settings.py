@@ -4,8 +4,8 @@ from json import load as loadJson
 from eventListen import Events
 import pygame as pg
 
-from main import Game
-from shared.utils.utils import Button, DataKeeper, SlideBar, Text, l
+from main import Game, l
+from shared.utils.utils import Button, DataKeeper, SlideBar, Text
 
 dk = DataKeeper()
 dk.sb2s = False

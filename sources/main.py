@@ -1,4 +1,5 @@
 from ctypes import pythonapi, c_long, py_object
+from inspect import stack
 from json import load as loadJson
 from json import dumps
 from os import listdir, path, environ, getlogin
@@ -37,8 +38,32 @@ brand = Image.open("data/images/brand.png")
 brand = brand.resize((175, 41), Image.Resampling.BICUBIC)
 brand = pg.image.fromstring(brand.tobytes(), brand.size, brand.mode)
 
+languages: dict = {}
+
+languageFiles = [path.join("data/language", f) for f in listdir("data/language") if path.isfile(path.join("data/language", f))]
+for languageFile in languageFiles:
+    with open(languageFile, mode="r", encoding="utf-8") as f:
+        languages[languageFile[14:-5]] = loadJson(f)
+        f.close()
+
 def getFont(font, size: int = 16) -> pg.font.Font:
     return pg.font.Font("data/fonts/Open_Sans/OpenSans-%s.ttf" % font, size)
+
+def l(ident: str, *, header: str = None) -> str:
+    """
+    Fonction permettant de récupérer la traduction d'un texte à partir de son code d'identification
+    Le nom de cette fonction est intentionnellement courte pour optimiser le temps de développement
+
+    Argument:
+        ident (str): Code d'identification
+        header (str): L'entête du code d'identification
+    
+    Retourne:
+        str: Texte dans la langue traduite
+    """
+    window = header or Game.window or path.basename(stack()[1].filename)[:-3]
+    return languages[Game.language]["%s_%s" % (window, ident)]
+
 
 with proto("Game") as Game:
     @Game
@@ -138,7 +163,7 @@ with proto("Game") as Game:
         if self.tmusic and self.settings["volume"] != 0:
             Game.tmusic -= (Game.deltaTime * 2.195)
             width, height = self.screenSize
-            text: str = "Playing %s" % self.sound[11:-4]
+            text: str = "%s %s" % (l("playing", header="main"), self.sound[11:-4])
             surface = Game.italic.render(text, False, (255, 255, 255))
             surface.set_alpha(int(255 * Game.tmusic / 5))
             tW, tH = Game.italic.size(text)
