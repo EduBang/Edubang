@@ -56,7 +56,10 @@ def predict(game, n: int = 0, k: int = 100) -> None:
 
             poses[a["corps"]].append((x, y))
 
-            pg.draw.line(game.screen, (155, 155, 155), spacePosToScreenPos(pos), spacePosToScreenPos((x, y)), 2)
+            startPos = spacePosToScreenPos(pos)
+            endPos = spacePosToScreenPos((x, y))
+            if -1e2 < startPos[0] < 1e4 and -1e2 < startPos[1] < 1e4 and -1e2 < endPos[0] < 1e4 and -1e2 < endPos[1] < 1e4:
+                pg.draw.line(game.screen, (155, 155, 155), startPos, endPos, 2)
 
             a["pos"] = (x, y)
 

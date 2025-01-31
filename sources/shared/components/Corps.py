@@ -57,7 +57,8 @@ with proto("Corps") as Corps:
             pg.draw.line(screen, (255, 255, 255), (x - 8, y), (x + 8, y), 2)
             pg.draw.line(screen, (255, 255, 255), (x, y - 8), (x, y + 8), 2)
         else:
-            pg.draw.circle(screen, self.color, (x, y), self.radius * camera.zoom)
+            if -1e2 < x < 1e4 and -1e2 < y < 1e4:
+                pg.draw.circle(screen, self.color, (x, y), self.radius * camera.zoom)
         return
     
     @Corps

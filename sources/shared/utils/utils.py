@@ -2405,6 +2405,16 @@ def drawArrow(startPos: tuple[int, int], endPos: tuple[int, int], *, color: tupl
         None
     """
     orientation: float = (atan2(startPos[1] - endPos[1], endPos[0] - startPos[0])) + pi/2
+    if not (-1e2 < startPos[0] < 1e4 and -1e2 < startPos[1] < 1e4):
+        startPos = (
+            endPos[0] + 1000 * sin(orientation),
+            endPos[1] + 1000 * cos(orientation)
+        )
+    if not (-1e2 < endPos[0] < 1e4 and -1e2 < endPos[1] < 1e4):
+        endPos = (
+            startPos[0] + 1000 * sin(orientation - pi),
+            startPos[1] + 1000 * cos(orientation - pi)
+        )
     pg.draw.line(Game.screen, color, startPos, endPos, l)
     pg.draw.polygon(Game.screen, color, (
         (endPos[0] + c * sin(orientation), endPos[1] + c * cos(orientation)),

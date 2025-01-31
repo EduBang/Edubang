@@ -8,6 +8,7 @@ from main import Game
 from shared.utils.utils import Button, DataKeeper, SlideBar, Text, l
 
 dk = DataKeeper()
+dk.sb2s = False
 
 interface: list = []
 
@@ -27,13 +28,11 @@ def saveSettings() -> None:
 
 def goKeybind() -> None:
     saveSettings()
-    Game.reset()
     Game.select("keybind")
     return
 
 def goLanguage() -> None:
     saveSettings()
-    Game.reset()
     Game.select("language")
     return
 
@@ -43,9 +42,18 @@ def window(w) -> None:
     interface.clear()
     return
 
+@Events.observe
+def SB2S() -> None:
+    dk.sb2s = True
+    return
+
 def backFunction() -> None:
     saveSettings()
-    Game.select("menu")
+    page = "menu"
+    if dk.sb2s:
+        dk.sb2s = False
+        page = "sandbox"
+    Game.select(page)
     return
 
 def load() -> None:

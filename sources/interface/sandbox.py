@@ -39,6 +39,9 @@ dk.wait = True
 dk.timer = 0
 dk.specialKeys = []
 dk.hideHUD = False
+dk.escape = False
+dk.screenShot = None
+dk.pauseMenu = []
 
 def stopFocusFn() -> None:
     Game.Camera.focus = None
@@ -51,7 +54,7 @@ description = getFont("Regular", 14)
 
 interface: list = []
 
-mb = MessageBox(l("returnToMenu"))
+# mb = MessageBox(l("returnToMenu"))
 
 loadingText: str = l("loading")
 
@@ -64,12 +67,59 @@ enhancer = ImageEnhance.Brightness(icon)
 icon = enhancer.enhance(.075)
 icon = pg.image.fromstring(icon.tobytes(), icon.size, icon.mode)
 
+pauseIcon = pg.transform.scale(pg.image.load("data/images/brand.png"), (234, 54.9))
+continueIcon = pg.transform.scale(pg.image.load("data/images/icons/continue.png"), (45, 45))
+orbitIcon = pg.transform.scale(pg.image.load("data/images/icons/orbit.png"), (45, 45))
+settingsIcon = pg.transform.scale(pg.image.load("data/images/icons/settingsBlack.png"), (45, 45))
+crossIcon = pg.transform.scale(pg.image.load("data/images/icons/cross.png"), (45, 45))
+
 showPath: bool = False
 showAttractionNorm: bool = False
 showSV: bool = False
 showNames: bool = True
 showPrediction: bool = False
 showBarycentre: bool = False
+
+def setPauseButtonState(state: bool) -> None:
+    for element in dk.pauseMenu:
+        element.active = state
+        if not state: Events.trigger("unhovering", element)
+    return
+
+def continueFn() -> None:
+    dk.escape = False
+    dk.screenShot = None
+    dk.wait = False
+    setPauseButtonState(False)
+    return
+
+def editFn() -> None:
+    dk.escape = False
+    dk.active = False
+    dk.loadingFinished = False
+    dk.image = None
+    dk.stars = []
+    dk.pauseMenu.clear()
+    Game.resetSpace()
+    Game.select("editor")
+    return
+
+def settingsFn() -> None:
+    dk.escape = False
+    dk.pauseMenu.clear()
+    Game.select("settings")
+    Events.trigger("SB2S")
+    return
+
+def quitFn() -> None:
+    dk.escape = False
+    dk.active = False
+    dk.loadingFinished = False
+    dk.image = None
+    dk.stars = []
+    dk.pauseMenu.clear()
+    Game.space.clear()
+    Game.select("menu")
 
 @Events.observe
 def window(w) -> None:
@@ -129,18 +179,15 @@ def keydown(event) -> None:
         if Game.Camera.focus:
             Game.Camera.focus = None
         else:
-            if mb.active:
-                mb.active = False
-                dk.active = False
-                dk.loadingFinished = False
-                dk.image = None
-                dk.stars = []
-                Game.reset()
-                Game.select("menu")
-            else:
-                mb.active = True
-    else:
-        mb.active = False
+            if not dk.escape:
+                dk.escape = True
+                sub = Game.screen.subsurface(pg.Rect(0, 0, *Game.screenSize))
+                img = pg.image.tobytes(sub, "RGB")
+                image = Image.frombytes("RGB", Game.screenSize, img)
+                image = image.filter(ImageFilter.GaussianBlur(10))
+                dk.screenShot = pg.image.fromstring(image.tobytes(), image.size, image.mode)
+                dk.wait = True
+                setPauseButtonState(True)
         
     if key == pg.K_KP_PLUS and Game.Camera.zoom < Game.Camera.maxZoom:
         Game.Camera.zoom *= 1.05
@@ -174,15 +221,6 @@ def keyup(event) -> None:
             Game.keys[key] = False
     return
 
-@Events.observe
-def mousebuttondown(event) -> None:
-    if dk.hideHUD: return
-    button = event.button
-    if not dk.active: return
-    if button not in [4, 5]:
-        mb.active = False
-    return
-
 def loader() -> None:
     dk.wait = True
     Game.Camera.active = True
@@ -191,14 +229,14 @@ def loader() -> None:
     Game.Camera.y = h // 2
     dk.active = True
 
-    space, size = loadSpace(dk.perlin)
-    img = Image.new("RGB", (size, size))
-    for pos in space:
-        img.putpixel(pos, (space[pos]))
-    img = img.resize((5 * size, 5 * size), Image.Resampling.LANCZOS)
-    dk.image = pg.image.fromstring(img.tobytes(), img.size, img.mode)
-    
-    dk.stars = loadStars(1500, (-3000, 3000))
+    if not dk.image:
+        space, size = loadSpace(dk.perlin)
+        img = Image.new("RGB", (size, size))
+        for pos in space:
+            img.putpixel(pos, (space[pos]))
+        img = img.resize((5 * size, 5 * size), Image.Resampling.LANCZOS)
+        dk.image = pg.image.fromstring(img.tobytes(), img.size, img.mode)
+        dk.stars = loadStars(1500, (-3000, 3000))
     
     # ship = Space_ship.new((1000, 1000), 2000, 0, 0, 0)
     # ship.name = "Spaceship"
@@ -275,6 +313,38 @@ def loader() -> None:
     stopFocus.active = False
     interface.append(stopFocus)
     dk.stopFocus = stopFocus
+
+    continueButton = Button((0, 0), (400, 50))
+    continueButton.text = l("continue")
+    continueButton.onPressed = continueFn
+    continueButton.icon = continueIcon
+    continueButton.active = False
+    interface.append(continueButton)
+    dk.pauseMenu.append(continueButton)
+
+    editButton = Button((0, 0), (400, 50))
+    editButton.text = l("edit")
+    editButton.onPressed = editFn
+    editButton.icon = orbitIcon
+    editButton.active = False
+    interface.append(editButton)
+    dk.pauseMenu.append(editButton)
+
+    settingsButton = Button((0, 0), (400, 50))
+    settingsButton.text = l("settings")
+    settingsButton.onPressed = settingsFn
+    settingsButton.icon = settingsIcon
+    settingsButton.active = False
+    interface.append(settingsButton)
+    dk.pauseMenu.append(settingsButton)
+
+    quitButton = Button((0, 0), (400, 50))
+    quitButton.text = l("quit")
+    quitButton.onPressed = quitFn
+    quitButton.icon = crossIcon
+    quitButton.active = False
+    interface.append(quitButton)
+    dk.pauseMenu.append(quitButton)
 
     dk.loadingFinished = True
     dk.wait = False
@@ -384,6 +454,15 @@ def showTime(screen) -> None:
     screen.blit(surface, (380, h - 50))
     return
 
+def drawEscapeMenu() -> None:
+    if not dk.escape: return
+    Game.screen.blit(dk.screenShot, (0, 0))
+    Game.screen.blit(pauseIcon, (Game.screenSize[0] // 2 - 117, Game.screenSize[1] // 2 - 175))
+    for element in dk.pauseMenu:
+        element.position = [Game.screenSize[0] // 2 - 200, Game.screenSize[1] // 2 - 75 + dk.pauseMenu.index(element) * 70]
+        element.draw()
+    return
+
 def draw(screen) -> None:
     screen.fill((0, 0, 0))
     width, height = Game.screenSize
@@ -479,7 +558,7 @@ def draw(screen) -> None:
             tW, tH = Game.font.size(l("pause"))
             screen.blit(text, (width // 2 - tW // 2, height // 2 - tH // 2 - 200))
 
-        mb.draw()
+        drawEscapeMenu()
     return
 
 def update() -> None:
