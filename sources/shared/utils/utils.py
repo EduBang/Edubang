@@ -1,6 +1,7 @@
 from json import load as loadJson
 from os import listdir, path
 from types import MethodType
+from typing import Generator
 from random import randint
 from math import pi, sqrt, atan2, sin, cos, log10, floor
 from copy import deepcopy
@@ -2049,7 +2050,7 @@ def process_collide(corps1, corps2):
 
 def loadSpace(perlin) -> tuple[dict[tuple, tuple], int]:
     """
-    Charge un espace selon un bruit de Perlin.
+    Fonction qui charge un espace selon un bruit de Perlin
 
     Arguments : 
         perlin (Perlin): Bruit de Perlin
@@ -2059,26 +2060,47 @@ def loadSpace(perlin) -> tuple[dict[tuple, tuple], int]:
     """
     galaxy = {}
 
-    # Code qui génère les amas de galaxies
     for x in range(perlin.size):
         for y in range(perlin.size):
             value = perlin.noise(x / 80, y / 80)
 
-            # Si le "bruit" est fort, il va générer une galaxie.
             if value > 0.15:
                 galaxy[(x, y)] = (int(70 * value), int(20 * value), int(70 * value * 0.8))
 
     return (galaxy, perlin.size)
 
+def loadSpaceIterated(perlin) -> Generator[int, None, tuple[dict[tuple, tuple], int]]:
+    """
+    Générateur qui charge un espace selon un bruit de Perlin et qui rend compte de son avancement
+
+    Arguments: 
+        perlin (Perlin): Bruit de Perlin
+
+    Retourne:
+        tuple[dict[tuple, tuple], int] : Espace généré
+    """
+    galaxy = {}
+
+    # Code qui génère les amas de galaxies
+    for x in range(perlin.size):
+        yield x + 1
+        for y in range(perlin.size):
+            value = perlin.noise(x / 80, y / 80)
+
+            if value > 0.15:
+                galaxy[(x, y)] = (int(70 * value), int(20 * value), int(70 * value * 0.8))
+
+    yield (galaxy, perlin.size)
+
 def loadStars(n: int = 100, position: tuple[int, int] = (-1000, 1000)) -> list[tuple[int, int]]:
     """
     Charge les étoiles de l'espace.
 
-    Arguments : 
+    Arguments: 
         n (int): Nombre d'étoiles
         position (tuple[int, int]): Plage de position possible de génération
     
-    Retourne :
+    Retourne:
         list[tuple[int, int]] : Etoiles générées
     """
     stars = []

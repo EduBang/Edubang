@@ -1,5 +1,4 @@
 from threading import Thread
-from os import path
 from math import pi, sqrt
 
 import pygame as pg
@@ -12,7 +11,7 @@ from shared.utils.utils import (
     C_EDUBANG, updateCorps, process_collide,
     MessageBox, Path, DataKeeper,
     Input, Text, CheckBox,
-    Button, SizeViewer, loadSpace,
+    Button, SizeViewer, loadSpaceIterated,
     loadStars, draw_velocity_vector,
     draw_cinetic_energy_vector, draw_attraction_norm, scientificNotation,
     spacePosToScreenPos, orbitalPeriod, C_EDUBANG,
@@ -30,8 +29,9 @@ dk = DataKeeper()
 dk.timeScale = None
 dk.active = False
 dk.loadingFinished = False
-dk.loadingImages = []
-dk.loadingImageIndex = 0
+dk.loadingBar = 0
+dk.loadingImage = pg.image.load("data/images/icons/orbitWhite.png")
+dk.orientation = 0
 dk.image = None
 dk.stars = []
 dk.perlin = PerlinNoise(768)
@@ -67,7 +67,7 @@ icon = pg.image.fromstring(icon.tobytes(), icon.size, icon.mode)
 
 pauseIcon = pg.transform.scale(pg.image.load("data/images/brand.png"), (234, 54.9))
 continueIcon = pg.transform.scale(pg.image.load("data/images/icons/continue.png"), (45, 45))
-orbitIcon = pg.transform.scale(pg.image.load("data/images/icons/orbit.png"), (45, 45))
+orbitIcon = pg.transform.scale(pg.image.load("data/images/icons/orbitBlack.png"), (45, 45))
 settingsIcon = pg.transform.scale(pg.image.load("data/images/icons/settingsBlack.png"), (45, 45))
 crossIcon = pg.transform.scale(pg.image.load("data/images/icons/cross.png"), (45, 45))
 
@@ -228,12 +228,16 @@ def loader() -> None:
     dk.active = True
 
     if not dk.image:
-        space, size = loadSpace(dk.perlin)
-        img = Image.new("RGB", (size, size))
-        for pos in space:
-            img.putpixel(pos, (space[pos]))
-        img = img.resize((5 * size, 5 * size), Image.Resampling.LANCZOS)
-        dk.image = pg.image.fromstring(img.tobytes(), img.size, img.mode)
+        for i in loadSpaceIterated(dk.perlin):
+            if isinstance(i, int):
+                dk.loadingBar = 396 * i / 768
+                continue
+            space, size = i
+            img = Image.new("RGB", (size, size))
+            for pos in space:
+                img.putpixel(pos, (space[pos]))
+            img = img.resize((5 * size, 5 * size), Image.Resampling.LANCZOS)
+            dk.image = pg.image.fromstring(img.tobytes(), img.size, img.mode)
         dk.stars = loadStars(1500, (-3000, 3000))
     
     # ship = Space_ship.new((1000, 1000), 2000, 0, 0, 0)
@@ -349,10 +353,6 @@ def loader() -> None:
     return
 
 def load() -> None:
-    for i in range(60):
-        img = pg.image.load(path.join("./data/videos/loadingScreen", "%s.jpg" % i))
-        img = pg.transform.scale(img, (108, 108))
-        dk.loadingImages.append(img)
     dk.loadingFinished = False
     subprocess = Thread(target=loader)
     subprocess.start()
@@ -461,15 +461,32 @@ def drawEscapeMenu() -> None:
         element.draw()
     return
 
+def displayRotatedImage(surf: pg.Surface, image: pg.image, pos: tuple[int, int], angle: float):
+    w, h = image.get_size()
+    originPos = (w / 2, h / 2)
+    imageRect = image.get_rect(topleft = (pos[0] - originPos[0], pos[1]-originPos[1]))
+    offsetCenterToPivot = pg.math.Vector2(pos) - imageRect.center
+    
+    rotatedOffset = offsetCenterToPivot.rotate(-angle)
+
+    rotatedImageCenter = (pos[0] - rotatedOffset.x, pos[1] - rotatedOffset.y)
+
+    rotatedImage = pg.transform.rotate(image, angle)
+    rotatedImageRect = rotatedImage.get_rect(center = rotatedImageCenter)
+
+    surf.blit(rotatedImage, rotatedImageRect)
+    return
+
 def draw(screen) -> None:
     screen.fill((0, 0, 0))
     width, height = Game.screenSize
     if not dk.loadingFinished:
         text = Game.font.render(loadingText, False, (255, 255, 255))
         tW, tH = Game.font.size(loadingText)
-        screen.blit(text, (width // 2 - tW + 70, height // 2 - tH // 2))
-        image = dk.loadingImages[dk.loadingImageIndex]
-        screen.blit(image, (width // 2 - 108 // 2 - tW, height // 2 - 108 // 2))
+        screen.blit(text, (width / 2 - tW + 70, height / 2 - tH / 2))
+        displayRotatedImage(screen, dk.loadingImage, (width / 2 - tW, height / 2), dk.orientation)
+        pg.draw.rect(screen, (255, 255, 255), (width / 2 - 200, height / 2 + 150, 400, 20), 1)
+        pg.draw.rect(screen, (255, 255, 255), (width / 2 - 198, height / 2 + 152, dk.loadingBar, 16))
         return
 
     image = dk.image
@@ -527,7 +544,7 @@ def draw(screen) -> None:
         draw_attraction_norm(screen)
 
     if showPrediction:
-        predict(Game, 200, 1)
+        predict(Game, 20, 10)
 
     if showBarycentre:
         bX, bY = spacePosToScreenPos(barycentre(Game.space))
@@ -561,14 +578,14 @@ def draw(screen) -> None:
 
 def update() -> None:
     if not dk.loadingFinished:
-        dk.loadingImageIndex += 1
-        if dk.loadingImageIndex > 59:
-            dk.loadingImageIndex = 0
+        dk.orientation += 1
+        if dk.orientation > 359:
+            dk.orientation = 0
 
     if dk.wait: return
     dk.timer += Game.DT * 2.195
     for corps in Game.space:
-        # corps.update_position([0, 0], Game.DT)
+        corps.update_position([0, 0], Game.DT)
         for otherCorps in Game.space:
             if corps == otherCorps: continue
             distance: float = updateCorps(corps, otherCorps)
