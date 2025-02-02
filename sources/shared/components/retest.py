@@ -1,3 +1,6 @@
+# Projet : EduBang
+# Auteurs : Anaël Chevillard, Sacha Fréguin, Néji Lim
+
 import pygame as pg
 from math import sqrt, sin, cos, pi, radians, acos, degrees, atan2
 from proto import proto

@@ -1,3 +1,6 @@
+# Projet : EduBang
+# Auteurs : Anaël Chevillard, Sacha Fréguin, Néji Lim
+
 from threading import Thread
 from math import pi, sqrt
 
@@ -6,7 +9,7 @@ from PIL import Image, ImageFilter, ImageOps, ImageEnhance
 from eventListen import Events
 from nsi25perlin import PerlinNoise
 
-from main import Game, getFont, brand, l
+from main import Game, getFont, brand, l, p
 from shared.utils.utils import (
     C_EDUBANG, updateCorps, process_collide,
     MessageBox, Path, DataKeeper,
@@ -30,7 +33,7 @@ dk.timeScale = None
 dk.active = False
 dk.loadingFinished = False
 dk.loadingBar = 0
-dk.loadingImage = pg.image.load("data/images/icons/orbitWhite.png")
+dk.loadingImage = pg.image.load(p("data/images/icons/orbitWhite.png"))
 dk.orientation = 0
 dk.image = None
 dk.stars = []
@@ -57,7 +60,7 @@ interface: list = []
 loadingText: str = l("loading")
 
 subtitle = getFont("Bold")
-icon = Image.open("data/images/icon.png")
+icon = Image.open(p("data/images/icon.png"))
 icon = icon.resize((398, 402), Image.Resampling.BICUBIC)
 icon = ImageOps.expand(icon, border=20, fill=(0, 0, 0, 0))
 icon = icon.filter(ImageFilter.GaussianBlur(10))
@@ -65,11 +68,11 @@ enhancer = ImageEnhance.Brightness(icon)
 icon = enhancer.enhance(.075)
 icon = pg.image.fromstring(icon.tobytes(), icon.size, icon.mode)
 
-pauseIcon = pg.transform.scale(pg.image.load("data/images/brand.png"), (234, 54.9))
-continueIcon = pg.transform.scale(pg.image.load("data/images/icons/continue.png"), (45, 45))
-orbitIcon = pg.transform.scale(pg.image.load("data/images/icons/orbitBlack.png"), (45, 45))
-settingsIcon = pg.transform.scale(pg.image.load("data/images/icons/settingsBlack.png"), (45, 45))
-crossIcon = pg.transform.scale(pg.image.load("data/images/icons/cross.png"), (45, 45))
+pauseIcon = pg.transform.scale(pg.image.load(p("data/images/brand.png")), (234, 54.9))
+continueIcon = pg.transform.scale(pg.image.load(p("data/images/icons/continue.png")), (45, 45))
+orbitIcon = pg.transform.scale(pg.image.load(p("data/images/icons/orbitBlack.png")), (45, 45))
+settingsIcon = pg.transform.scale(pg.image.load(p("data/images/icons/settingsBlack.png")), (45, 45))
+crossIcon = pg.transform.scale(pg.image.load(p("data/images/icons/cross.png")), (45, 45))
 
 showPath: bool = False
 showAttractionNorm: bool = False

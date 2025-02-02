@@ -1,10 +1,13 @@
+# Projet : EduBang
+# Auteurs : Anaël Chevillard, Sacha Fréguin, Néji Lim
+
 from json import dumps
 from json import load as loadJson
 from os import listdir, path
 
 from eventListen import Events
 
-from main import Game, getFont, l
+from main import Game, getFont, l, p
 from shared.utils.utils import Button, DataKeeper, KeyBind, Text, SCROLL_SPEED
 
 dk = DataKeeper()   
@@ -89,7 +92,7 @@ def load() -> None:
     interface.append(resetButton)
 
     h: int = 100
-    keybindsFiles = [path.join("data/settings", f) for f in listdir("data/settings") if path.isfile(path.join("data/settings", f))]
+    keybindsFiles = [path.join(p("data/settings"), f) for f in listdir(p("data/settings")) if path.isfile(path.join(p("data/settings"), f))]
     for keybindFile in keybindsFiles:
         keybinds = {}
         with open(keybindFile, "r", encoding="utf-8") as f:

@@ -1,3 +1,6 @@
+# Projet : EduBang
+# Auteurs : Anaël Chevillard, Sacha Fréguin, Néji Lim
+
 from math import pi, sqrt
 
 import pygame as pg

@@ -1,3 +1,6 @@
+# Projet : EduBang
+# Auteurs : Anaël Chevillard, Sacha Fréguin, Néji Lim
+
 from random import randint
 from math import pi
 
@@ -6,7 +9,7 @@ from PIL import Image
 from eventListen import Events
 from nsi25perlin import PerlinNoise
 
-from main import Game, getFont, l
+from main import Game, getFont, l, p
 from shared.utils.utils import updateCorps, process_collide, Button, C_EDUBANG, spacePosToScreenPos, DataKeeper, loadSpace
 from shared.components.Corps import Corps
 from shared.components.Captors import isColliding
@@ -153,7 +156,7 @@ def load() -> None:
     v[1] = 1
     cases[randint(0, 4)]()
 
-    icons: list = [pg.transform.scale(pg.image.load("./data/images/icons/%s.png" % i), (38, 50)) for i in ("start", "pencil", "settingsWhite", "power")]
+    icons: list = [pg.transform.scale(pg.image.load(p("data/images/icons/%s.png" % i)), (38, 50)) for i in ("start", "pencil", "settingsWhite", "power")]
 
     discoverButton = Button((100, 300), (170, 60), color=(13, 178, 190))
     discoverButton.text = l("discover")
@@ -187,7 +190,7 @@ def load() -> None:
     quitButton.onReleased = quitFunction
     interface.append(quitButton)
 
-    dk.brand = pg.transform.scale(pg.image.load("./data/images/brand.png"), (426, 100))
+    dk.brand = pg.transform.scale(pg.image.load(p("data/images/brand.png")), (426, 100))
     return
 
 def draw(screen) -> None:

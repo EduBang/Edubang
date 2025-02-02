@@ -1,8 +1,11 @@
+# Projet : EduBang
+# Auteurs : Anaël Chevillard, Sacha Fréguin, Néji Lim
+
 from os import listdir, path
 
 from eventListen import Events
 
-from main import Game, l
+from main import Game, l, p
 from shared.utils.utils import Button, DataKeeper, Language, Button
 
 dk = DataKeeper()
@@ -32,7 +35,7 @@ def load() -> None:
     dk.back = backButton
     interface.append(backButton)
 
-    languages = [path.join("data/language", f) for f in listdir("data/language") if path.isfile(path.join("data/language", f))]
+    languages = [path.join(p("data/language"), f) for f in listdir(p("data/language")) if path.isfile(path.join(p("data/language"), f))]
     for i, language in enumerate(languages):
         lang = Language(language, (400, 70 * i + 100))
         interface.append(lang)

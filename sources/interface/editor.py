@@ -1,3 +1,6 @@
+# Projet : EduBang
+# Auteurs : Anaël Chevillard, Sacha Fréguin, Néji Lim
+
 from json import dumps
 from json import load as loadJson
 from os import listdir, path
@@ -7,7 +10,7 @@ from datetime import datetime
 import pygame as pg
 from eventListen import Events
 
-from main import Game, getFont, brand, l
+from main import Game, getFont, brand, l, p
 from shared.components.Corps import Corps
 from shared.components.Prediction import predict
 from shared.utils.utils import DataKeeper, Button, spacePosToScreenPos, getSize, screenPosToSpacePos, Input, barycentre, drawArrow, MessageBox, Enums, Card
@@ -26,8 +29,7 @@ dk.target = None
 dk.arrows = {}
 dk.bodies = []
 dk.hideHUD = False
-
-mb = MessageBox(l("returnToMenu"))
+dk.mb = None
 
 semibold = getFont("SemiBold", 16)
 subtitle = getFont("Bold")
@@ -72,26 +74,33 @@ def resetSaveCanva() -> None:
 def doSave() -> None:
     name: str = dk.saveCanva["name"].text
     if not name:
-        astreSysteme: str = "astre" if len(dk.saveTarget) == 1 else "système"
-        dk.tsave = [5, "Nommez votre %s." % astreSysteme, (255, 0, 0)]
+        message = l("err1")
+        if len(dk.saveTarget) == 1:
+            message = l("err2")
+        dk.tsave = [5, message, (255, 0, 0)]
+        
         return
     description: str = dk.saveCanva["description"].text
     fileName: str = name.replace(" ", "_").lower()
 
     if len(dk.saveTarget) == 1:
-        with open("data/bodies/%s.json" % fileName, "w+", encoding="utf-8") as f:
-            f.write(dumps({
-                "mass": dk.saveTarget[0].mass,
-                "radius": dk.saveTarget[0].radius,
-                "color": dk.saveTarget[0].color,
-                "meta": {
-                    "name": name,
-                    "description": description,
-                }
-            }))
+        body: dict = {
+            "mass": dk.saveTarget[0].mass,
+            "radius": dk.saveTarget[0].radius,
+            "color": dk.saveTarget[0].color,
+            "meta": {
+                "name": name,
+                "description": description,
+            }
+        }
+        with open(p("data/bodies/%s.json" % fileName), "w+", encoding="utf-8") as f:
+            f.write(dumps(body, indent=4))
             f.close()
+        body["file"] = p("data/bodies/%s.json" % fileName)
+        c = Card(body, (0, 0))
+        dk.bodies.append(c)
     else:
-        with open("data/systems/%s.json" % fileName, "w+", encoding="utf-8") as f:
+        with open(p("data/systems/%s.ebs" % fileName), "w+", encoding="utf-8") as f:
             space: list = []
             for corps in dk.saveTarget:
                 meta = {}
@@ -116,12 +125,10 @@ def doSave() -> None:
             }
             data["space"] = space
 
-            f.write(dumps(data))
-
+            f.write(dumps(data, indent=4))
             f.close()
     resetSaveCanva()
-    dk.tsave = [5, "%s sauvegardé" % name, (0, 255, 0)]
-    # dk.inventory.update()
+    dk.tsave = [5, "%s %s" % (name, l("saved")), (0, 255, 0)]
     return
 
 @Events.observe
@@ -135,17 +142,18 @@ def keydown(event) -> None:
             elif dk.body: dk.body = None
             elif Game.Camera.focus: Game.Camera.focus = None
             else:
-                if mb.active:
-                    mb.active = False
+                if dk.mb.active:
+                    dk.mb.active = False
                     dk.active = False
                     dk.loadingFinished = False
                     dk.image = None
                     dk.stars = []
                     dk.bodies = []
+                    dk.mb = None
                     Game.reset()
                     Game.select("menu")
                 else:
-                    mb.active = True
+                    dk.mb.active = True
 
         if dk.standBy: return
         
@@ -385,7 +393,7 @@ def load() -> None:
     Game.Camera.x = w // 2
     Game.Camera.y = h // 2
 
-    bodyFiles = [path.join("data/bodies", f) for f in listdir("data/bodies") if path.isfile(path.join("data/bodies", f))]
+    bodyFiles = [path.join(p("data/bodies"), f) for f in listdir(p("data/bodies")) if path.isfile(path.join(p("data/bodies"), f))]
     for i, bodyFile in enumerate(bodyFiles):
         body = {}
         with open(bodyFile, "r", encoding="utf-8") as f:
@@ -396,7 +404,7 @@ def load() -> None:
         dk.bodies.append(c)
 
     saveButton = Button((0, 0), (180, 60))
-    saveButton.text = "Sauvegarder"
+    saveButton.text = l("save")
     saveButton.font = semibold
     saveButton.onPressed = doSave
     saveButton.active = False
@@ -405,7 +413,7 @@ def load() -> None:
 
     inputName = Input("", (0, 0), (180, 60))
     inputName.name = None
-    inputName.placeholder = "Nom"
+    inputName.placeholder = l("name")
     inputName.active = False
     inputName.visible = False
     inputName.onPressed = pause
@@ -415,13 +423,15 @@ def load() -> None:
 
     inputDescription = Input("", (0, 0), (180, 60))
     inputDescription.description = None
-    inputDescription.placeholder = "Description"
+    inputDescription.placeholder = l("description")
     inputDescription.active = False
     inputDescription.visible = False
     inputDescription.onPressed = pause
     inputDescription.afterInput = resume
     interface.append(inputDescription)
     dk.saveCanva["description"] = inputDescription
+
+    dk.mb = MessageBox(l("returnToMenu"))
 
     return
 
@@ -478,7 +488,7 @@ def draw(screen) -> None:
             if dk.tsave[0] <= 0:
                 dk.tsave = None
 
-        mb.draw()
+        dk.mb.draw()
     return
 
 def update() -> None:

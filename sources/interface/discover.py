@@ -1,18 +1,51 @@
+# Projet : EduBang
+# Auteurs : Anaël Chevillard, Sacha Fréguin, Néji Lim
+
 from json import load as loadJson
+from json.decoder import JSONDecodeError
 from os import listdir, path
+from tkinter import Tk, filedialog
 
 from eventListen import Events
 
-from main import Game, l
+from main import Game, l, p
 from shared.utils.utils import DataKeeper, System, Button
 
 dk = DataKeeper()
+dk.tmessage = None
 interface: list = []
 
 @Events.observe
 def window(w) -> None:
     if w != "discover": return
     interface.clear()
+    return
+
+def addSystem() -> None:
+    root = Tk()
+    root.withdraw()
+    file: str = filedialog.askopenfilename(filetypes=[("EduBang System", "*.ebs"), ("All files", "*.*")])
+    if not file: return
+    system = None
+    try:
+        s = {}
+        with open(file, "r", encoding="utf-8") as f:
+            s = loadJson(f)
+            f.close()
+        system = System(s, len(interface) - 2)
+        system.draw()
+    except Exception as e:
+        if isinstance(e, UnicodeDecodeError):
+            dk.tmessage = [10, l("err1")]
+        elif isinstance(e, JSONDecodeError):
+            dk.tmessage = [10, l("err2")]
+            system.destroy()
+        else:
+            dk.tmessage = [10, l("err3")]
+            system.destroy()
+    if getattr(system, "system", None):
+        interface.append(system)
+    root.destroy()
     return
 
 def backFunction() -> None:
@@ -25,7 +58,12 @@ def load() -> None:
     backButton.onPressed = backFunction
     interface.append(backButton)
 
-    systemsFile = [path.join("data/systems", f) for f in listdir("data/systems") if path.isfile(path.join("data/systems", f))]
+    addSystemButton = Button((100, 300), (180, 60))
+    addSystemButton.text = l("addSystem")
+    addSystemButton.onPressed = addSystem
+    interface.append(addSystemButton)
+
+    systemsFile = [path.join(p("data/systems"), f) for f in listdir(p("data/systems")) if path.isfile(path.join(p("data/systems"), f))]
     for i, systemFile in enumerate(systemsFile):
         s = {}
         with open(systemFile, "r", encoding="utf-8") as f:
@@ -43,6 +81,17 @@ def draw(screen) -> None:
 
     for element in interface:
         element.draw()
+
+    if dk.tmessage:
+        dk.tmessage[0] -= (Game.deltaTime * 2.195)
+        width, height = Game.screenSize
+        text: str = dk.tmessage[1]
+        surface = Game.italic.render(text, False, (255, 0, 0))
+        surface.set_alpha(int(255 * dk.tmessage[0] / 5))
+        tW, tH = Game.italic.size(text)
+        screen.blit(surface, (width // 2 - tW // 2, height // 2 - tH // 2 + 300))
+        if dk.tmessage[0] <= 0:
+            dk.tmessage = None
 
     return
 
