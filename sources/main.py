@@ -1,11 +1,8 @@
-# Projet : EduBang
-# Auteurs : Anaël Chevillard, Sacha Fréguin, Néji Lim
-
 from ctypes import pythonapi, c_long, py_object
 from inspect import stack
 from json import load as loadJson
 from json import dumps
-from os import listdir, path, environ, getlogin, sep
+from os import listdir, path, environ, getlogin
 from platform import system
 from sys import exit
 from math import pi, sqrt
@@ -20,25 +17,11 @@ import pygame as pg
 from proto import proto
 from eventListen import Events
 
-def p(path: str) -> str:
-    """
-    Fonction permettant de formater les chemins comme spécifié dans le Règlement des Trophées NSI 4ème Édition (3.3.4. Inter-opérabilité)
-    Le nom de cette fonction est intentionnellement courte pour optimiser le temps de développement
-    (p)ath -> p
-
-    Arguments:
-        path (str): Chemins à formater
-    
-    Retourne:
-        str: Le chemin
-    """
-    return sep.join(path.split("/"))
-
 pg.init()
 
 # Initialisation
 pg.display.set_caption("EduBang")
-icon = pg.image.load(p("data/images/appicon.png"))
+icon = pg.image.load("data/images/appicon.png")
 pg.display.set_icon(icon)
 MUSIC_END_EVENT: int = pg.USEREVENT + 1
 hoverable: list = []
@@ -51,13 +34,13 @@ pg.mixer.music.set_endevent(MUSIC_END_EVENT)
 
 clock = pg.time.Clock()
 
-brand = Image.open(p("data/images/brand.png"))
+brand = Image.open("data/images/brand.png")
 brand = brand.resize((175, 41), Image.Resampling.BICUBIC)
 brand = pg.image.fromstring(brand.tobytes(), brand.size, brand.mode)
 
 languages: dict = {}
 
-languageFiles = [path.join(p("data/language"), f) for f in listdir(p("data/language")) if path.isfile(path.join(p("data/language"), f))]
+languageFiles = [path.join("data/language", f) for f in listdir("data/language") if path.isfile(path.join("data/language", f))]
 for languageFile in languageFiles:
     with open(languageFile, mode="r", encoding="utf-8") as f:
         languages[languageFile[14:-5]] = loadJson(f)
@@ -74,13 +57,12 @@ def getFont(font, size: int = 16) -> pg.font.Font:
     Retourne:
         pg.font.Font: Police
     """
-    return pg.font.Font(p("data/fonts/Open_Sans/OpenSans-%s.ttf" % font), size)
+    return pg.font.Font("data/fonts/Open_Sans/OpenSans-%s.ttf" % font, size)
 
 def l(ident: str, *, header: str = None) -> str:
     """
     Fonction permettant de récupérer la traduction d'un texte à partir de son code d'identification
     Le nom de cette fonction est intentionnellement courte pour optimiser le temps de développement
-    (l)anguage -> l
 
     Argument:
         ident (str): Code d'identification
@@ -91,6 +73,7 @@ def l(ident: str, *, header: str = None) -> str:
     """
     window = header or Game.window or path.basename(stack()[1].filename)[:-3]
     return languages[Game.language]["%s_%s" % (window, ident)]
+
 
 with proto("Game") as Game:
     @Game
@@ -133,29 +116,29 @@ with proto("Game") as Game:
         self.screenSize = screen.get_size()
         self.language = "fr"
 
-        ws = [w for w in listdir(p("sources/interface")) if path.isfile(path.join(p("sources/interface"), w))]
+        ws = [w for w in listdir("sources/interface") if path.isfile(path.join("sources/interface", w))]
         for w in ws:
             module_name = w[:-3]
-            file_path = path.join(p("sources/interface"), w)
+            file_path = path.join("./sources/interface", w)
             spec = util.spec_from_file_location(module_name, file_path)
             module = util.module_from_spec(spec)
             spec.loader.exec_module(module)
             loadFunction = getattr(module, "load")
             drawFunction = getattr(module, "draw")
             updateFunction = getattr(module, "update")
-            self.windows[module_name] = (loadFunction, drawFunction, updateFunction)
+            self.windows[module_name] = [loadFunction, drawFunction, updateFunction]
 
-        keybindsFiles = [path.join(p("data/settings"), f) for f in listdir(p("data/settings")) if path.isfile(path.join(p("data/settings"), f))]
+        keybindsFiles = [path.join("data/settings", f) for f in listdir("data/settings") if path.isfile(path.join("data/settings", f))]
         for keybindFile in keybindsFiles:
             with open(keybindFile, "r", encoding="utf-8") as f:
                 Game.keybinds.update(loadJson(f))
                 f.close()
 
-        with open(p("data/settings.json"), "r", encoding="utf-8") as f:
+        with open("data/settings.json", "r", encoding="utf-8") as f:
             Game.settings = loadJson(f)
             f.close()
 
-        music = [path.join(p("data/music"), f) for f in listdir(p("data/music")) if path.isfile(path.join(p("data/music"), f))]
+        music = [path.join("data/music", f) for f in listdir("data/music") if path.isfile(path.join("data/music", f))]
         for sound in music:
             self.music.append(sound)
         pg.mixer.music.set_volume(self.settings["volume"] / 100)
@@ -254,7 +237,7 @@ with proto("Game") as Game:
         renderer: dict = {"hideHUD": {"name": "RR", "code": [9], "key": ["tab"]}}
         simulation: dict = {"increaseTime": {"name": "SUT", "code": [101], "key": ["e"]}, "decreaseTime": {"name": "SDT", "code": [97], "key": ["a"]}, "pause": {"name": "SP", "code": [32], "key": ["espace"]}, "resetSimulation": {"name": "SRS", "code": [103], "key": ["g"]}}
         for file in ("camera", "editor", "renderer", "simulation"):
-            with open(p("data/settings/%s.json" % file), "w", encoding="utf-8") as wf:
+            with open("data/settings/%s.json" % file, "w", encoding="utf-8") as wf:
                 wf.write(dumps(locals()[file]))
                 wf.close()
         Game.keybinds = {**camera, **editor, **renderer, **simulation}
