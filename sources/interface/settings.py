@@ -1,10 +1,13 @@
+# Projet : EduBang
+# Auteurs : Anaël Chevillard, Sacha Fréguin, Néji Lim
+
 from json import dumps
 from json import load as loadJson
 
 from eventListen import Events
 import pygame as pg
 
-from main import Game, l
+from main import Game, l, p
 from shared.utils.utils import Button, DataKeeper, SlideBar, Text
 
 dk = DataKeeper()
@@ -14,7 +17,7 @@ interface: list = []
 
 def saveSettings() -> None:
     settings = {}
-    with open("data/settings.json", "w", encoding="utf-8") as f:
+    with open(p("data/settings.json"), "w", encoding="utf-8") as f:
         for element in interface:
             if not hasattr(element, "setting"):
                 continue
@@ -72,7 +75,7 @@ def load() -> None:
     languageButton.onPressed = goLanguage
     interface.append(languageButton)
 
-    with open("data/settings.json", "r", encoding="utf-8") as f:
+    with open(p("data/settings.json"), "r", encoding="utf-8") as f:
         dk.settings = loadJson(f)
         f.close()
 

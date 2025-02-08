@@ -1,7 +1,9 @@
+# Projet : EduBang
+# Auteurs : Anaël Chevillard, Sacha Fréguin, Néji Lim
+
 from math import sqrt
 import pygame as pg 
 from proto import proto
-
 
 with proto("Space_ship") as Space_ship:
     @Space_ship

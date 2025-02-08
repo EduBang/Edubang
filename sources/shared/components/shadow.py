@@ -1,3 +1,6 @@
+# Projet : EduBang
+# Auteurs : Anaël Chevillard, Sacha Fréguin, Néji Lim
+
 import pygame as pg
 from PIL import Image, ImageDraw
 from math import *

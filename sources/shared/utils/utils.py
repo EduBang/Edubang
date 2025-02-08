@@ -1,3 +1,6 @@
+# Projet : EduBang
+# Auteurs : Anaël Chevillard, Sacha Fréguin, Néji Lim
+
 from json import load as loadJson
 from os import listdir, path
 from types import MethodType
@@ -9,7 +12,7 @@ from datetime import datetime
 
 import pygame as pg
 
-from main import Game, getFont, l
+from main import Game, getFont, l, p
 from proto import proto
 from eventListen import Events
 from shared.components.Vectors import Vectors
@@ -20,8 +23,8 @@ from shared.components.Corps import Corps
 # valeur de calibrage, origine à déterminer
 C_EDUBANG: int = 10750
 
-squareAlpha = pg.image.load("data/images/squareAlpha.png")
-colorPalette = pg.image.load("data/images/colorPalette.png")
+squareAlpha = pg.image.load(p("data/images/squareAlpha.png"))
+colorPalette = pg.image.load(p("data/images/colorPalette.png"))
 
 exponentFont = getFont("Medium", 12)
 titleFont = getFont("Regular", 20)
@@ -1124,6 +1127,27 @@ with proto("System") as System:
         return
 
     @System
+    def destroy(self) -> None:
+        """
+        Fonction qui détruit le système
+
+        Arguments:
+            None
+
+        Retourne:
+            None
+        """
+        self.system = None
+        self.position = [0, 0]
+        self.size = [0, 0]
+        self.draw = lambda: None
+        self.onHover = lambda: None
+        self.scrollable = False
+        self.offsetY = None
+        Events.stopObserving(self)
+        return
+
+    @System
     def new(self, system: dict, index: int) -> None:
         """
         L'initiateur de la boite d'un système
@@ -1260,7 +1284,7 @@ with proto("Inventory") as Inventory:
             None
         """
         self.bodies = []
-        bodyFiles = [path.join("data/bodies", f) for f in listdir("data/bodies") if path.isfile(path.join("data/bodies", f))]
+        bodyFiles = [path.join(p("data/bodies"), f) for f in listdir(p("data/bodies")) if path.isfile(path.join(p("data/bodies"), f))]
         for i, bodyFile in enumerate(bodyFiles):
             body = {}
             with open(bodyFile, "r", encoding="utf-8") as f:
@@ -1864,7 +1888,7 @@ with proto("Language") as Language:
     @Language
     def new(self, lang: str, position: tuple[int, int]) -> None:
         self.lang = lang[14:-5]
-        self.icon = pg.transform.scale(pg.image.load("data/images/flags/%s.png" % self.lang), (60, 40))
+        self.icon = pg.transform.scale(pg.image.load(p("data/images/flags/%s.png" % self.lang)), (60, 40))
         self.position = position
         self.size = (230, 50)
         self.draw = MethodType(drawLanguage, self)
@@ -2010,6 +2034,7 @@ def mergeEnergy(d1: tuple[int, tuple[int, int], tuple[int, int]], d2: tuple[int,
     #print(f"Resulting y: {y}")
 
     return [x, y]
+
 def process_collide(corps1, corps2):
     """
     Procède la fusion de 2 corps
@@ -2226,7 +2251,7 @@ def draw_attraction_norm(screen) -> None:
 
     x, y = MSP
     pg.draw.line(screen, (255, 255, 255), (x + 4, y - 4), (x + 16, y - 16), 1)
-    surface = Game.font.render("%s m/s²" % valeur, False, (255, 255, 255))
+    surface = Game.font.render("%s %s" % (valeur, l("attractionNormUnit")), False, (255, 255, 255))
     screen.blit(surface, (x + 18, y - 30))
     return
 
@@ -2444,7 +2469,7 @@ def getAttractor(corps):
         corps (Corps): Astre cible
 
     Retourne:
-        Corps | None: Astre attracteur ou Rien
+        Corps | None: Astre attracteur ou rien
     """
     attractors: dict = {}
     for c in Game.space:

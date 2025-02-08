@@ -1,3 +1,6 @@
+# Projet : EduBang
+# Auteurs : Anaël Chevillard, Sacha Fréguin, Néji Lim
+
 def isColliding(corps1, corps2, distance: float | int) -> bool:
     """
     Fonction qui vérifie si un astre rentre en collision avec un autre

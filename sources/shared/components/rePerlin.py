@@ -1,4 +1,6 @@
-import pygame as pg
+# Projet : EduBang
+# Auteurs : Anaël Chevillard, Sacha Fréguin, Néji Lim
+
 from math import sqrt
 from nsi25perlin import PerlinNoise as perlin
 from proto import proto

@@ -1,3 +1,6 @@
+# Projet : EduBang
+# Auteurs : Anaël Chevillard, Sacha Fréguin, Néji Lim
+
 import pygame as pg
 from math import sqrt, sin, cos
 from nsi25perlin import PerlinNoise as perlin
