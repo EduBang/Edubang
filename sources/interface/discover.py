@@ -4,7 +4,11 @@
 from json import load as loadJson
 from json.decoder import JSONDecodeError
 from os import listdir, path
-from tkinter import Tk, filedialog
+try:
+    from tkinter import Tk, filedialog
+except ModuleNotFoundError as e:
+    print("> Impossible d'importer le module tkinter : %s" % e)
+    Tk = filedialog = None
 
 from eventListen import Events
 
@@ -58,10 +62,11 @@ def load() -> None:
     backButton.onPressed = backFunction
     interface.append(backButton)
 
-    addSystemButton = Button((100, 300), (180, 60))
-    addSystemButton.text = l("addSystem")
-    addSystemButton.onPressed = addSystem
-    interface.append(addSystemButton)
+    if Tk and filedialog:
+        addSystemButton = Button((100, 300), (180, 60))
+        addSystemButton.text = l("addSystem")
+        addSystemButton.onPressed = addSystem
+        interface.append(addSystemButton)
 
     systemsFile = [path.join(p("data/systems"), f) for f in listdir(p("data/systems")) if path.isfile(path.join(p("data/systems"), f))]
     for i, systemFile in enumerate(systemsFile):
