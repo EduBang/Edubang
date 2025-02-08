@@ -6,6 +6,7 @@ from math import sqrt, sin, cos, pi, radians, acos, degrees, atan2
 from proto import proto
 from rePerlin import Perlin
 from PIL import Image
+import numpy as np
 
 with proto("Vectors") as Vectors:
     @Vectors
@@ -50,7 +51,7 @@ with proto("Angles") as Angles:
         return (cos(radians(angle)), sin(radians(angle)))
     
     @Angles
-    def generate_angle_whith_unit_vector(self, unit_vector_x: float, unit_vector_y: float = 0):
+    def generate_angle_whith_unit_vector(self, unit_vector_x: float, unit_vector_y: float):
         """
         Fonction qui trouve l'angle en degrés selon un vecteur unitaire
         
@@ -90,6 +91,50 @@ def generate_texture(intensity):
     return pil_to_pygame(pil_image)
 
 
+
+# def fusion_shadows_planets(l_matrix):
+
+
+
+#     for matrix in l_matrix:
+
+#         rgb = np.minimum(matrix[..., :3] + matrix[..., :3], 255)
+
+#         alpha = np.minimum(matrix[..., 3] + matrix[..., 3], 255)
+
+#         fused_arr = np.dstack((rgb, alpha)).astype(np.uint8)
+#         fusion_image = Image.fromarray(fused_arr, 'RGBA')
+
+#         return fusion_image
+#     # print(l_matrix)
+#     # width = len(l_matrix[0])  # Nombre de colonnes (largeur)
+#     # height = len(l_matrix[0][0])  # Nombre de lignes (hauteur)
+
+    # # Créer une nouvelle image PIL en mode RGBA
+    # fusion_image = Image.new('RGBA', (width, height))
+
+    # new_matrix = []
+    # inc = 0
+
+    # for matrix in l_matrix:
+    #     for x in range(width):
+    #         for y in range(height):
+    #             r, g, b, a = matrix[x][y]
+    #             new_matrix.append((r, g, b, min(a + inc, 255)))  # Alpha ne dépasse pas 255
+    #             inc += a  # Incrémentation progressive de la transparence
+
+    # # Créer une image PIL sans utiliser NumPy
+    # fusion_image.putdata(new_matrix)
+    
+    # fusion_data = np.zeros((height, width, 4), dtype=np.uint8)
+    
+    # for matrix in l_matrix:
+    #     alpha = matrix[..., 3]
+    #     fusion_data[..., 3] += alpha
+    #     fusion_data[..., 3] = np.clip(fusion_data[..., 3], 0, 255)
+    
+    # fusion_image = Image.fromarray(fusion_data, 'RGBA')
+
 pg.init()
 screen = pg.display.set_mode((1000, 1000))  # Initialiser la fenêtre d'affichage
 pg.display.set_caption("Test Rendering Planets")
@@ -102,18 +147,53 @@ planet_pos = (500, 500)  # Position du centre de la planète
 radius = 150  # Rayon de la planète
 running = True
 intensity = 255
-light_pos = (1000,500)
 
-unit_vector_light = Vectors.get_unit_vector(planet_pos, light_pos)
-print(f"Unit vector : {unit_vector_light}")
-angle = Angles.generate_angle_whith_unit_vector(unit_vector_light[0], unit_vector_light[1])
-# angle = -90
-print(f"Angle trouvé : {angle}°")
+l_light = [(750 ,0)]
+# l_matrix = []
+l_image = []
+
+
+for light_pos in l_light:
+    unit_vector_light = Vectors.get_unit_vector(light_pos, planet_pos)
+    
+    print(f"Unit vector : {unit_vector_light}")
+    angle = Angles.generate_angle_whith_unit_vector(unit_vector_light[0], unit_vector_light[1])
+    print(f"Angle trouvé : {angle}°")
+
+    size_image_shadow_planet = pg.transform.scale(image_shadow_planet, (radius * 2 + 10, radius * 2 + 10))
+    rotated_image_shadow_planet, new_rect = Angles.rotate_image(size_image_shadow_planet, angle, planet_pos)
+    print(type(rotated_image_shadow_planet))
+
+    l_image.append(rotated_image_shadow_planet)
+    # Convertir la surface Pygame en tableau numpy
+    # rotated_image_shadow_planet_array = pg.surfarray.array3d(rotated_image_shadow_planet)
+    
+    # matrix = []
+    # for x in range(rotated_image_shadow_planet_array.shape[0]):
+    #     row = []
+    #     for y in range(rotated_image_shadow_planet_array.shape[1]):
+    #         pixel = rotated_image_shadow_planet_array[x, y]
+    #         row.append(pixel)
+    #     matrix.append(row)
+    # width, height = rotated_image_shadow_planet.get_size()  # Récupérer dimensions correctes
+    # pixels = list(pg.PixelArray(rotated_image_shadow_planet))  # Extraire pixels
+    # matrix = [pixels[i * width:(i + 1) * width] for i in range(height)]
+    # matrix = np.array(rotated_image_shadow_planet, dtype=np.uint16)
+
+    # l_matrix.append(matrix)
+
+# fusioned_image_shadow = fusion_shadows_planets(l_matrix)
+
+# unit_vector_light = Vectors.get_unit_vector(planet_pos, light_pos)
+# print(f"Unit vector : {unit_vector_light}")
+# angle = Angles.generate_angle_whith_unit_vector(unit_vector_light[0], unit_vector_light[1])
+# # angle = -90
+# print(f"Angle trouvé : {angle}°")
 
 planet_surface = generate_texture(intensity)
 
-size_image_shadow_planet = pg.transform.scale(image_shadow_planet, (radius*2 + 10, radius*2 + 10))
-rotated_image_shadow_planet, new_rect = Angles.rotate_image(size_image_shadow_planet, angle, planet_pos)
+# size_image_shadow_planet = pg.transform.scale(image_shadow_planet, (radius*2 + 10, radius*2 + 10))
+# rotated_image_shadow_planet, new_rect = Angles.rotate_image(size_image_shadow_planet, angle, planet_pos)
 
 while running:
     for event in pg.event.get():
@@ -130,7 +210,9 @@ while running:
     screen.fill((0, 0, 0))
     #afficher planette :
     screen.blit(planet_surface, (planet_pos[0] - radius, planet_pos[1] - radius))
-    screen.blit(rotated_image_shadow_planet, new_rect.topleft)
+    for image in l_image:
+        screen.blit(image, new_rect.topleft)
+    pg.draw.circle(screen, (255, 0, 0), (light_pos), 100)
     # afficher ombre :
     # screen.blit(rotated_image, (500, 500))
     
