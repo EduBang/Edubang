@@ -59,13 +59,13 @@ UNICODES: dict[int, str] = {
 UNICODES_DARWIN: dict[int, str] = {
     0x30: "tab",
     0x31: "espace",
-    1073742050: "alt",
-    1073742051: "cmd"
+    0x400000E2: "alt",
+    0x400000E3: "cmd"
 }
 
 Game.ctrl = pg.KMOD_LCTRL if Game.os == "Windows" else pg.KMOD_META
 C_UNICODES = UNICODES if Game.os == "Windows" else UNICODES_DARWIN
-fnKeys: tuple = (0x400000E2 if Game.os == "Windows" else 1073742050, 0x400000E0 if Game.os == "Windows" else 1073742051)
+fnKeys: tuple = (0x400000E2, 0x400000E0 if Game.os == "Windows" else 0x400000E3)
 
 SCROLL_SPEED: int = 20
 
@@ -2445,13 +2445,13 @@ def drawArrow(startPos: tuple[int, int], endPos: tuple[int, int], *, color: tupl
     orientation: float = (atan2(startPos[1] - endPos[1], endPos[0] - startPos[0])) + pi/2
     if not (-1e2 < startPos[0] < 1e4 and -1e2 < startPos[1] < 1e4):
         startPos = (
-            endPos[0] + 1000 * sin(orientation),
-            endPos[1] + 1000 * cos(orientation)
+            endPos[0] - 2000 * sin(orientation),
+            endPos[1] - 2000 * cos(orientation)
         )
     if not (-1e2 < endPos[0] < 1e4 and -1e2 < endPos[1] < 1e4):
         endPos = (
-            startPos[0] + 1000 * sin(orientation - pi),
-            startPos[1] + 1000 * cos(orientation - pi)
+            startPos[0] - 2000 * sin(orientation - pi),
+            startPos[1] - 2000 * cos(orientation - pi)
         )
     pg.draw.line(Game.screen, color, startPos, endPos, l)
     pg.draw.polygon(Game.screen, color, (
