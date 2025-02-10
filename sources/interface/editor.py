@@ -30,6 +30,8 @@ dk.arrows = {}
 dk.bodies = []
 dk.hideHUD = False
 dk.mb = None
+dk.hover = None
+dk.shift = False
 
 semibold = getFont("SemiBold", 16)
 subtitle = getFont("Bold")
@@ -161,14 +163,16 @@ def keydown(event) -> None:
             Game.Camera.zoom *= 1.05
         elif key == pg.K_KP_MINUS and Game.Camera.zoom > Game.Camera.minZoom:
             Game.Camera.zoom /= 1.05
+        
+        dk.shift = key == pg.K_LSHIFT
 
     keys = []
     
     mods = pg.key.get_mods()
     if mods & pg.KMOD_LCTRL:
-        keys.append(0x400000e0)
+        keys.append(0x400000E0)
     if mods & pg.KMOD_LALT:
-        keys.append(0x400000e2)
+        keys.append(0x400000E2)
     keys.append(event.key)
 
     key = Game.getKeyFromCode(keys)
@@ -200,9 +204,9 @@ def keyup(event) -> None:
     
     mods = pg.key.get_mods()
     if mods & pg.KMOD_LCTRL:
-        dk.specialKeys.append(0x400000e0)
+        dk.specialKeys.append(0x400000E0)
     if mods & pg.KMOD_LALT:
-        dk.specialKeys.append(0x400000e2)
+        dk.specialKeys.append(0x400000E2)
     if event.key not in dk.specialKeys:
         keys.append(event.key)
     
@@ -216,6 +220,10 @@ def keyup(event) -> None:
         key = Game.getKeyFromCode(keys)
         if key:
             Game.keys[key] = False
+    
+    key = event.key
+    
+    dk.shift = key == pg.K_LSHIFT
     return
 
 @Events.observe
@@ -247,9 +255,10 @@ def mousebuttondown(event) -> None:
                 dk.target = arrow
                 break
         else:
-            Game.Camera.focus = None 
-            dk.selected.clear()
-            dk.mouseselection = screenPosToSpacePos(pos)
+            if not dk.hover:
+                Game.Camera.focus = None 
+                dk.selected.clear()
+                dk.mouseselection = screenPosToSpacePos(pos)
     return
 
 @Events.observe
@@ -277,6 +286,11 @@ def mousebuttonup(event) -> None:
         if sqrt(sqx + sqy) < corps.radius * Game.Camera.zoom:
             Game.Camera.focus = corps
             break
+    if dk.hover:
+        if dk.hover in dk.selected: return
+        if not dk.shift:
+            dk.selected.clear()
+        dk.selected.append(dk.hover)
     return
 
 def drawGrid() -> None:
@@ -308,6 +322,10 @@ def drawMouseSelection() -> None:
     return
 
 def drawSelected() -> None:
+    if dk.hover and dk.hover in Game.space:
+        x, y = spacePosToScreenPos(dk.hover.pos)
+        r = dk.hover.radius * Game.Camera.zoom
+        pg.draw.circle(Game.screen, (255, 255, 255), (x, y), dk.hover.radius * Game.Camera.zoom, 1)
     if len(dk.selected) < 1: return
     c = dk.selected[0]
     pos: tuple[float, float] = spacePosToScreenPos(c.pos)
@@ -503,4 +521,13 @@ def update() -> None:
             else:
                 if corps in dk.selected:
                     dk.selected.remove(corps)
+    pos = pg.mouse.get_pos()
+    for corps in Game.space:
+        x, y = spacePosToScreenPos(corps.pos)
+        sqx, sqy = (pos[0] - x) ** 2, (pos[1] - y) ** 2
+        if sqrt(sqx + sqy) < corps.radius * Game.Camera.zoom:
+            dk.hover = corps
+            break
+    else:
+        dk.hover = None
     return
