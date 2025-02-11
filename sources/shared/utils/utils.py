@@ -34,6 +34,7 @@ footerFont = getFont("Regular", 10)
 cardFont = getFont("Regular", 12)
 languageFont = getFont("Regular", 20)
 inter = getFont("SemiBold", 16, header="Inter")
+keybindFont = getFont("SemiBold", 16)
 
 FOCUS_COLOR: tuple[int, int, int] = (13, 178, 190)
 
@@ -462,7 +463,7 @@ with proto("KeyBind") as KeyBind:
         Retourne:
             None
         """
-        font = self.font
+        font = keybindFont
         if any([i in "↑←↓→" for i in self.keyname]):
             font = inter
         color: tuple[int, int, int] = FOCUS_COLOR if self.focus else (255, 255, 255)
@@ -612,7 +613,6 @@ with proto("KeyBind") as KeyBind:
         self.keys = keys
         self.keyname = keyname
         self.position = list(position)
-        self.font = Game.font
         self.size  = [120, 40]
         self.draw = MethodType(drawKeyBind, self)
         self.onReleased = lambda: None
