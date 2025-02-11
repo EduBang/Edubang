@@ -66,7 +66,7 @@ for languageFile in languageFiles:
         languages[languageFile[14:-5]] = loadJson(f)
         f.close()
 
-def getFont(font, size: int = 16) -> pg.font.Font:
+def getFont(font, size: int = 16, *, header: str = "OpenSans") -> pg.font.Font:
     """
     Fonction permettant de récupérer un type et une taille de police dans OpenSans
 
@@ -77,7 +77,7 @@ def getFont(font, size: int = 16) -> pg.font.Font:
     Retourne:
         pg.font.Font: Police
     """
-    return pg.font.Font(p("data/fonts/Open_Sans/OpenSans-%s.ttf" % font), size)
+    return pg.font.Font(p("data/fonts/%s/%s-%s.ttf" % (header, header, font)), size)
 
 def l(ident: str, *, header: str = None) -> str:
     """
@@ -135,6 +135,7 @@ with proto("Game") as Game:
         self.subprocess = None
         self.screenSize = screen.get_size()
         self.language = "fr"
+        self.rmb = None
 
         ws = [w for w in listdir(p("sources/interface")) if path.isfile(path.join(p("sources/interface"), w))]
         for w in ws:
@@ -255,7 +256,7 @@ with proto("Game") as Game:
         camera: dict = {"cameraUp": {"name": "CDU", "code": [122], "key": ["z"]}, "cameraLeft": {"name": "CDL", "code": [113], "key": ["q"]}, "cameraDown": {"name": "CDD", "code": [115], "key": ["s"]}, "cameraRight": {"name": "CDR", "code": [100], "key": ["d"]}, "resetCamera": {"name": "CRC", "code": [114], "key": ["r"]}, "zoomIn": {"name": "CZC", "code": [1073741911], "key": ["+"]}, "zoomOut": {"name": "CDC", "code": [45], "key": ["-"]}}
         editor: dict = {"delete": {"name": "ED", "code": [127], "key": ["del"]}, "selectAll": {"name": "EGA", "code": [1073742048, 97], "key": ["ctrl", "a"]}, "save": {"name": "ESA", "code": [1073742048, 115], "key": ["ctrl", "s"]}}
         renderer: dict = {"hideHUD": {"name": "RR", "code": [9], "key": ["tab"]}}
-        simulation: dict = {"increaseTime": {"name": "SUT", "code": [101], "key": ["e"]}, "decreaseTime": {"name": "SDT", "code": [97], "key": ["a"]}, "pause": {"name": "SP", "code": [32], "key": ["espace"]}, "resetSimulation": {"name": "SRS", "code": [103], "key": ["g"]}}
+        simulation: dict = {"increaseTime": {"name": "SUT", "code": [101], "key": ["e"]}, "decreaseTime": {"name": "SDT", "code": [97], "key": ["a"]}, "pause": {"name": "SP", "code": [32], "key": ["espace"]}, "resetSimulation": {"name": "SRS", "code": [103], "key": ["g"]}, "next": {"name": "SCN", "code": [1073741903], "key": ["\u2192"]}, "previous": {"name": "SCP", "code": [1073741904], "key": ["\u2190"]}}
         for file in ("camera", "editor", "renderer", "simulation"):
             with open(p("data/settings/%s.json" % file), "w", encoding="utf-8") as wf:
                 wf.write(dumps(locals()[file]))
@@ -321,10 +322,10 @@ def mousewheel(event) -> None:
 
 @Events.observe
 def mousebuttondown(event) -> None:
-    if Game.window != "sandbox": return
     button = event.button
     x, y = event.pos
     if button == 1: # clique gauche
+        if Game.window != "sandbox": return
         if not Game.Camera.active: return
         for corps in Game.space:
             xC = (corps.pos[0] + Game.Camera.x / Game.Camera.zoom) * Game.Camera.zoom
@@ -334,12 +335,34 @@ def mousebuttondown(event) -> None:
             if pi * (corps.radius * Game.Camera.zoom) ** 2 < 10:
                 if sqrt(sqx + sqy) < 10:
                     Game.Camera.focus = corps
-                    Game.Camera.zoom = 1 / corps.radius * 51
+                    Game.Camera.zoom = 51 / corps.radius
                     break
             if sqrt(sqx + sqy) < corps.radius * Game.Camera.zoom:
                 Game.Camera.focus = corps
-                Game.Camera.zoom = 1 / corps.radius * 51
+                Game.Camera.zoom = 51 / corps.radius
                 break
+    if button == 3: # clique droit
+        Game.rmb = (x, y)
+    return
+
+@Events.observe
+def mousebuttonup(event) -> None:
+    button = event.button
+    x, y = event.pos
+    if button == 3:
+        if Game.rmb == (x, y): # fenêtre contextuel
+            pass
+        Game.rmb = None
+    return
+    
+@Events.observe
+def mousemotion(event) -> None:
+    x, y = event.pos
+    if Game.rmb: # déplacement souris
+        dX, dY = Game.rmb[0] - x, Game.rmb[1] - y
+        Game.Camera.x -= dX
+        Game.Camera.y -= dY
+        Game.rmb = (x, y)
     return
 
 # Boucle principale
