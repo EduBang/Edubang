@@ -82,10 +82,10 @@ def predict(game, n: int = 0, k: int = 100) -> None:
                     c = Corps(i.mass + j.mass, radius, (x, y), (0, 0, 0), mergeEnergy((i.mass, i.pos, lastPosI), (j.mass, j.pos, lastPosJ)))
                     space.append(
                         {
-                        "pos": c.pos,
-                        "velocity": c.velocity,
-                        "mass": c.mass,
-                        "corps": c
+                            "pos": c.pos,
+                            "velocity": c.velocity,
+                            "mass": c.mass,
+                            "corps": c
                         }
                     )
                     cache.append(c)

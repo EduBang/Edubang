@@ -32,6 +32,9 @@ dk.hideHUD = False
 dk.mb = None
 dk.hover = None
 dk.shift = False
+dk.selectRect = []
+dk.moveSelected = False
+dk.relativePos = {}
 
 semibold = getFont("SemiBold", 16)
 subtitle = getFont("Bold")
@@ -57,6 +60,37 @@ def maximum(startPos, endPos) -> tuple:
     x1, y1 = startPos
     x2, y2 = endPos
     return (max(x1, x2), max(y1, y2))
+
+def getSelectRect() -> tuple[float, float, float, float]:
+    """
+    Calcule les coordonnées ainsi que les dimensions du rectangle de sélection
+
+    Arguments:
+        None
+
+    Retourne:
+        tuple[float, float, float, float]: Les coordonnées et les dimensions du rectangle de sélection
+    """
+    c = dk.selected[0]
+    pos: tuple[float, float] = spacePosToScreenPos(c.pos)
+    x1 = pos[0] - c.radius * Game.Camera.zoom
+    y1 = pos[1] - c.radius * Game.Camera.zoom
+    x2 = pos[0] + c.radius * Game.Camera.zoom
+    y2 = pos[1] + c.radius * Game.Camera.zoom
+    for selected in dk.selected:
+        x, y = spacePosToScreenPos(selected.pos)
+        pg.draw.circle(Game.screen, (255, 255, 255), (x, y), selected.radius * Game.Camera.zoom, 1)
+        dx1, dy1 = x - selected.radius * Game.Camera.zoom, y - selected.radius * Game.Camera.zoom
+        dx2, dy2 = x + selected.radius * Game.Camera.zoom, y + selected.radius * Game.Camera.zoom
+        if dx1 < x1:
+            x1 = dx1
+        if dy1 < y1:
+            y1 = dy1
+        if dx2 > x2:
+            x2 = dx2
+        if dy2 > y2:
+            y2 = dy2
+    return [x1, y1, x2 - x1, y2 - y1]
 
 def resetSaveCanva() -> None:
     saveButton, inputName, inputDescription = [dk.saveCanva[i] for i in ("save", "name", "description")]
@@ -222,14 +256,13 @@ def keyup(event) -> None:
             Game.keys[key] = False
     
     key = event.key
-    
     dk.shift = key == pg.K_LSHIFT
     return
 
 @Events.observe
 def inventory(body) -> None:
     dk.body = body
-    Game.Camera.zoom = 1 / body["radius"] * 51
+    Game.Camera.zoom = 51 / body["radius"]
     return
 
 @Events.observe
@@ -255,9 +288,16 @@ def mousebuttondown(event) -> None:
                 dk.target = arrow
                 break
         else:
-            if not dk.hover:
+            if not dk.selectRect: return
+            if dk.selectRect[0] < pos[0] < dk.selectRect[0] + dk.selectRect[2] and dk.selectRect[1] < pos[1] < dk.selectRect[1] + dk.selectRect[3]:
+                dk.moveSelected = True
+                for corps in dk.selected:
+                    rPos = screenPosToSpacePos(pos)
+                    dk.relativePos[corps] = (corps.pos[0] - rPos[0], corps.pos[1] - rPos[1])
+            else:
                 Game.Camera.focus = None 
                 dk.selected.clear()
+                dk.relativePos.clear()
                 dk.mouseselection = screenPosToSpacePos(pos)
     return
 
@@ -268,6 +308,8 @@ def mousebuttonup(event) -> None:
     button = event.button
     pos = event.pos
     if button != 1: return
+    if dk.moveSelected:
+        dk.moveSelected = False
     if dk.mouseselection:
         dk.mouseselection = None
     if dk.target:
@@ -324,29 +366,10 @@ def drawMouseSelection() -> None:
 def drawSelected() -> None:
     if dk.hover and dk.hover in Game.space:
         x, y = spacePosToScreenPos(dk.hover.pos)
-        r = dk.hover.radius * Game.Camera.zoom
         pg.draw.circle(Game.screen, (255, 255, 255), (x, y), dk.hover.radius * Game.Camera.zoom, 1)
     if len(dk.selected) < 1: return
-    c = dk.selected[0]
-    pos: tuple[float, float] = spacePosToScreenPos(c.pos)
-    x1 = pos[0] - c.radius * Game.Camera.zoom
-    y1 = pos[1] - c.radius * Game.Camera.zoom
-    x2 = pos[0] + c.radius * Game.Camera.zoom
-    y2 = pos[1] + c.radius * Game.Camera.zoom
-    for selected in dk.selected:
-        x, y = spacePosToScreenPos(selected.pos)
-        pg.draw.circle(Game.screen, (255, 255, 255), (x, y), selected.radius * Game.Camera.zoom, 1)
-        dx1, dy1 = x - selected.radius * Game.Camera.zoom, y - selected.radius * Game.Camera.zoom
-        dx2, dy2 = x + selected.radius * Game.Camera.zoom, y + selected.radius * Game.Camera.zoom
-        if dx1 < x1:
-            x1 = dx1
-        if dy1 < y1:
-            y1 = dy1
-        if dx2 > x2:
-            x2 = dx2
-        if dy2 > y2:
-            y2 = dy2
-    pg.draw.rect(Game.screen, (255, 255, 255), (x1, y1, x2 - x1, y2 - y1), 1)
+    dk.selectRect = getSelectRect()
+    pg.draw.rect(Game.screen, (255, 255, 255), dk.selectRect, 1)
 
     bX, bY = spacePosToScreenPos(barycentre(dk.selected))
     pg.draw.line(Game.screen, (0, 255, 0), (bX - 8, bY), (bX + 8, bY), 2)
@@ -455,7 +478,6 @@ def load() -> None:
 
 def stats(corps, width, height) -> None:
     screen = Game.screen
-
     pg.draw.rect(screen, (10, 9, 9), (width - 350, 0, 350, height))
     return
 
@@ -522,6 +544,11 @@ def update() -> None:
                 if corps in dk.selected:
                     dk.selected.remove(corps)
     pos = pg.mouse.get_pos()
+    if dk.moveSelected:
+        spos = screenPosToSpacePos(pos)
+        for corps in dk.selected:
+            corps.pos = (dk.relativePos[corps][0] + spos[0], dk.relativePos[corps][1] + spos[1])
+
     for corps in Game.space:
         x, y = spacePosToScreenPos(corps.pos)
         sqx, sqy = (pos[0] - x) ** 2, (pos[1] - y) ** 2

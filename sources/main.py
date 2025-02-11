@@ -136,6 +136,7 @@ with proto("Game") as Game:
         self.screenSize = screen.get_size()
         self.language = "fr"
         self.rmb = None
+        self.ormb = None
 
         ws = [w for w in listdir(p("sources/interface")) if path.isfile(path.join(p("sources/interface"), w))]
         for w in ws:
@@ -343,6 +344,7 @@ def mousebuttondown(event) -> None:
                 break
     if button == 3: # clique droit
         Game.rmb = (x, y)
+        Game.ormb = (x, y)
     return
 
 @Events.observe
@@ -350,9 +352,10 @@ def mousebuttonup(event) -> None:
     button = event.button
     x, y = event.pos
     if button == 3:
-        if Game.rmb == (x, y): # fenêtre contextuel
+        if Game.ormb == (x, y): # fenêtre contextuel
             pass
         Game.rmb = None
+        Game.ormb = None
     return
     
 @Events.observe

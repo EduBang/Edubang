@@ -158,8 +158,10 @@ def keydown(event) -> None:
             i.text = str(int(txt if txt != "" else "0") - 1)
     if Game.keys["resetCamera"]:
         Game.Camera.reset()
-        Game.Camera.x = 1000
-        Game.Camera.y = 500
+        x, y = spacePosToScreenPos(barycentre(Game.space))
+        w, h = Game.screenSize
+        Game.Camera.x = x + w / 2
+        Game.Camera.y = y + h / 2
         Game.Camera.active = True
     if Game.keys["pause"]:
         Game.pause = not Game.pause
@@ -246,9 +248,10 @@ def keyup(event) -> None:
 def loader() -> None:
     dk.wait = True
     Game.Camera.active = True
+    x, y = spacePosToScreenPos(barycentre(Game.space))
     w, h = Game.screenSize
-    Game.Camera.x = w // 2
-    Game.Camera.y = h // 2
+    Game.Camera.x = x + w / 2
+    Game.Camera.y = y + h / 2
     dk.active = True
 
     if not dk.image:
@@ -263,10 +266,6 @@ def loader() -> None:
             img = img.resize((5 * size, 5 * size), Image.Resampling.LANCZOS)
             dk.image = pg.image.fromstring(img.tobytes(), img.size, img.mode)
         dk.stars = loadStars(1500, (-3000, 3000))
-    
-    # ship = Space_ship.new((1000, 1000), 2000, 0, 0, 0)
-    # ship.name = "Spaceship"
-    # Game.space.append(ship)
 
     textDT = Text("%s : " % l("timeScale"), (20, 145), color=(255, 255, 255))
     interface.append(textDT)
