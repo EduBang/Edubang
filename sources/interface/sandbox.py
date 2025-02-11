@@ -174,6 +174,23 @@ def keydown(event) -> None:
     if Game.keys["hideHUD"]:
         dk.hideHUD = not dk.hideHUD
         Events.trigger("hideHUD", dk.hideHUD)
+    if Game.Camera.focus:
+        if Game.keys["next"]:
+            index = Game.space.index(Game.Camera.focus)
+            if index + 1 == len(Game.space):
+                Game.Camera.focus = Game.space[0]
+                Game.Camera.zoom = 51 / Game.Camera.focus.radius
+            else:
+                Game.Camera.focus = Game.space[index + 1]
+                Game.Camera.zoom = 51 / Game.Camera.focus.radius
+        if Game.keys["previous"]:
+            index = Game.space.index(Game.Camera.focus)
+            if index - 1 < 1:
+                Game.Camera.focus = Game.space[-1]
+                Game.Camera.zoom = 51 / Game.Camera.focus.radius
+            else:
+                Game.Camera.focus = Game.space[index - 1]
+                Game.Camera.zoom = 51 / Game.Camera.focus.radius
     key = event.key
     if not dk.active: return
     if key == pg.K_ESCAPE:
