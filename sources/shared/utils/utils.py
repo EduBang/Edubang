@@ -33,6 +33,7 @@ descriptionFontInventory = getFont("Regular", 12)
 footerFont = getFont("Regular", 10)
 cardFont = getFont("Regular", 12)
 languageFont = getFont("Regular", 20)
+inter = getFont("SemiBold", 16, header="Inter")
 
 FOCUS_COLOR: tuple[int, int, int] = (13, 178, 190)
 
@@ -54,13 +55,21 @@ UNICODES: dict[int, str] = {
     0x40000045: "F12",
     0x400000E2: "alt",
     0x400000E0: "ctrl",
+    0x40000052: "↑",
+    0x40000050: "←",
+    0x40000051: "↓",
+    0x4000004F: "→"
 }
 
 UNICODES_DARWIN: dict[int, str] = {
     0x30: "tab",
     0x31: "espace",
     0x400000E2: "alt",
-    0x400000E3: "cmd"
+    0x400000E3: "cmd",
+    0x40000052: "↑",
+    0x40000050: "←",
+    0x40000051: "↓",
+    0x4000004F: "→"
 }
 
 Game.ctrl = pg.KMOD_LCTRL if Game.os == "Windows" else pg.KMOD_META
@@ -453,9 +462,12 @@ with proto("KeyBind") as KeyBind:
         Retourne:
             None
         """
+        font = self.font
+        if any([i in "↑←↓→" for i in self.keyname]):
+            font = inter
         color: tuple[int, int, int] = FOCUS_COLOR if self.focus else (255, 255, 255)
         pg.draw.rect(Game.screen, color, pg.Rect(self.position, self.size), 0, 4)
-        surface = self.font.render(" + ".join(self.keyname), False, (0, 0, 0))
+        surface = font.render(" + ".join(self.keyname), False, (0, 0, 0))
         Game.screen.blit(surface, (self.position[0] + 10, self.position[1] + 10))
         return
     
