@@ -80,6 +80,8 @@
     "keybind_SDT": "Slow down time",
     "keybind_SP": "Pause the simulation",
     "keybind_SRS": "Reset the simulation",
+	"keybind_SCN": "Next",
+	"keybind_SCP": "Previous",
     "editor_returnToMenu": "Go back to menu ? (Escape)",
     "editor_m": "m",
     "editor_km": "km",

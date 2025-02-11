@@ -80,6 +80,8 @@
     "keybind_SDT": "Décélérer le temps",
     "keybind_SP": "Mettre la simulation en pause",
     "keybind_SRS": "Réinitialier la simulation",
+	"keybind_SCN": "Suivant",
+	"keybind_SCP": "Précédent",
     "editor_returnToMenu": "Retourner au menu (Échap)",
     "editor_m": "m",
     "editor_km": "km",

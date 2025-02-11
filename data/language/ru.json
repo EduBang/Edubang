@@ -80,6 +80,8 @@
     "keybind_SDT": "Замедлить время",
     "keybind_SP": "Приостановить симуляцию",
     "keybind_SRS": "Сбросить симуляцию",
+	"keybind_SCN": "Следующий",
+	"keybind_SCP": "Предыдущий",
     "editor_returnToMenu": "Вернуться в меню (Esc)",
     "editor_m": "м",
     "editor_km": "км",

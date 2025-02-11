@@ -80,6 +80,8 @@
     "keybind_SDT": "Tijd vertragen",
     "keybind_SP": "Simulatie pauzeren",
     "keybind_SRS": "Simulatie resetten",
+	"keybind_SCN": "Volgende",
+	"keybind_SCP": "Vorige",
     "editor_returnToMenu": "Terug naar menu? (Escape)",
     "editor_m": "m",
     "editor_km": "km",

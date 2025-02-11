@@ -80,6 +80,8 @@
     "keybind_SDT": "Zeit verlangsamen",
     "keybind_SP": "Simulation pausieren",
     "keybind_SRS": "Simulation zurücksetzen",
+	"keybind_SCN": "Weiter zu",
+	"keybind_SCP": "Vorherige",
     "editor_returnToMenu": "Zum Menü zurückkehren? (Escape)",
     "editor_m": "m",
     "editor_km": "km",
