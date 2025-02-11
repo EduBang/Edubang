@@ -137,9 +137,9 @@ def keydown(event) -> None:
     
     mods = pg.key.get_mods()
     if mods & pg.KMOD_LCTRL:
-        keys.append(0x400000e0)
+        keys.append(0x400000E0)
     if mods & pg.KMOD_LALT:
-        keys.append(0x400000e2)
+        keys.append(0x400000E2)
     keys.append(event.key)
 
     key = Game.getKeyFromCode(keys)
@@ -180,15 +180,19 @@ def keydown(event) -> None:
         if Game.Camera.focus:
             Game.Camera.focus = None
         else:
-            if not dk.escape:
-                dk.escape = True
-                sub = Game.screen.subsurface(pg.Rect(0, 0, *Game.screenSize))
-                img = pg.image.tobytes(sub, "RGB")
-                image = Image.frombytes("RGB", Game.screenSize, img)
-                image = image.filter(ImageFilter.GaussianBlur(10))
-                dk.screenShot = pg.image.fromstring(image.tobytes(), image.size, image.mode)
-                dk.wait = True
-                setPauseButtonState(True)
+            if dk.hideHUD:  
+                dk.hideHUD = False
+                Events.trigger("hideHUD", dk.hideHUD)
+            else:
+                if not dk.escape:
+                    dk.escape = True
+                    sub = Game.screen.subsurface(pg.Rect(0, 0, *Game.screenSize))
+                    img = pg.image.tobytes(sub, "RGB")
+                    image = Image.frombytes("RGB", Game.screenSize, img)
+                    image = image.filter(ImageFilter.GaussianBlur(10))
+                    dk.screenShot = pg.image.fromstring(image.tobytes(), image.size, image.mode)
+                    dk.wait = True
+                    setPauseButtonState(True)
         
     if key == pg.K_KP_PLUS and Game.Camera.zoom < Game.Camera.maxZoom:
         Game.Camera.zoom *= 1.05
@@ -204,9 +208,9 @@ def keyup(event) -> None:
     
     mods = pg.key.get_mods()
     if mods & pg.KMOD_LCTRL:
-        dk.specialKeys.append(0x400000e0)
+        dk.specialKeys.append(0x400000E0)
     if mods & pg.KMOD_LALT:
-        dk.specialKeys.append(0x400000e2)
+        dk.specialKeys.append(0x400000E2)
     if event.key not in dk.specialKeys:
         keys.append(event.key)
     
