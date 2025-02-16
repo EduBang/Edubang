@@ -10,7 +10,7 @@ from eventListen import Events
 from nsi25perlin import PerlinNoise
 
 from main import Game, getFont, l, p
-from shared.utils.utils import updateCorps, process_collide, Button, C_EDUBANG, spacePosToScreenPos, DataKeeper, loadSpace
+from shared.utils.utils import updateCorps, process_collide, Button, C_EDUBANG, spacePosToScreenPos, DataKeeper, loadSpace, displayMultilineText
 from shared.components.Corps import Corps
 from shared.components.Captors import isColliding
 from shared.components.Prediction import predict
@@ -26,7 +26,9 @@ img = img.resize((8 * size, 6 * size), Image.Resampling.LANCZOS)
 dk.image = pg.image.fromstring(img.tobytes(), img.size, img.mode)
 dk.brand = None
 dk.time = 15
+dk.help = False
 
+font = getFont("Regular", 14)
 semibold = getFont("SemiBold", 20)
 
 def goDiscover() -> None:
@@ -55,6 +57,26 @@ v: list[int, int] = [100, 1]
 def window(w) -> None:
     if w != "menu": return
     interface.clear()
+    return
+
+@Events.observe
+def keydown(event) -> None:
+    if Game.window != "menu": return
+
+    key = Game.getKeyFromCode([event.key])
+    if key:
+        Game.keys[key] = True
+    if Game.keys["help"]:
+        dk.help = not dk.help
+    return
+
+@Events.observe
+def keyup(event) -> None:
+    if Game.window != "menu": return
+
+    key = Game.getKeyFromCode([event.key])
+    if key:
+        Game.keys[key] = False
     return
 
 def loadRandomSpace() -> None:
@@ -191,6 +213,87 @@ def load() -> None:
     interface.append(quitButton)
 
     dk.brand = pg.transform.scale(pg.image.load(p("data/images/brand.png")), (426, 100))
+    dk.help = False
+    return
+
+def delimiter(position: tuple[int, int], dimension: tuple[int, int], *, padding: int = 10) -> pg.Rect:
+    """
+    Fonction qui va créer une bordure sur l'écran
+
+    Arguments:
+        position (tuple[int, int]): La position du sujet
+        dimension (tuple[int, int]): Les dimensions du suejt
+        padding (int): L'espace auteur du sujet et de la bordure, en pixels
+    
+    Retourne:
+        pg.Rect: Le rectangle PyGame qui symbolise la bordure
+    """
+    x, y = position
+    w, h = dimension
+    return pg.Rect(x - padding, y - padding, w + 2 * padding, h + 2 * padding)
+
+def setHelpMessage(
+        surface: pg.Surface,
+        startPosition: tuple[int, int],
+        startDimension: tuple[int, int],
+        border: int, 
+        endPosition: tuple[int, int],
+        endDimension: tuple[int, int],
+        text: str
+    ) -> None:
+    """
+    Fonction permettant de créer un message d'aide lorsque le menu d'aide est activé
+
+    Arguments:
+        surface (pg.Surface): Surface semi-transparente
+        startPosition (tuple[int, int]): Position de départ
+        startDimension (tuple[int, int]): Dimension de départ
+        border (int): bordure où commence la ligne (1, 2, 3, 4 pour haut, gauche, bas, droite ou ZQSD)
+        endPosition (tuple[int, int]): Position de la boîte d'aide
+        endDimension (tuple[int, int]): Dimension de la boîte d'aide
+        text (str): Texte à afficher dans la boîte d'aide
+    
+    Retourne:
+        None
+    """
+    pg.draw.rect(surface, (0, 0, 0, 0), delimiter(startPosition, startDimension))
+    pg.draw.rect(surface, (255, 255, 255, 255), delimiter(startPosition, startDimension), 1)
+    positions: dict[int, tuple[int, int]] = {
+        1: (
+            ((startPosition[0] + startDimension[0] + 10) - (startDimension[0] + 2 * 10) // 2, startPosition[1] - 10),
+            ((endPosition[0] + endDimension[0] + 10) - (endDimension[0] + 2 * 10) // 2, endPosition[1] + endDimension[1])
+            ),
+        2: (
+            (startPosition[0] - 10, (startPosition[1] + startDimension[1] + 10) - (startDimension[1] + 2 * 10) // 2),
+            (endPosition[0] + endDimension[0], (endPosition[1] + endDimension[1] + 10) - (endDimension[1] + 2 * 10) // 2)
+            ),
+        3: (
+            ((startPosition[0] + startDimension[0] + 10) - (startDimension[0] + 2 * 10) // 2, startPosition[1] + startDimension[1] + 10),
+            ((endPosition[0] + endDimension[0] + 10) - (endDimension[0] + 2 * 10) // 2, endPosition[1])
+            ),
+        4: (
+            (startPosition[0] + startDimension[0] + 10, (startPosition[1] + startDimension[1] + 10) - (startDimension[1] + 2 * 10) // 2),
+            (endPosition[0], (endPosition[1] + endDimension[1] + 10) - (endDimension[1] + 2 * 10) // 2)
+            )
+    }
+    startLinePosition, endLinePosition = positions[border]
+    pg.draw.line(Game.screen, (255, 255, 255), startLinePosition, endLinePosition)
+    pg.draw.rect(surface, (0, 0, 0, 0), (*endPosition, *endDimension))
+    pg.draw.rect(surface, (255, 255, 255, 255), (*endPosition, *endDimension), 1)
+    displayMultilineText(text, font, (endPosition[0] + 10, endPosition[1] + 10), endDimension[0] - 20)
+    return
+
+def showHelp() -> None:
+    if not dk.help: return
+    surface = pg.Surface((Game.screenSize), pg.SRCALPHA)
+    surface.fill((0, 0, 0, 128))
+
+    setHelpMessage(surface, (100, 300), (170, 60), 4, (600, 200), (200, 100), l("help1"))
+    setHelpMessage(surface, (100, 400), (265, 60), 4, (600, 330), (200, 100), l("help2"))
+    setHelpMessage(surface, (100, 500), (190, 60), 4, (600, 460), (200, 100), l("help3"))
+    setHelpMessage(surface, (100, 600), (240, 60), 4, (600, 590), (200, 100), l("help4"))
+
+    Game.screen.blit(surface, (0, 0))
     return
 
 def draw(screen) -> None:
@@ -231,6 +334,7 @@ def draw(screen) -> None:
     width, _ = semibold.size(l("notShare"))
     screen.blit(surface, (w - width - 100, h - 100))
 
+    showHelp()
     return
 
 def update() -> None:

@@ -2456,12 +2456,12 @@ def drawArrow(startPos: tuple[int, int], endPos: tuple[int, int], *, color: tupl
     """
     orientation: float = (atan2(startPos[1] - endPos[1], endPos[0] - startPos[0])) + pi/2
     if not (-1e2 < startPos[0] < 1e4 and -1e2 < startPos[1] < 1e4):
-        startPos = (
+        startPos: tuple = (
             endPos[0] - 2000 * sin(orientation),
             endPos[1] - 2000 * cos(orientation)
         )
     if not (-1e2 < endPos[0] < 1e4 and -1e2 < endPos[1] < 1e4):
-        endPos = (
+        endPos: tuple = (
             startPos[0] - 2000 * sin(orientation - pi),
             startPos[1] - 2000 * cos(orientation - pi)
         )

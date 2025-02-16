@@ -245,24 +245,20 @@ with proto("Game") as Game:
 
     @Game
     def getHeaviest(self):
-        c, m = self.space[0], self.space[0].mass
-        for corps in self.space:
-            if corps.mass > m:
-                c, m = corps, corps.mass
-        return c
+        return sorted(self.space, key=lambda corps: corps.mass, reverse=True)[0]
 
     @Game
     def resetKeybinds(self):
-        # if self.os != "Windows": return
         camera: dict = {"cameraUp": {"name": "CDU", "code": [122], "key": ["z"]}, "cameraLeft": {"name": "CDL", "code": [113], "key": ["q"]}, "cameraDown": {"name": "CDD", "code": [115], "key": ["s"]}, "cameraRight": {"name": "CDR", "code": [100], "key": ["d"]}, "resetCamera": {"name": "CRC", "code": [114], "key": ["r"]}, "zoomIn": {"name": "CZC", "code": [1073741911], "key": ["+"]}, "zoomOut": {"name": "CDC", "code": [45], "key": ["-"]}}
         editor: dict = {"delete": {"name": "ED", "code": [127], "key": ["del"]}, "selectAll": {"name": "EGA", "code": [1073742048, 97], "key": ["ctrl", "a"]}, "save": {"name": "ESA", "code": [1073742048, 115], "key": ["ctrl", "s"]}}
+        main: dict = {"help": {"name": "MH", "code": [1073741882], "key": ["F1"]}}
         renderer: dict = {"hideHUD": {"name": "RR", "code": [9], "key": ["tab"]}}
         simulation: dict = {"increaseTime": {"name": "SUT", "code": [101], "key": ["e"]}, "decreaseTime": {"name": "SDT", "code": [97], "key": ["a"]}, "pause": {"name": "SP", "code": [32], "key": ["espace"]}, "resetSimulation": {"name": "SRS", "code": [103], "key": ["g"]}, "next": {"name": "SCN", "code": [1073741903], "key": ["\u2192"]}, "previous": {"name": "SCP", "code": [1073741904], "key": ["\u2190"]}}
-        for file in ("camera", "editor", "renderer", "simulation"):
+        for file in ("camera", "editor", "main", "renderer", "simulation"):
             with open(p("data/settings/%s.json" % file), "w", encoding="utf-8") as wf:
                 wf.write(dumps(locals()[file]))
                 wf.close()
-        Game.keybinds = {**camera, **editor, **renderer, **simulation}
+        Game.keybinds = {**camera, **editor, **main, **renderer, **simulation}
         Game.resetKeys()
         return
 

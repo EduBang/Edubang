@@ -217,7 +217,6 @@ def keydown(event) -> None:
         Game.Camera.zoom *= 1.05
     elif key == pg.K_KP_MINUS and Game.Camera.zoom > Game.Camera.minZoom:
         Game.Camera.zoom /= 1.05
-
     return
 
 @Events.observe
