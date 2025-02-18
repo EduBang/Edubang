@@ -97,7 +97,7 @@ def displayRotatedImage(surf: pg.Surface, image: pg.image, pos: tuple[int, int],
     imageRect = image.get_rect(topleft = (pos[0] - originPos[0], pos[1]-originPos[1]))
     offsetCenterToPivot = pg.math.Vector2(pos) - imageRect.center
     
-    rotatedOffset = offsetCenterToPivot.rotate(-angle)
+    rotatedOffset = offsetCenterToPivot.rotate(angle)
 
     rotatedImageCenter = (pos[0] - rotatedOffset.x, pos[1] - rotatedOffset.y)
 
@@ -106,6 +106,8 @@ def displayRotatedImage(surf: pg.Surface, image: pg.image, pos: tuple[int, int],
 
     surf.blit(rotatedImage, rotatedImageRect)
     return
+
+# def get_pixels():
 
 
 
@@ -123,7 +125,7 @@ radius = 150  # Rayon de la planète
 running = True
 intensity = 255
 
-l_light = [(500 , 0), ]
+l_light = [(1000, 1000)]
 size_image_shadow_planet = pg.transform.scale(image_shadow_planet, (radius * 2 + 10, radius * 2 + 10))
 
 # l_image = []
@@ -145,7 +147,6 @@ for light_pos in l_light:
 
 planet_surface = generate_texture(intensity)
 
-
 while running:
     for event in pg.event.get():
         if event.type == pg.QUIT:
@@ -159,21 +160,15 @@ while running:
                 planet_surface = generate_texture(intensity)
 
     screen.fill((255, 255, 255))
-    #afficher planette :
+    # Afficher la planète :
     screen.blit(planet_surface, (planet_pos[0] - radius, planet_pos[1] - radius))
 
     for angle in l_angles:
-        # screen.blit(image, new_rect.topleft)
-            displayRotatedImage(screen, size_image_shadow_planet, planet_pos, angle)
-    
+        displayRotatedImage(screen, size_image_shadow_planet, planet_pos, angle)
+
+
     for light_pos in l_light:
-
         pg.draw.circle(screen, (255, 0, 0), (light_pos), 100)
-
-
-  
-    
-
 
     # Dessiner le texte avec la valeur de l'intensité
     intensity_text = font.render(f'Intensité: {intensity}', True, (255, 255, 255))
