@@ -566,7 +566,7 @@ def draw(screen) -> None:
         draw_attraction_norm(screen)
 
     if showPrediction:
-        predict(Game, 2000, -1)
+        predict(Game, 20, 10)
 
     if showBarycentre:
         bX, bY = spacePosToScreenPos(barycentre(Game.space))
