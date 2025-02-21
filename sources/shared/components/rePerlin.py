@@ -29,27 +29,35 @@ with proto("Perlin") as Perlin:
     @Perlin
     def final_matrix(self):
         perlin_matrix = self.generate_perlin()
-        scaled_perlin = self.upscale(perlin_matrix)
-        return scaled_perlin
+        c_matrix = color_matrix(self, perlin_matrix)
+        scaled_perlin_colored = self.upscale(c_matrix)
+        return scaled_perlin_colored
     
+
+
+
     @Perlin 
-    def color_matrix(self):
-        fm = self.fm
+    def color_matrix(self, matrix):
+        # fm = self.fm
         center_pos = self.center_pos
         color_matrix = []
-        for row in fm:
+        for row in matrix:
             color_row = []
             for element in row:
+                element = normalize(element, -140, 140)
 
-                if element <= 0:
+
+
+
+                if element >= 0 and element < 40:
                     color_row.append((11, 89, 134))  # eau profonde
-                elif element <= 5:
+                if element >= 40 and element < 50:
                     color_row.append((19, 128, 191))  # eau peu profonde
-                elif element <= 35:
+                if element >= 50 and element < 55:
                     color_row.append((228, 197, 23))  # plage
-                elif element <= 100:
+                if element >= 55 and element < 80:
                     color_row.append((75, 161, 68))  # herbe
-                elif element <= 150:
+                if element >= 80 and element < 95:
                     color_row.append((148, 141, 132))  # montagne
                 else:
                     color_row.append((82, 82, 82))  # montagne haute
@@ -57,12 +65,12 @@ with proto("Perlin") as Perlin:
         return color_matrix
 
     @Perlin
-    def generate_img(self):
+    def generate_img(self, final_matrix):
         # Créer une nouvelle image avec PIL
         new_image = Image.new('RGBA', (self.surface_size * self.zoom, self.surface_size * self.zoom))
         
         # Obtenir la matrice de couleurs
-        color_matrix = self.color_matrix()
+        color_matrix = final_matrix
 
         start_x = self.center_pos[0] - self.surface_size // 2
         start_y = self.center_pos[1] - self.surface_size // 2
@@ -76,3 +84,7 @@ with proto("Perlin") as Perlin:
                 new_image.putpixel((y, x), color)
         
         return new_image
+    
+
+def normalize(value, min_val, max_val):
+    return (value - min_val) / (max_val - min_val) * 100

@@ -87,7 +87,7 @@ def pil_to_pygame(image):
 
 def generate_texture(intensity):
     perlin_instance = Perlin(surface_size=radius * 2, center_pos=planet_pos, intensity=intensity, stretching=(7, 7), zoom=4)
-    pil_image = perlin_instance.generate_img()
+    pil_image = perlin_instance.generate_img(perlin_instance.fm)
     return pil_to_pygame(pil_image)
 
 
@@ -159,12 +159,12 @@ while running:
                 intensity -= 1
                 planet_surface = generate_texture(intensity)
 
-    screen.fill((255, 255, 255))
+    screen.fill((0, 0, 0))
     # Afficher la planète :
     screen.blit(planet_surface, (planet_pos[0] - radius, planet_pos[1] - radius))
 
-    for angle in l_angles:
-        displayRotatedImage(screen, size_image_shadow_planet, planet_pos, angle)
+    # for angle in l_angles:
+    #     displayRotatedImage(screen, size_image_shadow_planet, planet_pos, angle)
 
 
     for light_pos in l_light:
