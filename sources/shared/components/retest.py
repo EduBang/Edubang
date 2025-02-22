@@ -86,9 +86,9 @@ def pil_to_pygame(image):
     return pg.image.fromstring(data, size, mode)
 
 def generate_texture(intensity):
-    perlin_instance = Perlin(surface_size=radius * 2, center_pos=planet_pos, intensity=intensity, stretching=(7, 7), zoom=4)
-    pil_image = perlin_instance.generate_img(perlin_instance.fm)
-    return pil_to_pygame(pil_image)
+    perlin_instance = Perlin(surface_size=radius * 2, center_pos=planet_pos, intensity=intensity, stretching=(550, 55), zoom=1)
+    image_pg = perlin_instance.generate_img(perlin_instance.fm)
+    return image_pg
 
 
 def displayRotatedImage(surf: pg.Surface, image: pg.image, pos: tuple[int, int], angle: float):
@@ -121,7 +121,7 @@ font = pg.font.SysFont('Arial', 30)
 image_shadow_planet = pg.image.load("data/images/planet_shadow.png")
 
 planet_pos = (500, 500)  # Position du centre de la planète
-radius = 150  # Rayon de la planète
+radius = 300  # Rayon de la planète
 running = True
 intensity = 255
 
@@ -134,16 +134,10 @@ l_angles = []
 for light_pos in l_light:
 
     unit_vector_light = Vectors.get_unit_vector(planet_pos, light_pos)
-    
-    print(f"Unit vector : {unit_vector_light}")
     angle = Angles.generate_angle_whith_unit_vector(unit_vector_light[0], unit_vector_light[1])
-    print(f"Angle trouvé : {angle}°")
-
     size_image_shadow_planet = pg.transform.scale(image_shadow_planet, (radius * 2, radius * 2))
-    # rotated_image_shadow_planet, new_rect = Angles.rotate_image(size_image_shadow_planet,  - angle, planet_pos)
-
     l_angles.append(angle)
-    # l_image.append(rotated_image_shadow_planet)
+
 
 planet_surface = generate_texture(intensity)
 
@@ -152,11 +146,7 @@ while running:
         if event.type == pg.QUIT:
             running = False
         elif event.type == pg.KEYDOWN:
-            if event.key == pg.K_a:
-                intensity += 1
-                planet_surface = generate_texture(intensity)
-            elif event.key == pg.K_e:
-                intensity -= 1
+            if event.key == pg.K_e:
                 planet_surface = generate_texture(intensity)
 
     screen.fill((0, 0, 0))
