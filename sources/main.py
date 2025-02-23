@@ -389,7 +389,7 @@ def main() -> None:
         if len(hoverable) == 0:
             pg.mouse.set_cursor(pg.SYSTEM_CURSOR_ARROW)
 
-        # Constante de calibrage du temps
+            # Constante de calibrage du temps
         Game.deltaTime = clock.tick(60) / 2195 # (1000 * 2.195)
         Game.DT = Game.deltaTime * Game.timeScale
 
@@ -408,7 +408,6 @@ def main() -> None:
         Game.draw()
         if Game.pause: continue
         Game.update()
-    
     Game.quit()
     return
 

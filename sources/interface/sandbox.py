@@ -20,7 +20,8 @@ from shared.utils.utils import (
     spacePosToScreenPos, orbitalPeriod, C_EDUBANG,
     totalEnergy, kineticEnergy, momentum,
     getAttractor, barycentre, toDate,
-    displayMultilineText
+    displayMultilineText, setHelpMessage, displayRotatedImage,
+    unit
 )
 from shared.components.Captors import isColliding
 from shared.components.Prediction import predict
@@ -45,6 +46,7 @@ dk.hideHUD = False
 dk.escape = False
 dk.screenShot = None
 dk.pauseMenu = []
+dk.help = False
 
 def stopFocusFn() -> None:
     Game.Camera.focus = None
@@ -146,6 +148,8 @@ def keydown(event) -> None:
 
     if key:
         Game.keys[key] = True
+    if Game.keys["help"]:
+        dk.help = not dk.help
     if Game.keys["increaseTime"]:
         for i in interface:
             if not hasattr(i, "numberOnly"): continue
@@ -277,8 +281,9 @@ def loader() -> None:
         x = inputDT.position[0]
         y = inputDT.position[1] + inputDT.size[1] // 2 - dim[1] // 2 - 10
         Game.screen.blit(surface, (x, y))
-        text = Game.font.render(l("timeScaleUnit"), False, color)
-        Game.screen.blit(text, (x + dim[0] + 4, y))
+        u, e = l("timeScaleUnit").split(" ")
+        unit(u, e, (x + dim[0] + 4, y), color=color)
+
     inputDT.draw = inputDTdraw
     inputDT.numberOnly = True
     inputDT.resetOnClick = True
@@ -382,7 +387,7 @@ def load() -> None:
     return
 
 def menu(screen) -> None:
-    width, height = Game.screenSize
+    _, height = Game.screenSize
     pg.draw.rect(screen, (10, 9, 9), (0, 0, 350, height))
 
     screen.blit(brand, (20, 20))
@@ -428,8 +433,11 @@ def stats(corps) -> None:
     screen.blit(text, (width - 330, 210 + offset))
 
     velocity: float = round(sqrt((corps.velocity[0] / C_EDUBANG) ** 2 + (corps.velocity[1] / C_EDUBANG) ** 2), 3)
-    text = Game.font.render("%s : %s %s" % (l("orbitalVelocity"), velocity, l("orbitalVelocityUnit")), False, (255, 255, 255))
+    text = Game.font.render("%s : %s" % (l("orbitalVelocity"), velocity), False, (255, 255, 255))
+    w, h = Game.font.size("%s : %s" % (l("orbitalVelocity"), velocity))
     screen.blit(text, (width - 330, 240 + offset))
+    u, e = l("orbitalVelocityUnit").split(" ")
+    unit(u, e, (width - 325 + w, 240 + offset))
     
     offset += 20
 
@@ -446,8 +454,11 @@ def stats(corps) -> None:
     scientificNotation(corps.mass, (width - 330 + i + 5, 370 + offset), end=l("massUnit"))
 
     surfaceGravity: float = round((G * corps.mass) / ((corps.radius * 1e3) ** 2), 3)
-    text = Game.font.render("%s : %s %s" % (l("surfaceGravity"), surfaceGravity, l("surfaceGravityUnit")), False, (255, 255, 255))
+    text = Game.font.render("%s : %s" % (l("surfaceGravity"), surfaceGravity), False, (255, 255, 255))
+    w, h = Game.font.size("%s : %s" % (l("surfaceGravity"), surfaceGravity))
     screen.blit(text, (width - 330, 400 + offset))
+    u, e = l("surfaceGravityUnit").split(" ")
+    unit(u, e, (width - 325 + w, 400 + offset))
     return
 
 def sAfterOne(n: int, ident: str) -> str:
@@ -469,7 +480,7 @@ def showTime(screen) -> None:
         if date[4] > 0:
             text += "%s %s" % (date[4], sAfterOne(date[4], "hour"))
     
-    w, h = Game.screenSize
+    _, h = Game.screenSize
     surface = Game.font.render(text, False, (255, 255, 255))
     screen.blit(surface, (380, h - 50))
     return
@@ -483,20 +494,25 @@ def drawEscapeMenu() -> None:
         element.draw()
     return
 
-def displayRotatedImage(surf: pg.Surface, image: pg.image, pos: tuple[int, int], angle: float):
-    w, h = image.get_size()
-    originPos = (w / 2, h / 2)
-    imageRect = image.get_rect(topleft = (pos[0] - originPos[0], pos[1]-originPos[1]))
-    offsetCenterToPivot = pg.math.Vector2(pos) - imageRect.center
-    
-    rotatedOffset = offsetCenterToPivot.rotate(-angle)
+def showHelp() -> None:
+    if not dk.help: return
+    surface = pg.Surface((Game.screenSize), pg.SRCALPHA)
+    surface.fill((0, 0, 0, 128))
 
-    rotatedImageCenter = (pos[0] - rotatedOffset.x, pos[1] - rotatedOffset.y)
+    w, h = Game.screenSize
 
-    rotatedImage = pg.transform.rotate(image, angle)
-    rotatedImageRect = rotatedImage.get_rect(center = rotatedImageCenter)
+    setHelpMessage(surface, (20, 145), (300, 25), 4, (400, 50), (200, 100), l("help1"))
+    setHelpMessage(surface, (20, 245), (300, 225), 4, (400, 200), (200, 100), l("help2"))
+    setHelpMessage(surface, (20, 555), (300, 25), 4, (400, 350), (200, 100), l("help3"))
+    setHelpMessage(surface, (380, h - 50), (350, 25), 1, (400, h - 225), (200, 100), l("help4"))
 
-    surf.blit(rotatedImage, rotatedImageRect)
+    if Game.Camera.focus:
+        setHelpMessage(surface, (w - 330, 170), (300, 50), 2, (w - 630, 50), (200, 100), l("help5"))
+        setHelpMessage(surface, (w - 330, 280), (300, 55), 2, (w - 630, 200), (200, 100), l("help6"))
+        setHelpMessage(surface, (w - 330, 430), (300, 85), 2, (w - 630, 350), (200, 100), l("help7"))
+        setHelpMessage(surface, (w - 340, h - 60), (330, 50), 2, (w - 630, h - 225), (200, 100), l("help8"))
+
+    Game.screen.blit(surface, (0, 0))
     return
 
 def draw(screen) -> None:
@@ -513,7 +529,6 @@ def draw(screen) -> None:
 
     image = dk.image
     size = image.get_size()
-
     screen.blit(image, (Game.Camera.x / 10 - size[0] // 4, Game.Camera.y / 10 - size[1] // 4))
 
     if Game.Camera.zoom < 0.3:
@@ -595,6 +610,7 @@ def draw(screen) -> None:
             tW, tH = Game.font.size(l("pause"))
             screen.blit(text, (width // 2 - tW // 2, height // 2 - tH // 2 - 200))
 
+        showHelp()
         drawEscapeMenu()
     return
 

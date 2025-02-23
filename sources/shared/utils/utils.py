@@ -2260,8 +2260,11 @@ def draw_attraction_norm(screen) -> None:
 
     x, y = MSP
     pg.draw.line(screen, (255, 255, 255), (x + 4, y - 4), (x + 16, y - 16), 1)
-    surface = Game.font.render("%s %s" % (valeur, l("attractionNormUnit")), False, (255, 255, 255))
+    surface = Game.font.render(str(valeur), False, (255, 255, 255))
+    w, h = Game.font.size(str(valeur))
     screen.blit(surface, (x + 18, y - 30))
+    u, e = l("attractionNormUnit").split(" ")
+    unit(u, e, (w + x + 20, y - 30))
     return
 
 # endregion
@@ -2582,4 +2585,123 @@ def displayMultilineText(text: str, font, position: tuple[int, int], width: int,
             Game.screen.blit(surface, (position[0], position[1] + h * i))
 
     return h * len(lines)
+
+def delimiter(position: tuple[int, int], dimension: tuple[int, int], *, padding: int = 10) -> pg.Rect:
+    """
+    Fonction qui va créer une bordure sur l'écran
+
+    Arguments:
+        position (tuple[int, int]): La position du sujet
+        dimension (tuple[int, int]): Les dimensions du suejt
+        padding (int): L'espace auteur du sujet et de la bordure, en pixels
+    
+    Retourne:
+        pg.Rect: Le rectangle PyGame qui symbolise la bordure
+    """
+    x, y = position
+    w, h = dimension
+    return pg.Rect(x - padding, y - padding, w + 2 * padding, h + 2 * padding)
+
+def setHelpMessage(
+        surface: pg.Surface,
+        startPosition: tuple[int, int],
+        startDimension: tuple[int, int],
+        border: int, 
+        endPosition: tuple[int, int],
+        endDimension: tuple[int, int],
+        text: str,
+        /,
+        font: pg.font = descriptionFont
+    ) -> None:
+    """
+    Fonction permettant de créer un message d'aide lorsque le menu d'aide est activé
+
+    Arguments:
+        surface (pg.Surface): Surface semi-transparente
+        startPosition (tuple[int, int]): Position de départ
+        startDimension (tuple[int, int]): Dimension de départ
+        border (int): bordure où commence la ligne (1, 2, 3, 4 pour haut, gauche, bas, droite ou ZQSD)
+        endPosition (tuple[int, int]): Position de la boîte d'aide
+        endDimension (tuple[int, int]): Dimension de la boîte d'aide
+        text (str): Texte à afficher dans la boîte d'aide
+    
+    Retourne:
+        None
+    """
+    pg.draw.rect(surface, (0, 0, 0, 0), delimiter(startPosition, startDimension))
+    pg.draw.rect(surface, (255, 255, 255, 255), delimiter(startPosition, startDimension), 1)
+    positions: dict[int, tuple[int, int]] = {
+        1: (
+            ((startPosition[0] + startDimension[0] + 10) - (startDimension[0] + 2 * 10) // 2, startPosition[1] - 10),
+            ((endPosition[0] + endDimension[0] + 10) - (endDimension[0] + 2 * 10) // 2, endPosition[1] + endDimension[1])
+            ),
+        2: (
+            (startPosition[0] - 10, (startPosition[1] + startDimension[1] + 10) - (startDimension[1] + 2 * 10) // 2),
+            (endPosition[0] + endDimension[0], (endPosition[1] + endDimension[1] + 10) - (endDimension[1] + 2 * 10) // 2)
+            ),
+        3: (
+            ((startPosition[0] + startDimension[0] + 10) - (startDimension[0] + 2 * 10) // 2, startPosition[1] + startDimension[1] + 10),
+            ((endPosition[0] + endDimension[0] + 10) - (endDimension[0] + 2 * 10) // 2, endPosition[1])
+            ),
+        4: (
+            (startPosition[0] + startDimension[0] + 10, (startPosition[1] + startDimension[1] + 10) - (startDimension[1] + 2 * 10) // 2),
+            (endPosition[0], (endPosition[1] + endDimension[1] + 10) - (endDimension[1] + 2 * 10) // 2)
+            )
+    }
+    startLinePosition, endLinePosition = positions[border]
+    pg.draw.line(Game.screen, (255, 255, 255), startLinePosition, endLinePosition)
+    pg.draw.rect(surface, (0, 0, 0, 0), (*endPosition, *endDimension))
+    pg.draw.rect(surface, (255, 255, 255, 255), (*endPosition, *endDimension), 1)
+    displayMultilineText(text, font, (endPosition[0] + 10, endPosition[1] + 10), endDimension[0] - 20)
+    return
+
+def displayRotatedImage(surf: pg.Surface, image: pg.image, pos: tuple[int, int], angle: float):
+    """
+    Fonction permettant d'afficher une image selon une orientation
+
+    Arguments:
+        surf (pg.Surface): Surface où doit être affichée l'image
+        image (pg.image): Image
+        pos (tuple[int, int]): Position de l'image sur la surface
+        angle (float): Angle, en degré, de l'orientation de l'image
+
+    Retourne:
+        None
+    """
+    w, h = image.get_size()
+    originPos = (w / 2, h / 2)
+    imageRect = image.get_rect(topleft = (pos[0] - originPos[0], pos[1]-originPos[1]))
+    offsetCenterToPivot = pg.math.Vector2(pos) - imageRect.center
+    
+    rotatedOffset = offsetCenterToPivot.rotate(-angle)
+
+    rotatedImageCenter = (pos[0] - rotatedOffset.x, pos[1] - rotatedOffset.y)
+
+    rotatedImage = pg.transform.rotate(image, angle)
+    rotatedImageRect = rotatedImage.get_rect(center = rotatedImageCenter)
+
+    surf.blit(rotatedImage, rotatedImageRect)
+    return
+
+def unit(unit: str, exponent: str, position: tuple[int, int], /, color: tuple[int, int, int] = (255, 255, 255)) -> None:
+    """
+    Affiche unité avec la notation unité^exposant
+
+    Arguments: 
+        unit (str): Unité
+        exponent (str): Exposant
+        position (tuple[int, int]): Position de l'affichage.
+        color (tuple[int, int, int]): Couleur de l'unité
+    
+    Retourne:
+        None
+    """
+    text = Game.font.render(unit, False, color)
+    w1, _ = Game.font.size(unit)
+    Game.screen.blit(text, (position[0], position[1]))
+    
+    text = exponentFont.render(exponent, False, color)
+    Game.screen.blit(text, (position[0] + w1, position[1] - 3))
+    return
+
 # endregion

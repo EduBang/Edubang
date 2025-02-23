@@ -77,7 +77,7 @@ with proto("Corps") as Corps:
             None
         """
         # Mise à jour de la vitesse (conserve l'inertie)
-        gamma: float = lorentzFactor(sqrt(self.velocity[0] ** 2 + self.velocity[1] ** 2))
+        gamma: float = lorentzFactor(sqrt((self.velocity[0] / 10750) ** 2 + (self.velocity[1] / 10750) ** 2))
 
         # selon prgm, acc en km/s
         self.velocity[0] += acc[0] * dt / gamma

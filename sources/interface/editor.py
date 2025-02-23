@@ -273,7 +273,7 @@ def mousebuttondown(event) -> None:
     pos = event.pos
     if button != 1: return
     body = dk.body
-    if body:
+    if body and pos[0] > 300:
         pos = event.pos
         corps = Corps(body["mass"], body["radius"], screenPosToSpacePos(pos), body["color"], (0, 0))
         for meta in body["meta"]:
