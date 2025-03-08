@@ -2,6 +2,8 @@
 title EduBang
 setlocal enabledelayedexpansion
 
+type edubang_ascii.txt
+
 for /f "delims=" %%P in ('where python') do set "python_paths=!python_paths! %%P"
 
 set "latest_version="
