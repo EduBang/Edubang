@@ -85,8 +85,10 @@ def pil_to_pygame(image):
     data = image.tobytes()
     return pg.image.fromstring(data, size, mode)
 
-def generate_texture(intensity):
-    perlin_instance = Perlin(surface_size=radius * 2, center_pos=planet_pos, intensity=intensity, stretching=(550, 55), zoom=1)
+def generate_texture(intensity, stretch_x, stretch_y):
+    global perlin_instance 
+    perlin_instance = Perlin(surface_size=radius * 2, center_pos=planet_pos, intensity=intensity, stretching=(stretch_x, stretch_y), zoom=1)
+    global image_pg
     image_pg = perlin_instance.generate_img(perlin_instance.fm)
     return image_pg
 
@@ -128,7 +130,6 @@ intensity = 255
 l_light = [(1000, 1000)]
 size_image_shadow_planet = pg.transform.scale(image_shadow_planet, (radius * 2 + 10, radius * 2 + 10))
 
-# l_image = []
 l_angles = []
 
 for light_pos in l_light:
@@ -138,8 +139,9 @@ for light_pos in l_light:
     size_image_shadow_planet = pg.transform.scale(image_shadow_planet, (radius * 2, radius * 2))
     l_angles.append(angle)
 
-
-planet_surface = generate_texture(intensity)
+stretch_x = 300
+stretch_y = 300
+planet_surface = generate_texture(intensity, stretch_x, stretch_y)
 
 while running:
     for event in pg.event.get():
@@ -147,7 +149,34 @@ while running:
             running = False
         elif event.type == pg.KEYDOWN:
             if event.key == pg.K_e:
-                planet_surface = generate_texture(intensity)
+                planet_surface = generate_texture(intensity, stretch_x, stretch_y)
+            if event.key == pg.K_t:
+                stretch_x += 10
+                planet_surface = generate_texture(intensity, stretch_x, stretch_y)
+            if event.key == pg.K_g:
+                stretch_x -= 10
+                planet_surface = generate_texture(intensity, stretch_x, stretch_y)
+            if event.key == pg.K_y:
+                stretch_y += 10
+                planet_surface = generate_texture(intensity, stretch_x, stretch_y)
+            if event.key == pg.K_h:
+                stretch_y -= 10
+                planet_surface = generate_texture(intensity, stretch_x, stretch_y)
+            if event.key == pg.K_s:
+
+                pg.image.save(image_pg, "Soleil_preset.png")
+
+                with open("soleil.txt", "w") as file:
+                    file.write("Stretching X: " + str(stretch_x) + "\n")
+                    file.write("Stretching Y: " + str(stretch_y) + "\n\n")
+                    file.write("Ladder:\n")
+                    for item in perlin_instance.ladder:
+                        file.write(str(item) + "\n")
+                    file.write("\nFinal Matrix (fm):\n")
+                    for row in perlin_instance.fm:
+                        file.write(" ".join(map(str, row)) + "\n")
+                
+
 
     screen.fill((0, 0, 0))
     # Afficher la planète :

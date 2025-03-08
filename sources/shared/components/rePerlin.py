@@ -17,7 +17,9 @@ with proto("Perlin") as Perlin:
         self.stretching = stretching
         self.zoom = zoom
         self.perlin = perlin()
+        self.ladder = self.color_ladder()
         self.fm = self.final_matrix()
+        
 
     @Perlin
     def generate_perlin(self):
@@ -31,40 +33,47 @@ with proto("Perlin") as Perlin:
     def final_matrix(self):
         perlin_matrix = self.generate_perlin()
         scaled_perlin = self.upscale(self.zoom, perlin_matrix)           
-        scaled_c_matrix = self.color_matrix(scaled_perlin)
-        
+        scaled_c_matrix = self.color_matrix(scaled_perlin, self.ladder)
 
         # print(perlin_matrix)
         # # scaled_perlin_colored = self.upscale(c_matrix)
         return scaled_c_matrix
 
+    @Perlin
+    def color_ladder(self):
+        ladder =  [((0, 40), (230, 230, 180)),  # Jaune très pâle  
+                 ((40, 50), (240, 240, 200)),  # Jaune blanchâtre  
+                 ((50, 55), (250, 250, 220)),  # Presque blanc avec une touche de jaune  
+                 ((55, 70), (255, 255, 230)),  # Blanc chaud légèrement teinté  
+                 ((70, 80), (255, 255, 240)),  # Blanc solaire éclatant  
+                 ((80, 95), (255, 255, 250)),  # Blanc pur  
+                 ((95, 100), (255, 255, 255)), # Blanc aveuglant  
+                 ((100, 105), (255, 255, 255)) # Blanc absolu, lumière maximale  
+                ]
 
 
+
+            
+        return ladder
+        
 
     @Perlin 
-    def color_matrix(self, matrix):
+    def color_matrix(self, matrix, ladder):
         center_pos = self.center_pos
         color_matrix = []
         for row in matrix:
             color_row = []
             for element in row:
                 element = normalize(element, -255, 255)
-
-                if 0 <= element < 40:
-                    color_row.append((1, 79, 124))  # eau profonde très
-                elif 40 <= element < 50:
-                    color_row.append((11, 89, 134))  # eau profonde
-                elif 50 <= element < 55:
-                    color_row.append((19, 128, 191))  # eau peu profonde
-                elif 55 <= element < 58:
-                    color_row.append((228, 197, 23))  # plage
-                elif 58 <= element < 75:
-                    color_row.append((55, 141, 48))  # herbe
-                elif 75 <= element < 95:
-                    color_row.append((148, 141, 132))  # montagne
-                else:
-                    color_row.append((255, 255, 255))  # montagne haute
+                inc = 0
+                for item in ladder:
+                    if item[inc][inc] <= element < item[inc][inc + 1]:
+                        color_row.append(item[inc + 1])
+                        
+                        inc += 1
+                    
             color_matrix.append(color_row)
+        # print(color_matrix)
         return color_matrix
 
     @Perlin
