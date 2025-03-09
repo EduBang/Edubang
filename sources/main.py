@@ -348,8 +348,8 @@ def mousebuttonup(event) -> None:
     button = event.button
     x, y = event.pos
     if button == 3:
-        if Game.ormb == (x, y): # fenêtre contextuel
-            pass
+        if Game.ormb == (x, y):
+            Events.trigger("contextMenu", event.pos)
         Game.rmb = None
         Game.ormb = None
     return
@@ -357,7 +357,7 @@ def mousebuttonup(event) -> None:
 @Events.observe
 def mousemotion(event) -> None:
     x, y = event.pos
-    if Game.rmb: # déplacement souris
+    if Game.rmb:
         dX, dY = Game.rmb[0] - x, Game.rmb[1] - y
         Game.Camera.x -= dX
         Game.Camera.y -= dY

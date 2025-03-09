@@ -6,6 +6,8 @@ from json import load as loadJson
 from os import listdir, path
 from math import pi, sqrt
 from datetime import datetime
+from types import MethodType
+from locale import setlocale, LC_ALL, format_string
 
 import pygame as pg
 from eventListen import Events
@@ -14,6 +16,8 @@ from main import Game, getFont, brand, l, p
 from shared.components.Corps import Corps
 from shared.components.Prediction import predict
 from shared.utils.utils import DataKeeper, Button, spacePosToScreenPos, getSize, screenPosToSpacePos, Input, barycentre, drawArrow, MessageBox, Enums, Card
+
+setlocale(LC_ALL, "")
 
 dk = DataKeeper()
 dk.body = None
@@ -35,6 +39,11 @@ dk.shift = False
 dk.selectRect = []
 dk.moveSelected = False
 dk.relativePos = {}
+dk.contextMenu = None
+dk.contextMenuButtons = []
+dk.measurePos1 = None
+dk.measurePos2 = None
+dk.stats = {}
 
 semibold = getFont("SemiBold", 16)
 subtitle = getFont("Bold")
@@ -50,6 +59,7 @@ def pause() -> None:
 def resume() -> None:
     dk.standBy = False
     Game.Camera.active = True
+    return
 
 def minimum(startPos, endPos) -> tuple:
     x1, y1 = startPos
@@ -105,6 +115,10 @@ def resetSaveCanva() -> None:
     inputDescription.text = ""
     dk.standBy = False
     Game.Camera.active = True
+    return
+
+def doMeasure() -> None:
+    dk.measurePos1 = dk.contextMenu[1]
     return
 
 def doSave() -> None:
@@ -273,6 +287,7 @@ def mousebuttondown(event) -> None:
     pos = event.pos
     if button != 1: return
     body = dk.body
+    w, _ = Game.screenSize
     if body and pos[0] > 300:
         pos = event.pos
         corps = Corps(body["mass"], body["radius"], screenPosToSpacePos(pos), body["color"], (0, 0))
@@ -295,6 +310,7 @@ def mousebuttondown(event) -> None:
                     rPos = screenPosToSpacePos(pos)
                     dk.relativePos[corps] = (corps.pos[0] - rPos[0], corps.pos[1] - rPos[1])
             else:
+                if pos[0] > w - 350: return
                 Game.Camera.focus = None 
                 dk.selected.clear()
                 dk.relativePos.clear()
@@ -333,6 +349,22 @@ def mousebuttonup(event) -> None:
         if not dk.shift:
             dk.selected.clear()
         dk.selected.append(dk.hover)
+    if dk.contextMenu:
+        dk.contextMenu = None
+        for button in dk.contextMenuButtons:
+            button.active = False
+    return
+
+@Events.observe
+def contextMenu(position: tuple[int, int]) -> None:
+    if dk.hover:
+        dk.contextMenu = (position, dk.hover)
+        for i, button in enumerate(dk.contextMenuButtons):
+            button.active = True
+            button.position = (position[0] + 10, position[1] + i * 70 + 10)
+    else:
+        dk.contextMenu = None
+        dk.measurePos1 = None
     return
 
 def drawGrid() -> None:
@@ -378,9 +410,9 @@ def drawSelected() -> None:
 
 def drawSaving(width, height) -> None:
     if not dk.saving: return
-    x, y = (width - 900) // 2, (height - 450) // 2
-    pg.draw.rect(Game.screen, (10, 9, 9), (x, y, 900, 450))
-    pg.draw.rect(Game.screen, (255, 255, 255), (x, y, 900, 450), 1)
+    x, y = (width - 600) // 2, (height - 450) // 2
+    pg.draw.rect(Game.screen, (10, 9, 9), (x, y, 600, 450))
+    pg.draw.rect(Game.screen, (255, 255, 255), (x, y, 600, 450), 1)
 
     saveButton, inputName, inputDescription = [dk.saveCanva[i] for i in ("save", "name", "description")]
     inputName.position = (x + 10, y + 10)
@@ -423,7 +455,39 @@ def drawInventory(h: int) -> None:
             card.position = (20 + 90 * j, 160 + 110 * i)
             card.draw()
         i += 1
+    return
 
+def stats(corps, width, height) -> None:
+    screen = Game.screen
+    pg.draw.rect(screen, (10, 9, 9), (width - 350, 0, 350, height))
+
+    radiusInput, massInput = [dk.stats[i] for i in ("radius", "mass")]
+    radiusInput.active = radiusInput.visible = True
+    massInput.active = massInput.visible = True
+    radiusInput.position = (width - 340, 10)
+    massInput.position = (width - 340, 80)
+    return
+
+def drawContextMenu() -> None:
+    if not dk.contextMenu: return
+    pg.draw.rect(Game.screen, (20, 19, 19), (*(dk.contextMenu[0]), 200, 100))
+    [i.draw() for i in dk.contextMenuButtons]
+    return
+
+def drawDisanceButton(self) -> None:
+    surface = self.font.render(self.text, False, (255, 255, 255))
+    Game.screen.blit(surface, self.position)
+    return
+
+def drawMeasure() -> None:
+    if not dk.measurePos1: return
+    x, y = pg.mouse.get_pos()
+    x1, y1 = dk.measurePos1.pos
+    x2, y2 = screenPosToSpacePos((x, y))
+    distance: float = round(sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2), 2)
+    pg.draw.line(Game.screen, (255, 255, 255), spacePosToScreenPos((x1, y1)), (x, y))
+    surface = Game.italic.render("%s km" % format_string("%d", distance, grouping=True), False, (255, 255, 255))
+    Game.screen.blit(surface, (x, y - 24))
     return
 
 def load() -> None:
@@ -474,11 +538,29 @@ def load() -> None:
 
     dk.mb = MessageBox(l("returnToMenu"))
 
-    return
+    measureDistanceButton = Button((0, 0), (180, 24))
+    measureDistanceButton.text = "Mesurer une distance"
+    measureDistanceButton.font = semibold
+    measureDistanceButton.onPressed = doMeasure
+    measureDistanceButton.active = False
+    measureDistanceButton.draw = MethodType(drawDisanceButton, measureDistanceButton)
+    dk.contextMenuButtons.append(measureDistanceButton)
 
-def stats(corps, width, height) -> None:
-    screen = Game.screen
-    pg.draw.rect(screen, (10, 9, 9), (width - 350, 0, 350, height))
+    radiusInput = Input("", (0, 0), (180, 60))
+    radiusInput.active = False
+    radiusInput.visible = False
+    radiusInput.onPressed = pause
+    radiusInput.afterInput = resume
+    interface.append(radiusInput)
+    dk.stats["radius"] = radiusInput
+
+    massInput = Input("", (0, 0), (180, 60))
+    massInput.active = False
+    massInput.visible = False
+    massInput.onPressed = pause
+    massInput.afterInput = resume
+    interface.append(massInput)
+    dk.stats["mass"] = massInput
     return
 
 def draw(screen) -> None:
@@ -495,7 +577,7 @@ def draw(screen) -> None:
         drawArrow(pos, (x, y))
         dk.arrows[corps] = (x, y)
 
-    predict(Game, 250, 1)
+    predict(Game, 250, 2)
 
     if not dk.hideHUD:
         drawSelected()
@@ -509,8 +591,16 @@ def draw(screen) -> None:
 
         if Game.Camera.focus:
             stats(Game.Camera.focus, width, height)
+        else:
+            dk.standBy = False
+            Game.Camera.active = True
+            for i in dk.stats:
+                dk.stats[i].active = dk.stats[i].visible = False
 
         drawSaving(width, height)
+
+        drawMeasure()
+        drawContextMenu()
 
         drawInventory(height)
 

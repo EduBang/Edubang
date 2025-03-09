@@ -1920,7 +1920,6 @@ with proto("Language") as Language:
 
 # region Fonctions physiques
 
-# Fonction permettant de mettre à jour la postion entre 2 corps.
 def updateCorps(a, b) -> float:
     """
     Met à jour la position de 2 corps en fonction de leur masse et de leur distance.
@@ -1942,7 +1941,6 @@ def updateCorps(a, b) -> float:
     b.update_position(accB, Game.DT)
     return distance
 
-# Fonction permettant de mélanger les couleurs de 2 corps selon la surface
 def mergeColor(a, b) -> tuple[int, int, int]:
     """
     Fusionne la couleur de 2 corps en fonction de leur surface.
@@ -1962,7 +1960,6 @@ def mergeColor(a, b) -> tuple[int, int, int]:
     blue: float = (surfaceA * a.color[2] + surfaceB * b.color[2]) / (surfaceA + surfaceB)
     return (red, green, blue)
 
-# Fonction permettant de fusionner le nom de 2 astres selon leur masse
 def mergeNames(d1: tuple[int, str], d2: tuple[int, str]) -> str:
     """
     Fusionne le nom de 2 corps en fonction de leur masse.
@@ -2038,9 +2035,8 @@ def mergeEnergy(d1: tuple[int, tuple[int, int], tuple[int, int]], d2: tuple[int,
     sumVectorCineticEnergyCorps2: tuple[float, float] = (cineticEnergyVectorCorps2[0] / d2[0], cineticEnergyVectorCorps2[1] / d2[0])
 
 
-    x: float = - (sumVectorCineticEnergyCorps1[0] + sumVectorCineticEnergyCorps2[0]) / C_EDUBANG
-    y: float = - (sumVectorCineticEnergyCorps1[1] + sumVectorCineticEnergyCorps2[1]) / C_EDUBANG
-
+    x: float = -(sumVectorCineticEnergyCorps1[0] + sumVectorCineticEnergyCorps2[0]) / C_EDUBANG
+    y: float = -(sumVectorCineticEnergyCorps1[1] + sumVectorCineticEnergyCorps2[1]) / C_EDUBANG
 
     return [x, y]
 
@@ -2683,7 +2679,7 @@ def displayRotatedImage(surf: pg.Surface, image: pg.image, pos: tuple[int, int],
     surf.blit(rotatedImage, rotatedImageRect)
     return
 
-def unit(unit: str, exponent: str, position: tuple[int, int], /, color: tuple[int, int, int] = (255, 255, 255)) -> None:
+def unit(unit: str, exponent: str, position: tuple[int, int], *, color: tuple[int, int, int] = (255, 255, 255)) -> None:
     """
     Affiche unité avec la notation unité^exposant
 

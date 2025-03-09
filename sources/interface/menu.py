@@ -262,10 +262,6 @@ def draw(screen) -> None:
     for element in interface:
         element.draw()
 
-    surface = semibold.render(l("notShare"), False, (128, 128, 128))
-    width, _ = semibold.size(l("notShare"))
-    screen.blit(surface, (w - width - 100, h - 100))
-
     showHelp()
     return
 
