@@ -36,7 +36,7 @@ languageFont = getFont("Regular", 20)
 inter = getFont("SemiBold", 16, header="Inter")
 keybindFont = getFont("SemiBold", 16)
 
-FOCUS_COLOR: tuple[int, int, int] = (13, 178, 190)
+FOCUS_COLOR: tuple[int, int, int] = (128, 24, 99)
 
 UNICODES: dict[int, str] = {
     0x9: "tab",

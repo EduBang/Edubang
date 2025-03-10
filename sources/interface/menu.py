@@ -179,7 +179,7 @@ def load() -> None:
 
     icons: list = [pg.transform.scale(pg.image.load(p("data/images/icons/%s.png" % i)), (38, 50)) for i in ("start", "pencil", "settingsWhite", "power")]
 
-    discoverButton = Button((100, 300), (170, 60), color=(13, 178, 190))
+    discoverButton = Button((100, 300), (170, 60), color=(128, 24, 99))
     discoverButton.text = l("discover")
     discoverButton.font = semibold
     discoverButton.textColor = (255, 255, 255)
@@ -187,7 +187,7 @@ def load() -> None:
     discoverButton.onReleased = goDiscover
     interface.append(discoverButton)
 
-    editorButton = Button((100, 400), (265, 60), color=(13, 178, 190))
+    editorButton = Button((100, 400), (265, 60), color=(128, 24, 99))
     editorButton.text = l("editor")
     editorButton.font = semibold
     editorButton.textColor = (255, 255, 255)
@@ -195,7 +195,7 @@ def load() -> None:
     editorButton.onReleased = goEditor
     interface.append(editorButton)
 
-    settingsButton = Button((100, 500), (190, 60), color=(13, 178, 190))
+    settingsButton = Button((100, 500), (190, 60), color=(128, 24, 99))
     settingsButton.text = l("settings")
     settingsButton.font = semibold
     settingsButton.textColor = (255, 255, 255)
@@ -203,7 +203,7 @@ def load() -> None:
     settingsButton.onReleased = goSettings
     interface.append(settingsButton)
 
-    quitButton = Button((100, 600), (240, 60), color=(13, 178, 190))
+    quitButton = Button((100, 600), (240, 60), color=(128, 24, 99))
     quitButton.text = l("quit")
     quitButton.font = semibold
     quitButton.textColor = (255, 255, 255)
