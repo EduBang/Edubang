@@ -2,7 +2,7 @@
 
 clear
 echo "EduBang"
-cat edubang_ascii.txt
+cat data/command/edubang_ascii.txt
 
 PYTHON_PATH=$(which python3 || which python)
 
