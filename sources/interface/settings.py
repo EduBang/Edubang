@@ -62,17 +62,17 @@ def backFunction() -> None:
 def load() -> None:
     backButton = Button((100, 200), (180, 60))
     backButton.text = l("back")
-    backButton.onPressed = backFunction
+    backButton.onReleased = backFunction
     interface.append(backButton)
 
     keybindButton = Button((100, 300), (180, 60))
     keybindButton.text = l("keybind")
-    keybindButton.onPressed = goKeybind
+    keybindButton.onReleased = goKeybind
     interface.append(keybindButton)
 
     languageButton = Button((100, 400), (180, 60))
     languageButton.text = l("language")
-    languageButton.onPressed = goLanguage
+    languageButton.onReleased = goLanguage
     interface.append(languageButton)
 
     with open(p("data/settings.json"), "r", encoding="utf-8") as f:

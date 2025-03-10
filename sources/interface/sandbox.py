@@ -18,7 +18,6 @@ from shared.utils.utils import (
     loadStars, draw_velocity_vector,
     draw_cinetic_energy_vector, draw_attraction_norm, scientificNotation,
     spacePosToScreenPos, orbitalPeriod, C_EDUBANG,
-    totalEnergy, kineticEnergy, momentum,
     getAttractor, barycentre, toDate,
     displayMultilineText, setHelpMessage, displayRotatedImage,
     unit

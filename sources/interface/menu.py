@@ -29,6 +29,8 @@ dk.time = 15
 dk.help = False
 
 semibold = getFont("SemiBold", 20)
+fontIntro = getFont("SemiBold", 18)
+inter = getFont("SemiBold", 18, header="Inter")
 
 def goDiscover() -> None:
     Game.reset()
@@ -179,7 +181,7 @@ def load() -> None:
 
     icons: list = [pg.transform.scale(pg.image.load(p("data/images/icons/%s.png" % i)), (38, 50)) for i in ("start", "pencil", "settingsWhite", "power")]
 
-    discoverButton = Button((100, 300), (170, 60), color=(128, 24, 99))
+    discoverButton = Button((100, 240), (170, 60), color=(128, 24, 99))
     discoverButton.text = l("discover")
     discoverButton.font = semibold
     discoverButton.textColor = (255, 255, 255)
@@ -187,7 +189,7 @@ def load() -> None:
     discoverButton.onReleased = goDiscover
     interface.append(discoverButton)
 
-    editorButton = Button((100, 400), (265, 60), color=(128, 24, 99))
+    editorButton = Button((100, 340), (265, 60), color=(128, 24, 99))
     editorButton.text = l("editor")
     editorButton.font = semibold
     editorButton.textColor = (255, 255, 255)
@@ -195,7 +197,7 @@ def load() -> None:
     editorButton.onReleased = goEditor
     interface.append(editorButton)
 
-    settingsButton = Button((100, 500), (190, 60), color=(128, 24, 99))
+    settingsButton = Button((100, 440), (190, 60), color=(128, 24, 99))
     settingsButton.text = l("settings")
     settingsButton.font = semibold
     settingsButton.textColor = (255, 255, 255)
@@ -203,7 +205,7 @@ def load() -> None:
     settingsButton.onReleased = goSettings
     interface.append(settingsButton)
 
-    quitButton = Button((100, 600), (240, 60), color=(128, 24, 99))
+    quitButton = Button((100, 540), (240, 60), color=(128, 24, 99))
     quitButton.text = l("quit")
     quitButton.font = semibold
     quitButton.textColor = (255, 255, 255)
@@ -220,10 +222,10 @@ def showHelp() -> None:
     surface = pg.Surface((Game.screenSize), pg.SRCALPHA)
     surface.fill((0, 0, 0, 128))
 
-    setHelpMessage(surface, (100, 300), (170, 60), 4, (600, 200), (200, 100), l("help1"))
-    setHelpMessage(surface, (100, 400), (265, 60), 4, (600, 330), (200, 100), l("help2"))
-    setHelpMessage(surface, (100, 500), (190, 60), 4, (600, 460), (200, 100), l("help3"))
-    setHelpMessage(surface, (100, 600), (240, 60), 4, (600, 590), (200, 100), l("help4"))
+    setHelpMessage(surface, (100, 240), (170, 60), 4, (600, 200), (200, 100), l("help1"))
+    setHelpMessage(surface, (100, 340), (265, 60), 4, (600, 330), (200, 100), l("help2"))
+    setHelpMessage(surface, (100, 440), (190, 60), 4, (600, 460), (200, 100), l("help3"))
+    setHelpMessage(surface, (100, 540), (240, 60), 4, (600, 590), (200, 100), l("help4"))
 
     Game.screen.blit(surface, (0, 0))
     return
@@ -261,6 +263,17 @@ def draw(screen) -> None:
 
     for element in interface:
         element.draw()
+        
+    height = displayMultilineText(l("intro"), fontIntro, (w - 500, 100), 430)
+    
+    helpKey = Game.keybinds["help"]["key"]
+    
+    font = fontIntro
+    if any([i in "↑←↓→" for i in helpKey]):
+        font = inter
+        
+    surface = font.render("%s : %s" % (" + ".join(helpKey), l("help")), False, (255, 255, 255))
+    screen.blit(surface, (100, 630))
 
     showHelp()
     return
