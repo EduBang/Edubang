@@ -29,8 +29,7 @@ Cette partie décrit le mode d'utilisation d'Edubang ainsi que son fonctionnemen
 ### macOS
 
 1. Installer Python [3.10.7](https://www.python.org/downloads/release/python-3107/) ou plus.
-2. Installer toutes les dépendances qui se trouvent dans le fichier [requirements.txt](/requirements.txt) avec pip.
-3. Démarrer EduBang en exécutant le fichier [main.py](/sources/main.py)
+2. Démarrer EduBang en exécutant le fichier [start.command](/start.command), ce fichier installera toutes les dépendances puis exécutera EduBang.
 
 ---
 
@@ -102,7 +101,8 @@ Menu
 │   └── Système stellaire
 ├── Éditeur de système
 ├── Paramètres
-│   └── Contrôles
+│   ├── Contrôles
+│   └── Langues
 └── Quitter
 ```
 
