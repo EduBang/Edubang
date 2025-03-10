@@ -6,7 +6,6 @@ from math import exp, sqrt
 from proto import proto
 
 G: float = 6.6743e-11
-c: int = 299_792_458 # m/s
 UA: float = 149_597_870.7 # km, Selon l'Union Astronomique Internationale en 2012
 
 with proto("Physics") as Physics:
@@ -42,12 +41,10 @@ with proto("Physics") as Physics:
         Retourne:
             float: La norme de l'attraction
         """
+        force: float = .0
         if 0 < d < cutDistance:
-            attenuation: float = exp(-d / cutDistance)
-            relative: float = (1 + (self.getRelativeVelocity(v1, v2) ** 2) / (c ** 2))
             force: float = G * (mass1 * mass2) / (d ** 2)
-            return force * relative * attenuation
-        return .0
+        return force
     
     @Physics
     def get_velocity(self, pos_init: tuple[float, float], pos_final: tuple[float, float], dt: float) -> float | int:

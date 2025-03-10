@@ -6,18 +6,6 @@ from math import pi, sqrt
 from proto import proto
 import pygame as pg
 
-def lorentzFactor(v: float | int) -> float:
-    """
-    Calcule de facteur de Lorentz
-
-    Arguments:
-        v (float | int): La vitesse de l'objet
-    
-    Retourne:
-        float: Le facteur de Lorentz
-    """
-    return 1 / sqrt(1 - (v ** 2 / 0x13F4D4EACDD7564))
-
 with proto("Corps") as Corps:
     @Corps
     def new(self, mass: int | float, radius: int, pos: tuple[int, int], color: tuple[int, int, int], v_initial: tuple[float, float]) -> None:
@@ -77,11 +65,8 @@ with proto("Corps") as Corps:
             None
         """
         # Mise à jour de la vitesse (conserve l'inertie)
-        gamma: float = lorentzFactor(sqrt((self.velocity[0] / 10750) ** 2 + (self.velocity[1] / 10750) ** 2))
-
-        # selon prgm, acc en km/s
-        self.velocity[0] += acc[0] * dt / gamma
-        self.velocity[1] += acc[1] * dt / gamma
+        self.velocity[0] += acc[0] * dt
+        self.velocity[1] += acc[1] * dt
 
         # Mise à jour de la position en fonction de la nouvelle vitesse (avec inertie)
         self.pos = (
