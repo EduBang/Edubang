@@ -16,7 +16,7 @@ from main import Game, getFont, l, p
 from proto import proto
 from eventListen import Events
 from shared.components.Vectors import Vectors
-from shared.components.Physics import Physics, G, c
+from shared.components.Physics import Physics, G
 from shared.components.Corps import Corps
 
 # La constante d'EduBang
@@ -2294,64 +2294,6 @@ def spacePosToScreenPos(pos: tuple[float, float]) -> tuple[float, float]:
     x: float = (pos[0] * Game.Camera.zoom) + Game.Camera.x
     y: float = (pos[1] * Game.Camera.zoom) + Game.Camera.y
     return (x, y)
-
-# endregion
-
-# region Relative
-
-def lorentzFactor(v: float | int) -> float:
-    """
-    Calcule de facteur de Lorentz
-
-    Arguments:
-        v (float | int): La vitesse de l'objet
-    
-    Retourne:
-        float: Le facteur de Lorentz
-    """
-    return 1 / sqrt(1 - (v ** 2 / c ** 2))
-
-def momentum(m: float | int, v: float | int) -> float:
-    """
-    Calcule le moment relativiste
-
-    Arguments:
-        m (float | int): La masse de l'objet
-        v (float | int): La vitesse de l'objet
-    
-    Retourne:
-        float: Le moment relativiste
-    """
-    gamma: float = lorentzFactor(v)
-    return gamma * m * v
-
-def totalEnergy(m: float | int, v: float | int) -> float:
-    """
-    Calcule l'énergie totale de l'objet
-    
-    Arguments:
-        m (float | int): La masse de l'objet
-        v (float | int): La vitesse de l'objet
-    
-    Retourne:
-        float: L'énergie totale de l'objet
-    """
-    gamma: float = lorentzFactor(v)
-    return gamma * m * c ** 2
-
-def kineticEnergy(m: float | int, v: float | int) -> float:
-    """
-    Calcule l'énérgie cinétique de l'objet
-
-    Arguments:
-        m (float | int): La masse de l'objet
-        v (float | int): La vitesse de l'objet
-    
-    Retourne:
-        float: L'énergie cinétique de l'objet
-    """
-    gamma: float = lorentzFactor(v)
-    return (gamma - 1) * m * c ** 2
 
 # endregion
 
