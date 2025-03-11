@@ -83,12 +83,12 @@ def resetKeybinds() -> None:
 def load() -> None:
     backButton = Button((100, 200), (180, 60))
     backButton.text = l("back")
-    backButton.onPressed = backFunction
+    backButton.onReleased = backFunction
     interface.append(backButton)
 
     resetButton = Button((100, 300), (180, 60))
     resetButton.text = l("reset")
-    resetButton.onPressed = resetKeybinds
+    resetButton.onReleased = resetKeybinds
     interface.append(resetButton)
 
     h: int = 100

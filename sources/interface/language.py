@@ -31,7 +31,7 @@ def backFunction() -> None:
 def load() -> None:
     backButton = Button((100, 200), (180, 60))
     backButton.text = l("back")
-    backButton.onPressed = backFunction
+    backButton.onReleased = backFunction
     dk.back = backButton
     interface.append(backButton)
 

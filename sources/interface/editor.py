@@ -461,11 +461,19 @@ def stats(corps, width, height) -> None:
     screen = Game.screen
     pg.draw.rect(screen, (10, 9, 9), (width - 350, 0, 350, height))
 
-    radiusInput, massInput = [dk.stats[i] for i in ("radius", "mass")]
+    radiusInput, massInputN, massInputE = [dk.stats[i] for i in ("radius", "massN", "massE")]
     radiusInput.active = radiusInput.visible = True
-    massInput.active = massInput.visible = True
-    radiusInput.position = (width - 340, 10)
-    massInput.position = (width - 340, 80)
+    massInputN.active = massInputN.visible = True
+    massInputE.active = massInputE.visible = True
+    radiusInput.position = (width - 190, 10)
+    massInputN.position = (width - 290, 80)
+    massInputE.position = (width - 190, 70)
+    
+    surface = Game.font.render("Rayon", False, (255, 255, 255))
+    screen.blit(surface, (width - 340, 15))
+    
+    surface = Game.font.render("Masse", False, (255, 255, 255))
+    screen.blit(surface, (width - 340, 85))
     return
 
 def drawContextMenu() -> None:
@@ -546,21 +554,32 @@ def load() -> None:
     measureDistanceButton.draw = MethodType(drawDisanceButton, measureDistanceButton)
     dk.contextMenuButtons.append(measureDistanceButton)
 
-    radiusInput = Input("", (0, 0), (180, 60))
+    radiusInput = Input("", (0, 0), (180, 40))
     radiusInput.active = False
     radiusInput.visible = False
+    radiusInput.numberOnly = True
     radiusInput.onPressed = pause
     radiusInput.afterInput = resume
     interface.append(radiusInput)
     dk.stats["radius"] = radiusInput
 
-    massInput = Input("", (0, 0), (180, 60))
-    massInput.active = False
-    massInput.visible = False
-    massInput.onPressed = pause
-    massInput.afterInput = resume
-    interface.append(massInput)
-    dk.stats["mass"] = massInput
+    massInputN = Input("", (0, 0), (100, 40))
+    massInputN.active = False
+    massInputN.visible = False
+    massInputN.numberOnly = True
+    massInputN.onPressed = pause
+    massInputN.afterInput = resume
+    interface.append(massInputN)
+    dk.stats["massN"] = massInputN
+    
+    massInputE = Input("", (0, 0), (100, 30))
+    massInputE.active = False
+    massInputE.visible = False
+    massInputE.numberOnly = True
+    massInputE.onPressed = pause
+    massInputE.afterInput = resume
+    interface.append(massInputE)
+    dk.stats["massE"] = massInputE
     return
 
 def draw(screen) -> None:
