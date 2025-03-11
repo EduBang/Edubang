@@ -2063,7 +2063,10 @@ def process_collide(corps1, corps2):
     corps.mass = mass
     corps.radius = radius
     corps.color = color
-    corps.velocity = mergeEnergy((corps1.mass, corps1.pos, corps1.path[-2]), (corps2.mass, corps2.pos, corps2.path[-2]))
+    try:
+        corps.velocity = mergeEnergy((corps1.mass, corps1.pos, corps1.path[-2]), (corps2.mass, corps2.pos, corps2.path[-2]))
+    except IndexError:
+        corps.velocity = [0, 0]
     #print(f" velocité : {corps.velocity}")
     #print(f" merge energy : {mergeEnergy((corps1.mass, corps1.pos, corps1.path[-2]), (corps2.mass, corps2.pos, corps2.path[-2]))}")
 
