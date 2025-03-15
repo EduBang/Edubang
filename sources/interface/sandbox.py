@@ -1,5 +1,5 @@
 # Projet : EduBang
-# Auteurs : Anaël Chevillard, Sacha Fréguin, Néji Lim
+# Auteurs : Anaël Pernot-Chevillard, Sacha Fréguin, Néji Lim
 
 from threading import Thread
 from math import pi, sqrt

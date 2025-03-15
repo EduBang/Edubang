@@ -1,5 +1,5 @@
 # Projet : EduBang
-# Auteurs : Anaël Chevillard, Sacha Fréguin, Néji Lim
+# Auteurs : Anaël Pernot-Chevillard, Sacha Fréguin, Néji Lim
 
 def isColliding(corps1, corps2, distance: float | int) -> bool:
     """

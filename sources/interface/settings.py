@@ -1,5 +1,5 @@
 # Projet : EduBang
-# Auteurs : Anaël Chevillard, Sacha Fréguin, Néji Lim
+# Auteurs : Anaël Pernot-Chevillard, Sacha Fréguin, Néji Lim
 
 from json import dumps
 from json import load as loadJson
