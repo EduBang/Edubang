@@ -24,7 +24,6 @@ from shared.utils.utils import (
 )
 from shared.components.Captors import isColliding
 from shared.components.Prediction import predict
-from shared.components.Spaceship import Space_ship
 from shared.components.Physics import G
 from shared.components.Vectors import Vectors
 
