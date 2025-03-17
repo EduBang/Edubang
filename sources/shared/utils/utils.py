@@ -1505,10 +1505,12 @@ with proto("ColorPicker") as ColorPicker:
         Retourne:
             None
         """
-        pos = (self.position[0] + 285, self.position[1] + 20)
+        if not self.visible: return
+        if not self.active: return
+        pos = (self.position[0] - 285, self.position[1] + 20)
         pg.draw.rect(Game.screen, self.color, (pos, (255, 255)))
         Game.screen.blit(squareAlpha, pos)
-        pos = (self.aim[0] + self.position[0] + 19, self.aim[1] + self.position[1] + 20)
+        pos = (-self.aim[0] + self.position[0] + 19, self.aim[1] + self.position[1] + 20)
         pg.draw.circle(Game.screen, Game.screen.get_at(pos), pos, 15)
         pg.draw.circle(Game.screen, (255, 255, 255), pos, 15, 1)
     
@@ -1522,7 +1524,9 @@ with proto("ColorPicker") as ColorPicker:
         Retourne:
             None
         """
-        Game.screen.blit(colorPalette, (self.position[0] + 20, self.position[1] + 310))
+        if not self.visible: return
+        if not self.active: return
+        Game.screen.blit(colorPalette, (0, self.position[1] + 310))
         color = pg.Color(0)
         color.hsla = (3.6 * self.value, 100, 50, 100)
         pg.draw.rect(Game.screen, color, (self.position[0] + self.value * 5 + 20, self.position[1] + 305, 10, 20))
@@ -1539,11 +1543,13 @@ with proto("ColorPicker") as ColorPicker:
         Retourne:
             None
         """
+        if not self.visible: return
+        if not self.active: return
         if not self.focus:
             pg.draw.rect(Game.screen, self.target, (self.position, (60, 60)), 0, 8)
         else:
-            pg.draw.rect(Game.screen, (10, 9, 9), (self.position, (560, 340)), 0, 8)
-            pg.draw.rect(Game.screen, self.target, ((self.position[0] + 20, self.position[1] + 20), (255, 255)))
+            pg.draw.rect(Game.screen, (1, 0, 0), (self.position, (-560, 340)), 0, 8)
+            pg.draw.rect(Game.screen, self.target, ((self.position[0] - 200, self.position[1] + 20), (255, 255)))
             drawColorPickerBar(self)
             drawColorPickerSquare(self)
         return
@@ -1558,6 +1564,7 @@ with proto("ColorPicker") as ColorPicker:
         Retourne:
             None
         """
+        if not self.active: return
         x, y = event.pos
         if not self.focus:
             if x > self.position[0] and x < self.position[0] + 60 and y > self.position[1] and y < self.position[1] + 60:
@@ -1586,7 +1593,7 @@ with proto("ColorPicker") as ColorPicker:
                     color.hsla = (3.6 * self.value, 100, 50, 100)
                     self.color = (color.r, color.g, color.b)
                     pos = (
-                        self.aim[0] + self.position[0] + 20,
+                        -self.aim[0] + self.position[0] + 20,
                         self.aim[1] + self.position[1] + 20
                     )
                     self.target = Game.screen.get_at(pos)[:-1]
@@ -1602,6 +1609,7 @@ with proto("ColorPicker") as ColorPicker:
         Retourne:
             None
         """
+        if not self.active: return
         button = event.button
         if button != 1: return
         x, y = event.pos
@@ -1623,7 +1631,7 @@ with proto("ColorPicker") as ColorPicker:
                 color.hsla = (3.6 * self.value, 100, 50, 100)
                 self.color = (color.r, color.g, color.b)
                 pos = (
-                    self.aim[0] + self.position[0] + 20,
+                    -self.aim[0] + self.position[0] + 20,
                     self.aim[1] + self.position[1] + 20
                 )
                 self.target = Game.screen.get_at(pos)[:-1]
@@ -1639,6 +1647,7 @@ with proto("ColorPicker") as ColorPicker:
         Retourne:
             None
         """
+        if not self.active: return
         button = event.button
         if button != 1: return
         x, y = event.pos
@@ -1658,6 +1667,7 @@ with proto("ColorPicker") as ColorPicker:
         Retourne:
             None
         """
+        if not self.active: return
         x, y = pg.mouse.get_pos()
         if x > self.position[0] + 20 and x < self.position[0] + 520 and y > self.position[1] + 305 and y < self.position[1] + 325:
             self.value += event.y
@@ -1697,6 +1707,8 @@ with proto("ColorPicker") as ColorPicker:
         Retourne:
             None
         """
+        self.active = True
+        self.visible = True
         self.position = position
         self.color = (255, 0, 0)
         self.target = (255, 0, 0)
@@ -2645,4 +2657,15 @@ def unit(unit: str, exponent: str, position: tuple[int, int], *, color: tuple[in
     Game.screen.blit(text, (position[0] + w1, position[1] - 3))
     return
 
+
+def getNE(n: float) -> tuple[int, int]:
+    if "inf" in str(n):
+        return (10, 999)
+    _n = str(n).split("e")[0]
+    e = int(str(n).split("e")[1])
+    if not "." in str(n):
+        return (int(_n), e)
+    d = len(_n.split(".")[1])
+    n = int(float(_n) * 10 ** d)
+    return (n, e - d)
 # endregion
