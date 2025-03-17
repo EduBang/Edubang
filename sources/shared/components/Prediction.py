@@ -25,7 +25,7 @@ def predict(game, n: int = 0, k: int = 100) -> None:
     """
     if game.timeScale == 0: return
 
-    space: list = [{"pos": tuple(i.pos), "velocity": list(i.velocity), "mass": int(i.mass), "corps": i} for i in game.space]
+    space: list = [{"pos": tuple(i.pos), "velocity": list(i.velocity), "mass": float(i.mass), "corps": i} for i in game.space]
 
     k *= (5e-2 if game.timeScale > 0 else -5e-2)
 
