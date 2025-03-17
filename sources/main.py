@@ -42,7 +42,7 @@ icon = pg.image.load(p("data/images/appicon.png"))
 pg.display.set_icon(icon)
 MUSIC_END_EVENT: int = pg.USEREVENT + 1
 hoverable: list = []
-screen = pg.display.set_mode((1280, 720), pg.RESIZABLE)
+screen = pg.display.set_mode((1920, 1080), pg.FULLSCREEN)
 pg.key.set_repeat(500, 50)
 
 pg.font.init()
