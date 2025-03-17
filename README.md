@@ -49,7 +49,28 @@ Le logiciel vous redirigera par la suite dans le [Bac à sable](#bac-à-sable).
 
 ## Éditeur de système
 
-À RÉDIGER
+
+
+L'**éditeur de système** d'EduBang permet de créer et personnaliser des systèmes stellaires en ajoutant des astres (étoiles, planètes, lunes) avec des paramètres définis comme la masse, la position et la vitesse. Il offre une interface interactive pour expérimenter et observer les effets des modifications sur les trajectoires des astres.
+
+Il fournit des outils et des données tels que :
+- L'affichage sous forme de grille dynamique
+- Deux axes, abscisses et ordonnées gradués permettant de mesurer des distances
+- Une bibliothèque de planètes pré-paramétrées
+- Une fonction intelligente de sélection des astres
+- L'affichage des prédictions dynamique
+- Des vecteurs propres à chaque planète pour régler se vitesse
+- L'affichage du barycentre du système
+
+
+Si vous choisssez d'étudier un astre, l' éditeur de système vous donnera les données relatives à cet astre tels que :
+- Le rayon.
+- La masse.
+
+L'éditeur propose également des fonctionnalités de personnalisation des astres séléctionés:
+- Personnalisation de la masse
+- Personnalisation du rayon
+
 
 ## Paramètres
 
@@ -74,7 +95,7 @@ Il fourni des outils et des données tels que :
 - Une règle de mesure
 - Le temps écoulé depuis le début de la simulation
 
-Si vous choissisez d'étudier un astre, le bac à sable vous donnera les données relatifs à cet astre tels que :
+Si vous choisssez d'étudier un astre, le bac à sable vous donnera les données relatifs à cet astre tels que :
 - La période de révolution autour de l'astre dominant.
 - La vitesse orbitale.
 - Le rayon.
