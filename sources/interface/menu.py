@@ -177,7 +177,7 @@ def reset() -> None:
 def load() -> None:
     v[0] = 100
     v[1] = 1
-    cases[randint(0, 4)]()
+    loadRandomSpace()
 
     icons: list = [pg.transform.scale(pg.image.load(p("data/images/icons/%s.png" % i)), (38, 50)) for i in ("start", "pencil", "settingsWhite", "power")]
 

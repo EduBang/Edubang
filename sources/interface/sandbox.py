@@ -426,7 +426,7 @@ def stats(corps) -> None:
     pg.draw.line(screen, (102, 102, 102), (width - 330, 200 + offset), (width - 150, 200 + offset))
 
     attractor = getattr(corps, "orbit", None) or getAttractor(corps)
-    days: str = "%s %s" % (round(orbitalPeriod(attractor.mass, Vectors.get_distance(corps.pos, attractor.pos)), 2) if attractor else l("ravolutionPeriodUnknown"), l("revolutionPeriodUnit"))
+    days: str = "%s %s" % (round(orbitalPeriod(attractor.mass, Vectors.get_distance(corps.pos, attractor.pos)), 2) if attractor else l("revolutionPeriodUnknown"), l("revolutionPeriodUnit"))
     text = Game.font.render("%s : %s" % (l("revolutionPeriod"), days), False, (255, 255, 255))
     screen.blit(text, (width - 330, 210 + offset))
 
