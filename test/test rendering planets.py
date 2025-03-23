@@ -3,10 +3,10 @@
 
 import pygame as pg
 from math import sqrt, sin, cos, pi
-from Perlin import Perlin
+from rePerlin import  Perlin
 
 # Utilisation de chaînes brutes pour éviter les problèmes d'échappement
-path_normal_map = r"sources/test/normal_map.png"
+path_normal_map = r"data/images/normal_map.png"
 normal_map = pg.image.load(path_normal_map)
 
 planet_pos = (500, 500)  # Position du centre de la planète
