@@ -120,7 +120,7 @@ clock = pg.time.Clock()
 pg.font.init()
 font = pg.font.SysFont('Arial', 30)
 
-image_shadow_planet = pg.image.load("data/images/planet_shadow.png")
+image_shadow_planet = pg.image.load("data/images/assets/planet_shadow.png")
 
 planet_pos = (500, 500)  # Position du centre de la planète
 radius = 300  # Rayon de la planète

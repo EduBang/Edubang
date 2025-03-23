@@ -23,8 +23,8 @@ from shared.components.Corps import Corps
 # valeur de calibrage, origine à déterminer
 C_EDUBANG: int = 10750
 
-squareAlpha = pg.image.load(p("data/images/squareAlpha.png"))
-colorPalette = pg.image.load(p("data/images/colorPalette.png"))
+squareAlpha = pg.image.load(p("data/images/assets/squareAlpha.png"))
+colorPalette = pg.image.load(p("data/images/assets/colorPalette.png"))
 
 exponentFont = getFont("Medium", 12)
 titleFont = getFont("Regular", 20)
