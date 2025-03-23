@@ -162,5 +162,4 @@ cython_debug/
 .idea/
 .DS_Store
 /.vscode
-data/settings.json
-data/settings.json
+/data/settings.json
