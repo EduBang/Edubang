@@ -287,45 +287,53 @@ def loader() -> None:
     inputDT.resetOnClick = True
     interface.append(inputDT)
 
-    textShowName = Text(l("planetName"), (20, 245), color=(255, 255, 255))
+    textWarning1 = Text(l("dtWarning1"), (20, 178), color = (255, 255, 255))
+    interface.append(textWarning1)
+
+    textWarning2 = Text(l("dtWarning2"), (20, 198), color = (255, 255, 255))
+    interface.append(textWarning2)
+
+
+    textShowName = Text(l("planetName"), (20, 285), color=(255, 255, 255))
     interface.append(textShowName)
 
-    showNames = CheckBox((280, 241), True)
+    showNames = CheckBox((280, 285), True)
     showNames.sn = None
     interface.append(showNames)
 
-    textShowPath = Text(l("planetTrajectory"), (20, 295), color=(255, 255, 255))
+    textShowPath = Text(l("planetTrajectory"), (20, 335), color=(255, 255, 255))
     interface.append(textShowPath)
 
-    showPath = CheckBox((280, 291), False)
+    showPath = CheckBox((280, 335), False)
     showPath.trajectoire = None
     interface.append(showPath)
     
-    textShowAttractionNorm = Text(l("planetAttraction"), (20, 345), color=(255, 255, 255))
+    textShowAttractionNorm = Text(l("planetAttraction"), (20, 385), color=(255, 255, 255))
     interface.append(textShowAttractionNorm)
 
-    showAttractionNorm = CheckBox((280, 341), False)
+    
+    showAttractionNorm = CheckBox((280, 385), False)
     showAttractionNorm.attraction_norm = None
     interface.append(showAttractionNorm)
 
-    textShowPrediction = Text(l("planetPrediction"), (20, 395), color=(255, 255, 255))
+    textShowPrediction = Text(l("planetPrediction"), (20, 435), color=(255, 255, 255))
     interface.append(textShowPrediction)
 
-    showPrediction = CheckBox((280, 391), False)
+    showPrediction = CheckBox((280, 435), False)
     showPrediction.prediction = None
     interface.append(showPrediction)
 
-    textShowBarycentre = Text(l("planetBarycenter"), (20, 445), color=(255, 255, 255))
+    textShowBarycentre = Text(l("planetBarycenter"), (20, 485), color=(255, 255, 255))
     interface.append(textShowBarycentre)
 
-    showBarycentre = CheckBox((280, 441), False)
+    showBarycentre = CheckBox((280, 485), False)
     showBarycentre.barycentre = None
     interface.append(showBarycentre)
 
-    textShowSV = Text(l("rules"), (20, 555), color=(255, 255, 255))
+    textShowSV = Text(l("rules"), (20, 585), color=(255, 255, 255))
     interface.append(textShowSV)
 
-    showSV = CheckBox((280, 551), False)
+    showSV = CheckBox((280, 585), False)
     showSV.checked = True
     showSV.sv = None
     interface.append(showSV)
@@ -396,12 +404,12 @@ def menu(screen) -> None:
     pg.draw.line(screen, (102, 102, 102), (20, 130), (200, 130))
 
     text = subtitle.render(l("renderingParameter"), False, (255, 255, 255))
-    screen.blit(text, (20, 200))
-    pg.draw.line(screen, (102, 102, 102), (20, 230), (200, 230))
+    screen.blit(text, (20, 240))
+    pg.draw.line(screen, (102, 102, 102), (20, 270), (200, 270))
 
     text = subtitle.render(l("tools"), False, (255, 255, 255))
-    screen.blit(text, (20, 500))
-    pg.draw.line(screen, (102, 102, 102), (20, 530), (200, 530))
+    screen.blit(text, (20, 540))
+    pg.draw.line(screen, (102, 102, 102), (20, 570), (200, 570))
 
 def stats(corps) -> None:
     screen = Game.screen
@@ -572,14 +580,12 @@ def draw(screen) -> None:
             Path.draw_corps_path(screen, corps.path, corps.color)
         
 
-        # draw_velocity_vector(screen, corps)
-        # draw_cinetic_energy_vector(screen, corps)
 
     if showAttractionNorm:
         draw_attraction_norm(screen)
 
     if showPrediction:
-        predict(Game, 20, 10)
+        predict(Game, 40, 5)
 
     if showBarycentre:
         bX, bY = spacePosToScreenPos(barycentre(Game.space))

@@ -21,6 +21,8 @@
     "sandbox_parameterSimulation": "Параметры симуляции",
     "sandbox_timeScale": "Масштаб времени",
     "sandbox_timeScaleUnit": "дн·с -1",
+    "sandbox_dtWarning1" : "Обратите внимание, что скорость",
+    "sandbox_dtWarning2" : "моделирования влияет на точность",
     "sandbox_renderingParameter": "Параметры отображения",
     "sandbox_planetName": "Показать названия объектов",
     "sandbox_planetTrajectory": "Показать траектории",

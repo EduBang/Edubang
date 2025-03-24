@@ -21,6 +21,8 @@
     "sandbox_parameterSimulation": "Simulatieparameter",
     "sandbox_timeScale": "Tijdschaal",
     "sandbox_timeScaleUnit": "dag·s -1",
+    "sandbox_dtWarning1" : "Merk op dat de simulatiesnelheid de",
+    "sandbox_dtWarning2" : "nauwkeurigheid beïnvloedt",
     "sandbox_renderingParameter": "Weergave-instellingen",
     "sandbox_planetName": "Toon namen",
     "sandbox_planetTrajectory": "Toon trajecten",

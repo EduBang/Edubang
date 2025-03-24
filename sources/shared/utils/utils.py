@@ -2031,7 +2031,6 @@ def mergeEnergy(d1: tuple[int, tuple[int, int], tuple[int, int]], d2: tuple[int,
         tuple[float, float] : Energie cinétique résultante
     """
     mass: int = d1[0] + d2[0]
-  
     cineticEnergyCorps1: float = Physics.get_cinetic_energy(d1[0], Physics.get_velocity(d1[1], d1[2], Game.DT))
     cineticEnergyCorps2: float = Physics.get_cinetic_energy(d2[0], Physics.get_velocity(d2[1], d2[2], Game.DT))
 
@@ -2076,12 +2075,12 @@ def process_collide(corps1, corps2):
     corps.radius = radius
     corps.color = color
     try:
+
+
         corps.velocity = mergeEnergy((corps1.mass, corps1.pos, corps1.path[-2]), (corps2.mass, corps2.pos, corps2.path[-2]))
     except IndexError:
+        print("index_error")
         corps.velocity = [0, 0]
-    #print(f" velocité : {corps.velocity}")
-    #print(f" merge energy : {mergeEnergy((corps1.mass, corps1.pos, corps1.path[-2]), (corps2.mass, corps2.pos, corps2.path[-2]))}")
-
 
     corps.path = []
     processMergingNames(corps1, corps2, corps)
@@ -2278,6 +2277,8 @@ def draw_attraction_norm(screen) -> None:
     unit(u, e, (w + x + 20, y - 30))
     return
 
+
+
 # endregion
 
 # region Converter
@@ -2314,17 +2315,6 @@ def spacePosToScreenPos(pos: tuple[float, float]) -> tuple[float, float]:
 
 # region Autre
 
-def updateSpaceship(a, b) -> float:
-    distance: float = Vectors.get_distance(a.pos, b.pos)
-    attraction: float = Physics.get_attraction(a.mass, b.mass, distance, a.velocity, b.velocity)
-    unitVectorA: tuple[float, float] = Vectors.get_unit_vector(a.pos, b.pos)
-    unitVectorB: tuple[float, float] = (-unitVectorA[0], -unitVectorA[1])
-    accA: tuple[float, float] = [(unitVectorA[0] * attraction / a.mass) + unitVectorA[1] * attraction / a.mass]
-    accB: tuple[float, float] = [unitVectorB[0] * attraction / b.mass, unitVectorB[1] * attraction / b.mass]
-
-    a.update_position(accA, Game.deltaTime * Game.timeScale)
-    b.update_position(accB, Game.deltaTime * Game.timeScale)
-    return distance
 
 def scientificNotation(value: float | int, position: tuple[int, int], *, end: str | None = None) -> None:
     """

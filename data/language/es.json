@@ -21,6 +21,8 @@
     "sandbox_parameterSimulation": "Parámetros de simulación",
     "sandbox_timeScale": "Escala de tiempo",
     "sandbox_timeScaleUnit": "día·s -1",
+    "sandbox_dtWarning1" : "Tenga en cuenta que la velocidad",
+    "sandbox_dtWarning2" : "de simulación afecta",
     "sandbox_renderingParameter": "Configuración de la pantalla",
     "sandbox_planetName": "Mostrar nombres de estrellas",
     "sandbox_planetTrajectory": "Mostrar trayectorias",

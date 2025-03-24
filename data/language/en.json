@@ -21,6 +21,8 @@
     "sandbox_parameterSimulation": "Simulation parameter",
     "sandbox_timeScale": "Time Scale",
     "sandbox_timeScaleUnit": "day·s -1",
+    "sandbox_dtWarning1" : "Caution : simulation speed affects",
+    "sandbox_dtWarning2" : "accuracy",
     "sandbox_renderingParameter": "Display settings",
     "sandbox_planetName": "Show names",
     "sandbox_planetTrajectory": "Show trajectories",
