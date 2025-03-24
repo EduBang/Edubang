@@ -15,7 +15,7 @@ from eventListen import Events
 from main import Game, getFont, brand, l, p
 from shared.components.Corps import Corps
 from shared.components.Prediction import predict
-from shared.utils.utils import DataKeeper, Button, spacePosToScreenPos, getSize, screenPosToSpacePos, Input, barycentre, drawArrow, MessageBox, Enums, Card, ColorPicker, getNE
+from shared.utils.utils import DataKeeper, Button, spacePosToScreenPos, getSize, screenPosToSpacePos, Input, barycentre, drawArrow, MessageBox, Enums, Card, getNE
 
 setlocale(LC_ALL, "")
 
@@ -44,6 +44,8 @@ dk.contextMenuButtons = []
 dk.measurePos1 = None
 dk.measurePos2 = None
 dk.stats = {}
+dk.cs = None
+dk.cp = None
 
 semibold = getFont("SemiBold", 16)
 subtitle = getFont("Bold")
@@ -102,6 +104,11 @@ def colorBInput(I) -> None:
 def createSystemFn() -> None:
     if len(Game.space) < 2: return
     dk.selected = Game.space
+    dk.saving = True
+    return
+
+def createPresetFn() -> None:
+    dk.saveTarget = [Game.Camera.focus]
     dk.saving = True
     return
 
@@ -172,8 +179,8 @@ def doSave() -> None:
         if len(dk.saveTarget) == 1:
             message = l("err2")
         dk.tsave = [5, message, (255, 0, 0)]
-        
         return
+
     description: str = dk.saveCanva["description"].text
     fileName: str = name.replace(" ", "_").lower()
 
@@ -234,7 +241,9 @@ def keydown(event) -> None:
         if key == pg.K_ESCAPE:
             if dk.saving: resetSaveCanva()
             elif dk.body: dk.body = None
-            elif Game.Camera.focus: Game.Camera.focus = None
+            elif Game.Camera.focus:
+                Game.Camera.focus = None
+                dk.cp.active = False
             else:
                 if dk.mb.active:
                     dk.mb.active = False
@@ -365,7 +374,8 @@ def mousebuttondown(event) -> None:
                 corps.mass = float("%se%s" % (massInputN.text if massInputN.text else "1", massInputE.text if int(massInputE.text if massInputE.text else 0) > 15 else 16))
                 if not "e" in str(corps.mass):
                     corps.mass = float("1e16")
-                Game.Camera.focus = None 
+                Game.Camera.focus = None
+                dk.cp.active = False
     return
 
 @Events.observe
@@ -400,6 +410,7 @@ def mousebuttonup(event) -> None:
                 G.text = str(g)
                 B.text = str(b)
                 Game.Camera.focus = corps
+                dk.cp.active = True
                 break
         if sqrt(sqx + sqy) < corps.radius * Game.Camera.zoom:
             N, E = getNE(corps.mass)
@@ -412,6 +423,7 @@ def mousebuttonup(event) -> None:
             G.text = str(g)
             B.text = str(b)
             Game.Camera.focus = corps
+            dk.cp.active = True
             break
     if dk.hover:
         if dk.hover in dk.selected: return
@@ -524,11 +536,17 @@ def drawInventory(h: int) -> None:
             card.position = (20 + 90 * j, 160 + 110 * i)
             card.draw()
         i += 1
+
+    dk.cs.position = (20, h - 90)
     return
 
 def stats(corps, width, height) -> None:
     screen = Game.screen
     pg.draw.rect(screen, (10, 9, 9), (width - 350, 0, 350, height))
+
+    text = subtitle.render(l("physicalCharacteristics", header="sandbox"), False, (255, 255, 255))
+    Game.screen.blit(text, (width - 340, 15))
+    pg.draw.line(Game.screen, (102, 102, 102), (width - 340, 45), (width - 280, 45))
     
     radiusInput, massInputN, massInputE, R, G, B = [dk.stats[i] for i in ("radius", "massN", "massE", "colorR", "colorG", "colorB")]
     radiusInput.active = radiusInput.visible = True
@@ -537,24 +555,25 @@ def stats(corps, width, height) -> None:
     R.active = R.visible = True
     G.active = G.visible = True
     B.active = B.visible = True
-    radiusInput.position = (width - 270, 10)
-    massInputN.position = (width - 270, 80)
-    massInputE.position = (width - 140, 70)
-    R.position = (width - 270, 150)
-    G.position = (width - 220, 150)
-    B.position = (width - 170, 150)
+    radiusInput.position = (width - 270, 65)
+    massInputN.position = (width - 270, 135)
+    massInputE.position = (width - 140, 125)
+    R.position = (width - 270, 205)
+    G.position = (width - 210, 205)
+    B.position = (width - 150, 205)
+    dk.cp.position = (width - 330, height - 90)
     
-    surface = Game.font.render("Rayon", False, (255, 255, 255))
-    screen.blit(surface, (width - 340, 15))
+    surface = Game.font.render(l("radius", header="sandbox"), False, (255, 255, 255))
+    screen.blit(surface, (width - 340, 70))
     
-    surface = Game.font.render("Masse", False, (255, 255, 255))
-    screen.blit(surface, (width - 340, 85))
+    surface = Game.font.render(l("mass", header="sandbox"), False, (255, 255, 255))
+    screen.blit(surface, (width - 340, 140))
     
     surface = Game.font.render("x 10", False, (255, 255, 255))
-    screen.blit(surface, (width - 180, 85))
+    screen.blit(surface, (width - 180, 140))
 
-    surface = Game.font.render("Couleur", False, (255, 255, 255))
-    screen.blit(surface, (width - 340, 150))
+    surface = Game.font.render(l("color"), False, (255, 255, 255))
+    screen.blit(surface, (width - 340, 205))
     return
 
 def drawContextMenu() -> None:
@@ -691,6 +710,14 @@ def load() -> None:
     createSystem.text = "Créer son système"
     createSystem.onReleased = createSystemFn
     interface.append(createSystem)
+    dk.cs = createSystem
+
+    createPreset = Button((20, h - 90), (260, 60))
+    createPreset.text = "Créer son préset"
+    createPreset.active = False
+    createPreset.onReleased = createPresetFn
+    interface.append(createPreset)
+    dk.cp = createPreset
     return
 
 def draw(screen) -> None:

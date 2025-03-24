@@ -59,13 +59,13 @@ def backFunction() -> None:
 def load() -> None:
     backButton = Button((100, 200), (180, 60))
     backButton.text = l("back")
-    backButton.onPressed = backFunction
+    backButton.onReleased = backFunction
     interface.append(backButton)
 
     if Tk and filedialog:
         addSystemButton = Button((100, 300), (180, 60))
         addSystemButton.text = l("addSystem")
-        addSystemButton.onPressed = addSystem
+        addSystemButton.onReleased = addSystem
         interface.append(addSystemButton)
 
     systemsFile = [path.join(p("data/systems"), f) for f in listdir(p("data/systems")) if path.isfile(path.join(p("data/systems"), f))]

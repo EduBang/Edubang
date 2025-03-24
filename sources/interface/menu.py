@@ -264,14 +264,14 @@ def draw(screen) -> None:
     for element in interface:
         element.draw()
         
-    height = displayMultilineText(l("intro"), fontIntro, (w - 500, 100), 430)
+    displayMultilineText(l("intro"), fontIntro, (w - 500, 100), 430)
     
     helpKey = Game.keybinds["help"]["key"]
     
     font = fontIntro
     if any([i in "↑←↓→" for i in helpKey]):
         font = inter
-        
+    
     surface = font.render("%s : %s" % (" + ".join(helpKey), l("help")), False, (255, 255, 255))
     screen.blit(surface, (100, 630))
 

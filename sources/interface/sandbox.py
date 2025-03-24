@@ -45,6 +45,7 @@ dk.escape = False
 dk.screenShot = None
 dk.pauseMenu = []
 dk.help = False
+dk.loadingText = None
 
 def stopFocusFn() -> None:
     Game.Camera.focus = None
@@ -54,10 +55,10 @@ def stopFocusFn() -> None:
 dk.stopFocus = None
 
 description = getFont("Regular", 14)
+fontIntro = getFont("SemiBold", 18)
+inter = getFont("SemiBold", 18, header="Inter")
 
 interface: list = []
-
-loadingText: str = l("loading")
 
 subtitle = getFont("Bold")
 icon = Image.open(p("data/images/icon.png"))
@@ -287,12 +288,11 @@ def loader() -> None:
     inputDT.resetOnClick = True
     interface.append(inputDT)
 
-    textWarning1 = Text(l("dtWarning1"), (20, 178), color = (255, 255, 255))
+    textWarning1 = Text(l("dtWarning1"), (20, 178), color=(255, 255, 255))
     interface.append(textWarning1)
 
-    textWarning2 = Text(l("dtWarning2"), (20, 198), color = (255, 255, 255))
+    textWarning2 = Text(l("dtWarning2"), (20, 198), color=(255, 255, 255))
     interface.append(textWarning2)
-
 
     textShowName = Text(l("planetName"), (20, 285), color=(255, 255, 255))
     interface.append(textShowName)
@@ -386,6 +386,7 @@ def loader() -> None:
     return
 
 def load() -> None:
+    dk.loadingText = l("loading")
     dk.loadingFinished = False
     subprocess = Thread(target=loader)
     subprocess.start()
@@ -410,6 +411,16 @@ def menu(screen) -> None:
     text = subtitle.render(l("tools"), False, (255, 255, 255))
     screen.blit(text, (20, 540))
     pg.draw.line(screen, (102, 102, 102), (20, 570), (200, 570))
+
+    helpKey = Game.keybinds["help"]["key"]
+    
+    font = fontIntro
+    if any([i in "↑←↓→" for i in helpKey]):
+        font = inter
+    surface = font.render("%s : %s" % (" + ".join(helpKey), l("help", header="menu")), False, (255, 255, 255))
+    screen.blit(surface, (20, height - 50))
+
+    return
 
 def stats(corps) -> None:
     screen = Game.screen
@@ -508,8 +519,8 @@ def showHelp() -> None:
     w, h = Game.screenSize
 
     setHelpMessage(surface, (20, 145), (300, 25), 4, (400, 50), (200, 100), l("help1"))
-    setHelpMessage(surface, (20, 245), (300, 225), 4, (400, 200), (200, 100), l("help2"))
-    setHelpMessage(surface, (20, 555), (300, 25), 4, (400, 350), (200, 100), l("help3"))
+    setHelpMessage(surface, (20, 285), (300, 225), 4, (400, 200), (200, 100), l("help2"))
+    setHelpMessage(surface, (20, 585), (300, 25), 4, (400, 350), (200, 100), l("help3"))
     setHelpMessage(surface, (380, h - 50), (350, 25), 1, (400, h - 225), (200, 100), l("help4"))
 
     if Game.Camera.focus:
@@ -525,8 +536,8 @@ def draw(screen) -> None:
     screen.fill((0, 0, 0))
     width, height = Game.screenSize
     if not dk.loadingFinished:
-        text = Game.font.render(loadingText, False, (255, 255, 255))
-        tW, tH = Game.font.size(loadingText)
+        text = Game.font.render(dk.loadingText, False, (255, 255, 255))
+        tW, tH = Game.font.size(dk.loadingText)
         screen.blit(text, (width / 2 - tW + 70, height / 2 - tH / 2))
         displayRotatedImage(screen, dk.loadingImage, (width / 2 - tW, height / 2), dk.orientation)
         pg.draw.rect(screen, (255, 255, 255), (width / 2 - 200, height / 2 + 150, 400, 20), 1)
