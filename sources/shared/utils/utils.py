@@ -767,6 +767,7 @@ with proto("Input") as Input:
                 if self.resetOnClick: self.text = ""
         else:
             self.focus = False
+            self.afterInput(self)
         return
     
     def mousebuttonupI(self, event) -> None:
@@ -788,6 +789,7 @@ with proto("Input") as Input:
             if self.focus: self.onReleased()
         else:
             self.focus = False
+            self.afterInput(self)
         return
     
     def mousewheelI(self, event) -> None:
@@ -833,6 +835,7 @@ with proto("Input") as Input:
         if self.focus:
             if event.key in [pg.K_RETURN, pg.K_ESCAPE, pg.K_TAB]:
                 self.focus = False
+                self.afterInput(self)
             elif event.key == pg.K_BACKSPACE:
                 self.text = self.text[:-1]
             else:
@@ -865,7 +868,7 @@ with proto("Input") as Input:
         self.draw = MethodType(drawInput, self)
         self.onPressed = lambda: None
         self.onReleased = lambda: None
-        self.afterInput = lambda: None
+        self.afterInput = lambda x: None
         self.onHover = onHover
         self.font = Game.font
         self.numberOnly = False
@@ -2656,7 +2659,6 @@ def unit(unit: str, exponent: str, position: tuple[int, int], *, color: tuple[in
     text = exponentFont.render(exponent, False, color)
     Game.screen.blit(text, (position[0] + w1, position[1] - 3))
     return
-
 
 def getNE(n: float) -> tuple[int, int]:
     if "inf" in str(n):
