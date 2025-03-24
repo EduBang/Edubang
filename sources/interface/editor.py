@@ -56,9 +56,53 @@ def pause() -> None:
     Game.Camera.active = False
     return
 
-def resume() -> None:
+def resume(_) -> None:
     dk.standBy = False
     Game.Camera.active = True
+    return
+
+def setRadius(radiusInput) -> None:
+    if not Game.Camera.focus: return
+    Game.Camera.focus.radius = float(radiusInput.text)
+    return
+
+def colorRInput(I) -> None:
+    if not I.text: return
+    if int(I.text) < 0:
+        I.text = "0"
+    if int(I.text) > 255:
+        I.text = "255"
+    if not Game.Camera.focus: return
+    r, g, b = Game.Camera.focus.color
+    Game.Camera.focus.color = (int(I.text), g, b)
+    return
+
+def colorGInput(I) -> None:
+    if not I.text: return
+    if int(I.text) < 0:
+        I.text = "0"
+    if int(I.text) > 255:
+        I.text = "255"
+    if not Game.Camera.focus: return
+    r, g, b = Game.Camera.focus.color
+    Game.Camera.focus.color = (r, int(I.text), b)
+    return
+    
+def colorBInput(I) -> None:
+    if not I.text: return
+    if int(I.text) < 0:
+        I.text = "0"
+    if int(I.text) > 255:
+        I.text = "255"
+    if not Game.Camera.focus: return
+    r, g, b = Game.Camera.focus.color
+    Game.Camera.focus.color = (r, g, int(I.text))
+    return
+    
+def createSystemFn() -> None:
+    if len(Game.space) < 2: return
+    dk.selected = Game.space
+    dk.saving = True
     return
 
 def minimum(startPos, endPos) -> tuple:
@@ -311,17 +355,17 @@ def mousebuttondown(event) -> None:
                     dk.relativePos[corps] = (corps.pos[0] - rPos[0], corps.pos[1] - rPos[1])
             else:
                 if pos[0] > w - 350: return
+                dk.selected.clear()
+                dk.relativePos.clear()
+                dk.mouseselection = screenPosToSpacePos(pos)
                 if not Game.Camera.focus: return
-                radiusInput, massInputN, massInputE, color = [dk.stats[i] for i in ("radius", "massN", "massE", "color")]
+                radiusInput, massInputN, massInputE = [dk.stats[i] for i in ("radius", "massN", "massE")]
                 corps = Game.Camera.focus
                 corps.radius = float(radiusInput.text)
                 corps.mass = float("%se%s" % (massInputN.text if massInputN.text else "1", massInputE.text if int(massInputE.text if massInputE.text else 0) > 15 else 16))
                 if not "e" in str(corps.mass):
                     corps.mass = float("1e16")
                 Game.Camera.focus = None 
-                dk.selected.clear()
-                dk.relativePos.clear()
-                dk.mouseselection = screenPosToSpacePos(pos)
     return
 
 @Events.observe
@@ -347,18 +391,26 @@ def mousebuttonup(event) -> None:
         if pi * (corps.radius * Game.Camera.zoom) ** 2 < 10:
             if sqrt(sqx + sqy) < 10:
                 N, E = getNE(corps.mass)
-                radiusInput, massInputN, massInputE, color = [dk.stats[i] for i in ("radius", "massN", "massE", "color")]
+                radiusInput, massInputN, massInputE, R, G, B = [dk.stats[i] for i in ("radius", "massN", "massE", "colorR", "colorG", "colorB")]
                 radiusInput.text = str(corps.radius)
                 massInputN.text = str(N)
                 massInputE.text = str(E)
+                r, g, b = corps.color
+                R.text = str(r)
+                G.text = str(g)
+                B.text = str(b)
                 Game.Camera.focus = corps
                 break
         if sqrt(sqx + sqy) < corps.radius * Game.Camera.zoom:
             N, E = getNE(corps.mass)
-            radiusInput, massInputN, massInputE, color = [dk.stats[i] for i in ("radius", "massN", "massE", "color")]
+            radiusInput, massInputN, massInputE, R, G, B = [dk.stats[i] for i in ("radius", "massN", "massE", "colorR", "colorG", "colorB")]
             radiusInput.text = str(corps.radius)
             massInputN.text = str(N)
             massInputE.text = str(E)
+            r, g, b = corps.color
+            R.text = str(r)
+            G.text = str(g)
+            B.text = str(b)
             Game.Camera.focus = corps
             break
     if dk.hover:
@@ -478,15 +530,19 @@ def stats(corps, width, height) -> None:
     screen = Game.screen
     pg.draw.rect(screen, (10, 9, 9), (width - 350, 0, 350, height))
     
-    radiusInput, massInputN, massInputE, color = [dk.stats[i] for i in ("radius", "massN", "massE", "color")]
+    radiusInput, massInputN, massInputE, R, G, B = [dk.stats[i] for i in ("radius", "massN", "massE", "colorR", "colorG", "colorB")]
     radiusInput.active = radiusInput.visible = True
     massInputN.active = massInputN.visible = True
     massInputE.active = massInputE.visible = True
-    color.active = color.visible = True
+    R.active = R.visible = True
+    G.active = G.visible = True
+    B.active = B.visible = True
     radiusInput.position = (width - 270, 10)
     massInputN.position = (width - 270, 80)
     massInputE.position = (width - 140, 70)
-    color.position = (width - 270, 150)
+    R.position = (width - 270, 150)
+    G.position = (width - 220, 150)
+    B.position = (width - 170, 150)
     
     surface = Game.font.render("Rayon", False, (255, 255, 255))
     screen.blit(surface, (width - 340, 15))
@@ -494,11 +550,11 @@ def stats(corps, width, height) -> None:
     surface = Game.font.render("Masse", False, (255, 255, 255))
     screen.blit(surface, (width - 340, 85))
     
-    surface = Game.font.render("Couleur", False, (255, 255, 255))
-    screen.blit(surface, (width - 340, 155))
-    
     surface = Game.font.render("x 10", False, (255, 255, 255))
     screen.blit(surface, (width - 180, 85))
+
+    surface = Game.font.render("Couleur", False, (255, 255, 255))
+    screen.blit(surface, (width - 340, 150))
     return
 
 def drawContextMenu() -> None:
@@ -584,7 +640,7 @@ def load() -> None:
     radiusInput.visible = False
     radiusInput.numberOnly = True
     radiusInput.onPressed = pause
-    radiusInput.afterInput = resume
+    radiusInput.afterInput = setRadius
     interface.append(radiusInput)
     dk.stats["radius"] = radiusInput
 
@@ -593,7 +649,6 @@ def load() -> None:
     massInputN.visible = False
     massInputN.numberOnly = True
     massInputN.onPressed = pause
-    massInputN.afterInput = resume
     interface.append(massInputN)
     dk.stats["massN"] = massInputN
     
@@ -602,15 +657,40 @@ def load() -> None:
     massInputE.visible = False
     massInputE.numberOnly = True
     massInputE.onPressed = pause
-    massInputE.afterInput = resume
     interface.append(massInputE)
     dk.stats["massE"] = massInputE
     
-    colorPicker = ColorPicker((0, 0))
-    colorPicker.active = False
-    colorPicker.visible = False
-    interface.append(colorPicker)
-    dk.stats["color"] = colorPicker
+    colorR = Input("", (0, 0), (50, 30))
+    colorR.active = False
+    colorR.visible = False
+    colorR.numberOnly = True
+    colorR.onPressed = pause
+    colorR.afterInput = colorRInput
+    interface.append(colorR)
+    dk.stats["colorR"] = colorR
+    
+    colorG = Input("", (0, 0), (50, 30))
+    colorG.active = False
+    colorG.visible = False
+    colorG.numberOnly = True
+    colorG.onPressed = pause
+    colorG.afterInput = colorGInput
+    interface.append(colorG)
+    dk.stats["colorG"] = colorG
+    
+    colorB = Input("", (0, 0), (50, 30))
+    colorB.active = False
+    colorB.visible = False
+    colorB.numberOnly = True
+    colorB.onPressed = pause
+    colorB.afterInput = colorBInput
+    interface.append(colorB)
+    dk.stats["colorB"] = colorB
+    
+    createSystem = Button((20, h - 90), (260, 60))
+    createSystem.text = "Créer son système"
+    createSystem.onReleased = createSystemFn
+    interface.append(createSystem)
     return
 
 def draw(screen) -> None:

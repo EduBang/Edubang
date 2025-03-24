@@ -1,9 +1,0 @@
-{
-  "mass": 1,
-  "radius": 100,
-  "color": [150, 150, 150],
-  "meta": {
-    "name": "Blank",
-    "description": "A blank body to start from scratch."
-  }
-}
