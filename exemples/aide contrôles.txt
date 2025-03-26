@@ -1,0 +1,51 @@
+Contrôles :
+
+
+Pendant la simulation d'un système :
+
+
+
+	vitesse de simulation :
+		   A  -->   ralentir	
+		   E  -->   accélérer
+		SPACE -->   pause
+	
+
+	réinitialiser la simulation :
+		   R  -->   reset (pratique si vous êtes perdu.e)
+
+
+	mouvements de caméra :
+		ZQSD  -->   se déplacer
+	
+
+	zoom de caméra :
+		MOLETTE --> zoom avant / arrière
+	
+	
+	iterractions : 
+		CLICK GAUCHE --> interraction sur un astre 
+				 cocher les cases de fonctinnalités
+
+
+Dans le menu éditeur :
+
+	(pour les mouvements de caméra ce sont les mêmes partout)
+
+
+	interragir avec les planettes : 
+
+		CLICKER DEPOSER --> placer des planettes ou se déplacer ou replacer une planette
+
+
+	séléction et enregistrement des présets : 
+
+		CRTL + A --> tout séléctionner
+		CTRL + S --> enregistrer
+		SELECTION SOURIS --> glisser en maintenant le click gauche
+		
+		
+
+
+
+
