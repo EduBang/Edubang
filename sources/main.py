@@ -238,9 +238,12 @@ with proto("Game") as Game:
     
     @Game
     def playMusic(self) -> None:
-        pg.mixer.music.load(self.sound)
-        pg.mixer.music.play()
-        self.tmusic = 5
+        try:
+            pg.mixer.music.load(self.sound)
+            pg.mixer.music.play()
+            self.tmusic = 5
+        except pg.error as e:
+            print("> Impossible de charger le fichier audio : %s" % e)
         return
 
     @Game
