@@ -3,7 +3,7 @@
   "radius": 6371.008,
   "color": [0, 0, 255],
   "meta": {
-    "name": "Earth",
-    "description": "Our home planet."
+    "name": "Terre",
+    "description": "Notre planète d'origine."
   }
 }

@@ -12,7 +12,7 @@
       "position": [-50071.20667526269, 107.91208335185925],
       "color": [0, 0, 255],
       "velocity": [102.5164791842599, 48861.404308805],
-      "meta": { "name": "Earth", "description": "Our home planet." }
+      "meta": { "name": "Terre", "description": "Notre planète d'origine." }
     },
     {
       "mass": 5.9736e24,
@@ -20,7 +20,7 @@
       "position": [49968.69019607843, 124.92172549019608],
       "color": [0, 0, 255],
       "velocity": [124.92172549019608, -48969.31639215686],
-      "meta": { "name": "Earth", "description": "Our home planet." }
+      "meta": { "name": "Terre", "description": "Notre planète d'origine." }
     }
   ]
 }

@@ -1,6 +1,6 @@
 {
-    "title": "Solar System",
-    "description": "Our solar system.",
+    "title": "Système Solaire",
+    "description": "Notre système solaire.",
     "meta": {
         "user": "EduBang",
         "lastModified": 1735321419
@@ -13,8 +13,8 @@
             "color": [255, 255, 0],
             "velocity": [0, 0],
             "meta": {
-                "name": "Sun",
-                "description": "The star of our solar system."
+                "name": "Soleil",
+                "description": "L'étoile de notre système solaire."
             }
         },
         {
@@ -24,8 +24,8 @@
             "color": [127, 127, 127],
             "velocity": [0, -509141.5],
             "meta": {
-                "name": "Mercury",
-                "description": "The smallest planet in our solar system."
+                "name": "Mercure",
+                "description": "La plus petite planète de notre système solaire."
             }
         },
         {
@@ -35,8 +35,8 @@
             "color": [255, 127, 127],
             "velocity": [0, -376526.3825],
             "meta": {
-                "name": "Venus",
-                "description": "The hottest planet in our solar system."
+                "name": "Vénus",
+                "description": "La planète la plus chaude de notre système solaire."
             }
         },
         {
@@ -46,8 +46,8 @@
             "color": [0, 0, 255],
             "velocity": [0, -320167.25],
             "meta": {
-                "name": "Earth",
-                "description": "Our home planet."
+                "name": "Terre",
+                "description": "Notre planète d'origine."
             }
         },
         {
@@ -58,7 +58,7 @@
             "velocity": [0, -258860],
             "meta": {
                 "name": "Mars",
-                "description": "The red planet."
+                "description": "La planète rouge."
             }
         },
         {
@@ -69,7 +69,7 @@
             "velocity": [0, -140378.875],
             "meta": {
                 "name": "Jupiter",
-                "description": "The largest planet in our solar system."
+                "description": "La plus grande planète de notre système solaire."
             }
         },
         {
@@ -79,8 +79,8 @@
             "color": [230, 177, 124],
             "velocity": [0, -103637.525],
             "meta": {
-                "name": "Saturn",
-                "description": "The ringed planet."
+                "name": "Saturne",
+                "description": "La planète aux anneaux."
             }
         },
         {
@@ -91,7 +91,7 @@
             "velocity": [0, -73064.869],
             "meta": {
                 "name": "Uranus",
-                "description": "The sideways planet."
+                "description": "La planète couchée."
             }
         },
         {
@@ -102,7 +102,7 @@
             "velocity": [0, -58399.16],
             "meta": {
                 "name": "Neptune",
-                "description": "Discovered by mathematical prediction rather than direct observation."
+                "description": "Découverte par prédiction mathématique plutôt que par observation directe."
             }
         }
     ]

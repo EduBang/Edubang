@@ -1,6 +1,6 @@
 {
   "title": "Jupiter et Mercure",
-  "description": "Mercure qui orbite Jupiter.",
+  "description": "Mercure en orbite autour de Jupiter.",
   "meta": {
     "user": "EduBang",
     "lastModified": 1736098861
@@ -13,8 +13,8 @@
       "color": [127, 127, 127],
       "velocity": [17171.50007888322, -562943.4154963114],
       "meta": {
-        "name": "Mercury",
-        "description": "The smallest planet in our solar system."
+        "name": "Mercure",
+        "description": "La plus petite planète de notre système solaire."
       }
     },
     {
@@ -25,7 +25,7 @@
       "velocity": [0, 0],
       "meta": {
         "name": "Jupiter",
-        "description": "The largest planet in our solar system."
+        "description": "La plus grande planète de notre système solaire."
       }
     }
   ]
