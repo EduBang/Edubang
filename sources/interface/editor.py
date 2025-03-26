@@ -103,7 +103,7 @@ def colorBInput(I) -> None:
     
 def createSystemFn() -> None:
     if len(Game.space) < 2: return
-    dk.selected = Game.space
+    dk.saveTarget = Game.space
     dk.saving = True
     return
 
