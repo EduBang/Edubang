@@ -1,5 +1,5 @@
-# Projet : EduBang
-# Auteurs : Anaël Pernot-Chevillard, Sacha Fréguin, Néji Lim
+#Projet : EduBang
+#Auteurs : Anaël Pernot-Chevillard, Sacha Fréguin, Néji Lim
 
 from ctypes import pythonapi, c_long, py_object
 from inspect import stack

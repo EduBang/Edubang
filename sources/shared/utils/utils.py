@@ -1,5 +1,5 @@
-# Projet : EduBang
-# Auteurs : Anaël Pernot-Chevillard, Sacha Fréguin, Néji Lim
+#Projet : EduBang
+#Auteurs : Anaël Pernot-Chevillard, Sacha Fréguin, Néji Lim
 
 from json import load as loadJson
 from os import listdir, path

@@ -1,5 +1,5 @@
-# Projet : EduBang
-# Auteurs : Anaël Pernot-Chevillard, Sacha Fréguin, Néji Lim
+#Projet : EduBang
+#Auteurs : Anaël Pernot-Chevillard, Sacha Fréguin, Néji Lim
 
 from random import randint
 from math import pi

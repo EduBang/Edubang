@@ -1,5 +1,5 @@
-# Projet : EduBang
-# Auteurs : Anaël Pernot-Chevillard, Sacha Fréguin, Néji Lim
+#Projet : EduBang
+#Auteurs : Anaël Pernot-Chevillard, Sacha Fréguin, Néji Lim
 
 import pygame as pg
 from math import sqrt, sin, cos, pi, radians, acos, degrees, atan2
@@ -162,19 +162,9 @@ while running:
             if event.key == pg.K_h:
                 stretch_y -= 10
                 planet_surface = generate_texture(intensity, stretch_x, stretch_y)
-            if event.key == pg.K_s:
 
-                pg.image.save(image_pg, "Soleil_preset.png")
 
-                with open("soleil.txt", "w") as file:
-                    file.write("Stretching X: " + str(stretch_x) + "\n")
-                    file.write("Stretching Y: " + str(stretch_y) + "\n\n")
-                    file.write("Ladder:\n")
-                    for item in perlin_instance.ladder:
-                        file.write(str(item) + "\n")
-                    file.write("\nFinal Matrix (fm):\n")
-                    for row in perlin_instance.fm:
-                        file.write(" ".join(map(str, row)) + "\n")
+            
                 
 
 

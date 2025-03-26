@@ -1,5 +1,5 @@
-# Projet : EduBang
-# Auteurs : Anaël Pernot-Chevillard, Sacha Fréguin, Néji Lim
+#Projet : EduBang
+#Auteurs : Anaël Pernot-Chevillard, Sacha Fréguin, Néji Lim
 
 import pygame as pg
 from math import sqrt, sin, cos
